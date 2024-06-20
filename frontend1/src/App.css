@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+}
+
+.app-container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+  }
+  
+  .main-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-left: 100px;
+    margin-bottom: 50px;
+    flex-grow: 1;
+  }
