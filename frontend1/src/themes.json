@@ -7,7 +7,9 @@
                 {"name": "b", "value": "#bed4e9"},
                 {"name": "c", "value": "#3373b0"},
                 {"name": "d", "value": "#0c3960"},
-                {"name": "e", "value": "#1d212a"}
+                {"name": "e", "value": "#1d212a"},
+                {"name" : "backgroundColor", "value" : "white"},
+                {"name" : "textColor", "value" : "black"}
             ]
         }
     ]
