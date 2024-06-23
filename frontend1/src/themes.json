@@ -1,0 +1,14 @@
+{
+    "themes": [
+        {
+            "name" : "Main Theme",
+            "colors" : [
+                {"name": "a", "value": "#e7f1fb"},
+                {"name": "b", "value": "#bed4e9"},
+                {"name": "c", "value": "#3373b0"},
+                {"name": "d", "value": "#0c3960"},
+                {"name": "e", "value": "#1d212a"}
+            ]
+        }
+    ]
+}
