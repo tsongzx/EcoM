@@ -64,7 +64,7 @@ const Home = () => {
   window.addEventListener('scroll', showNavBar);
 
 	return (
-    <div>
+    <div id='Home'>
       <Card id = {navbar ? 'renderedNavbar' : 'unrenderedNavbar'} >
         <Card style={{ border: '1px solid red', width: '50%' }}/>
         <Card style={{ border: '1px solid black', width: '50%', display: 'flex', justifyContent: 'flex-end' }}>

@@ -7,27 +7,28 @@
     margin-bottom: 0px;
 }
 
-Button {
+#Home Button {
     right: '0';
+    font-family: Montserrat;
 }
 
-.titleButton {
+#Home .titleButton {
     width: calc(50% - 5px);
     font-size: 1em;
     font-weight: bold;
     border-radius: 10px;
 }
 
-.registerButton {
+#Home .registerButton {
     background-color: white;
     color: black;
-    border: solid blue 1px;
+    border: solid #1976d2 1px;
 }
 
 #renderedNavbar {
     display: flex;
     flex-direction: row;
-    border: 1px solid blue;
+    border: 1px solid #1976d2;
     top: 0;
     position: sticky;
 }
