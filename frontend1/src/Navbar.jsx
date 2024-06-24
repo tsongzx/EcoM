@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const listItemStyle = {
     textDecoration: 'none',
@@ -21,6 +21,9 @@ const Navbar = () => {
             margin: '0 0',
             paddingTop: '5px',
             paddingBottom: '5px',
+            width: '100vw',
+            position: 'fixed',
+            top: '0',
           }}>
               <li style={listItemStyle}><Link style={listItemStyle} to="/">Home</Link></li>
               <li style={listItemStyle}><Link style={listItemStyle} to="/logout">Logout</Link></li>

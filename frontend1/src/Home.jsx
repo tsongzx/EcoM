@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Card, Typography, Button } from '@mui/material';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import imageCat from './assets/IMG_2678.jpg'
+import imageCat from './assets/IMG_2678.jpg';
+import { useNavigate } from 'react-router-dom';
 import './Home.css'
 
 const Home = () => {
@@ -10,6 +11,8 @@ const Home = () => {
 	const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [navbar, setNavbar] = useState(false);
+
+  const navigate = useNavigate();
 
 	const openLoginModal = () => {
 		setLoginModalOpen(true);
@@ -31,6 +34,7 @@ const Home = () => {
 		console.log('Logging in...');
 		// Add your login logic here
 		handleCloseLogin();
+    navigate('./Dashboard');
 	};
 
   const handleRegister = () => {
