@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Typography, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { Card, Button } from '@mui/material';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
 import imageCat from './assets/IMG_2678.jpg';
@@ -52,12 +52,6 @@ const Home = () => {
     setLoginModalOpen(true);
   }
 
-  // const handleRegister = () => {
-  //   console.log('Signing up...');
-  //   handleClose
-  // }
-
-  //modify this function to affect when the scroll bar appears
   const showNavBar = () => {
     if (window.scrollY >= window.innerHeight - 300) {
       setNavbar(true);

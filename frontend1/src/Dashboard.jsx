@@ -1,22 +1,28 @@
-import {React, useState} from 'react';
-import { Grid, Paper, Typography, MenuItem, Select, Card, CardContent, Autocomplete, TextField } from '@mui/material';
+import {React, useState, useEffect} from 'react';
+import { Grid, Paper, Typography, Card, CardContent, Autocomplete, TextField } from '@mui/material';
 import Navbar from './Navbar.jsx';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  const [selectedOption, setSelectedOption] = useState('');
+  const navigate = useNavigate();
 
   const industries = ['Industry 1', 'Industry 2', 'Industry 3', 'Industry 4', 'Industry 5'];
   const companies = ['Company 1', 'Company 2', 'Company 3'];
 
+  const [selectedCompany, setSelectedCompany] = useState(null);
 
-  // const handleChange = (event) => {
-  //   setSelectedOption(event.target.value);
-  // };
+
+  useEffect (() => {
+    if (selectedCompany !== null) {
+      console.log(selectedCompany);
+      navigate(`/company/${encodeURIComponent(selectedCompany)}`, { state: { companyName: selectedCompany } });
+    }
+  }, [selectedCompany, navigate]);
+
 
   return (
     <div>
       <Navbar></Navbar>
-      {/* <div style={{ maxWidth: '100vw', maxHeight: '100vh', overflowY: 'auto' }}></div> */}
       <div style={{ maxWidth: '100vw', height: 'calc(100vh - 50px)', overflowY: 'auto', paddingTop: '50px' }}>
         <Grid container direction="row" spacing={2} style={{ width: '100%', maxWidth: '100%', height: '100%' }}>
           <Grid item xs={12} style={{ minHeight: '30%'}}>
@@ -42,6 +48,10 @@ const Dashboard = () => {
                   <Autocomplete style={{ width: '50%'}}
                     options={companies}
                     renderInput={(params) => <TextField {...params} label="Select an option" variant="outlined" />}
+                    filterOptions={(options, state) => options.slice(0, 3)}
+                    onChange={(event, newValue) => {
+                      setSelectedCompany(newValue);
+                    }}
                   />
                 </CardContent>
               </Card>
