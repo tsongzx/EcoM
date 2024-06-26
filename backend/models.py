@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime
 # from sqlalchemy.orm import sessionmaker
-from backend.db import Base
+from db import Base
 import datetime
 
 # e.g
@@ -15,7 +15,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(100), nullable=False)
     # change to aest?
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now())
 
 # geoffrey to create the models for the rest of tables
 # refer to sqlalchemy 
