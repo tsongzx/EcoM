@@ -1,20 +1,37 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import sessionmaker
 
 # Step 2: Establish a database connection
-# geoffrey to fill this in!!!
-# refer to my old code - prefer use username/password params!!
-database_url = 'mysql+pymysql://username:password@host/database_name'
-engine = create_engine(database_url)
 
-#will return engine instance
+# https://stackoverflow.com/questions/10770377/how-to-create-db-in-mysql-with-sqlalchemy
+
+# usin pymysql driver
+# database_url = 'mysql+pymysql://username:password@host/database_name'
+
+# usin default driver - mysqlclient
+username = 'root'
+password = ''
+host = 'local_host'
+database_name = 'crumpeteers'
+engine_url = f'mysql://{username}:{password}@{host}'
+database_url = f'{engine_url}/{database_name}'
+engine = create_engine(engine_url)  
+
+# Query to create db if it does not already exist
+engine.execute(f'CREATE DATABASE IF NOT EXISTS {database_name}')
+
+# Use db - return engine instance
+db_engine = create_engine(database_url)
+# OR: engine.execute("USE dbname") # select new db
+
 Base = declarative_base()
 
-# definitions are in models.py
+# Create session local class for session maker
+SessionLocal = sessionmaker(bind=db_engine, expire_on_commit=False) 
 
 # Step 4: Create the database tables
-Base.metadata.create_all(engine)
+Base.metadata.create_all(db_engine)
 
 
 # IDEALLY I THINK OPEN CONNECTION AND CLOSE CONNECTION EACH TIME
