@@ -50,7 +50,7 @@ const WatchlistModal = ({ isOpen }) => {
       };
 
 
-    const onCloseWatchListModal = () => {
+    const CloseWatchListModal = () => {
         setNewWatchlistName('');
     }
     // also need to apply padding on the bottom of the Modal so that the stick new watchlist doesn't conflict with it
