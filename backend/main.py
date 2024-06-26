@@ -1,6 +1,4 @@
 from typing import Union
-
-# import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta, timezone
@@ -12,26 +10,6 @@ from sqlalchemy.orm import Session
 
 import schemas
 import models
-# app = FastAPI()
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-# @app.get("/")
-# async def root():
-#     return {"message": "Hello World"}
-  
-# @app.get("/items/{item_id}")
-# async def read_item(item_id):
-#     return {"item_id": item_id}
-  
-# @app.get("/items/{item_id}")
-# async def read_item(item_id: str):
-#     if item_id not in items:
-#         raise HTTPException(status_code=404, detail="Item not found")
-#     return {"item": items[item_id]}
-
-# @app.get("/items/")
-# async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-#     return {"token": token}
   
 def get_session():
   session = SessionLocal()
@@ -166,20 +144,7 @@ async def auth_register(
         data={"userId": new_user.id}, expires_delta=access_token_expires
     )
     return schemas.Token(access_token=access_token, token_type="bearer")
-#     user = authenticate_user(db, form_data.username, form_data.password)
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect username or password",
-#             headers={"WWW-Authenticate": "Bearer"},
-#         )
-#     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-#     access_token = generate_token(
-#         data={"userId": user.id}, expires_delta=access_token_expires
-#     )
-#     return Token(access_token=access_token, token_type="bearer")
-
-# https://medium.com/@chnarsimha986/fastapi-login-logout-changepassword-4c12e92d41e2
+  
 
 
 
