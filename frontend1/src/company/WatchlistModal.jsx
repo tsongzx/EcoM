@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Modal from '@mui/material/Modal';
 import { Button, Typography } from "@mui/material";
 
-const WatchlistModal = ({ isOpen }) => {
+const WatchlistModal = ({ isOpen, handleClose }) => {
     const [watchlist, setWatchist] = useState([]); //this should be populated with whatever lists the user has via backend
     const [listName, setListName] = useState(false);
     const [newWatchlistName, setNewWatchlistName] = useState('');
@@ -36,9 +36,14 @@ const WatchlistModal = ({ isOpen }) => {
 
     //Add event Listener for 'esc' key that cancels listName or CLoses modal depending on whether listname is open
     const handleKeyPressEsc = (event) => {
-        if (listName) {
-            //close listname
-            setListName(false);
+        if (event.key === 'Esc') {
+            if (listName && event.key === 'Esc') {
+                //close listname
+                setListName(false);
+            } else {
+                setNewWatchlistName('');
+                handleClose();
+            }
         }
     }
 
@@ -61,7 +66,11 @@ const WatchlistModal = ({ isOpen }) => {
             <Typography variant="body2">Add to watchlist</Typography>
             {/* Render exisitng watchlists */}
             {watchlist?.map((list) => (
-                <Button>{list}</Button>
+                <Button>{list} <Checkbox
+                {...label}
+                icon={<BookmarkBorderIcon />}
+                checkedIcon={<BookmarkIcon />}
+              /></Button>
             ))}
             <div>
                 {listName ?
