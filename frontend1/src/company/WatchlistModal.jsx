@@ -35,6 +35,12 @@ const WatchlistModal = ({ isOpen }) => {
     // Handle removing from a watchlist
 
     //Add event Listener for 'esc' key that cancels listName or CLoses modal depending on whether listname is open
+    const handleKeyPressEsc = (event) => {
+        if (listName) {
+            //close listname
+            setListName(false);
+        }
+    }
 
     //Add Event Listener for 'enter' key that submits information if the listName is open
     const handleKeyPressEnter = (event) => {
@@ -43,6 +49,10 @@ const WatchlistModal = ({ isOpen }) => {
         }
       };
 
+
+    const onCloseWatchListModal = () => {
+        setNewWatchlistName('');
+    }
     // also need to apply padding on the bottom of the Modal so that the stick new watchlist doesn't conflict with it
     // if untitled, either throw error or set as untitled
     return (
@@ -50,10 +60,13 @@ const WatchlistModal = ({ isOpen }) => {
             open = {isOpen}>
             <Typography variant="body2">Add to watchlist</Typography>
             {/* Render exisitng watchlists */}
+            {watchlist?.map((list) => (
+                <Button>{list}</Button>
+            ))}
             <div>
                 {listName ?
                 (<Box sx={{ display: 'flex', alignItems: 'center'}}>
-                    <TextField fullWidth id="standard-basic" label="new watchlist name" variant="standard" onChange={handleNewWatchListName} onKeyPress = {handleKeyPressEnter}/>
+                    <TextField fullWidth id="standard-basic" label="new watchlist name" variant="standard" defaultValue={newWatchlistName} onChange={handleNewWatchListName} onKeyPress = {handleKeyPressEnter}/>
                     <Button variant="outlined" onClick={handleAddNewWatchlist}>OK</Button>
                 </Box>) 
                 : (<Button onClick={handleListName}>+ New WatchList</Button>)
