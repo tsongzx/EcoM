@@ -1,6 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy_utils import database_exists, create_database
+
+import logging
+logger = logging.getLogger()
 
 # Step 2: Establish a database connection
 
@@ -11,27 +15,27 @@ from sqlalchemy.orm import sessionmaker
 
 # usin default driver - mysqlclient
 username = 'root'
-password = ''
-host = 'local_host'
+password = 'password'
+host = 'localhost' # or use IP address
 database_name = 'crumpeteers'
-engine_url = f'mysql://{username}:{password}@{host}'
-database_url = f'{engine_url}/{database_name}'
-engine = create_engine(engine_url)  
+database_url = f'mysql://{username}:{password}@{host}/{database_name}'
+if not database_exists(database_url):
+    logger.info("creating db")
+    create_database(database_url)
+
+# turn on echo to see SQL statements that SQLAlchemy sends to your database.
+# turn off when in production
+engine = create_engine(database_url, pool_pre_ping=True, echo=True)  
 
 # Query to create db if it does not already exist
-engine.execute(f'CREATE DATABASE IF NOT EXISTS {database_name}')
-
-# Use db - return engine instance
-db_engine = create_engine(database_url)
-# OR: engine.execute("USE dbname") # select new db
+# with engine.connect() as conn:
+#     stmt = f'CREATE DATABASE IF NOT EXISTS {database_name}'
+#     result = conn.execute(stmt)
 
 Base = declarative_base()
 
 # Create session local class for session maker
-SessionLocal = sessionmaker(bind=db_engine, expire_on_commit=False) 
-
-# Step 4: Create the database tables
-Base.metadata.create_all(db_engine)
+SessionLocal = sessionmaker(bind=engine, expire_on_commit=False) 
 
 
 # IDEALLY I THINK OPEN CONNECTION AND CLOSE CONNECTION EACH TIME
