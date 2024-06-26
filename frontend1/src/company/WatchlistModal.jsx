@@ -10,6 +10,10 @@ const WatchlistModal = ({ isOpen }) => {
         setListName(true);
     }
 
+    const handleNewWatchlist = () => {
+        
+    }
+
     return (
         <Modal 
             open = {isOpen}>
