@@ -16,7 +16,10 @@ const WatchlistModal = ({ isOpen }) => {
             <Typography variant="body2">Add to watchlist</Typography>
             <div>
                 {listName ?
-                (<Box sx={{ display: 'flex', alignItems: 'center'}}><TextField fullWidth id="standard-basic" label="new watchlist name" variant="standard"/><Button>OK</Button></Box>) 
+                (<Box sx={{ display: 'flex', alignItems: 'center'}}>
+                    <TextField fullWidth id="standard-basic" label="new watchlist name" variant="standard"/>
+                    <Button variant="outlined">OK</Button>
+                </Box>) 
                 : (<Button onClick={handleListName}>+ New WatchList</Button>)
                 };
             </div>
