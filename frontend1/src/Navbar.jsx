@@ -1,33 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-const listItemStyle = {
-    textDecoration: 'none',
-    fontSize: '1em',
-    fontFamily: 'Verdana',
-    display: 'inline',
-    marginRight: '10px',
-    color: 'white',
-    fontWeight: 'bold',
-  };
+import './Navbar.css';
 
 const Navbar = () => {
     //display two different login items depending on whether the user has logged in.
+    //GOING TO CONVERT THESE TO BUTTONS DOWN THE LINE
     return (
-        <ul style={{
-            id: 'navbar',
-            backgroundColor: 'lightcoral',
-            listStyleType: 'none',
-            margin: '0 0',
-            paddingTop: '5px',
-            paddingBottom: '5px',
-            width: '100vw',
-            position: 'fixed',
-            top: '0',
-          }}>
-              <li style={listItemStyle}><Link style={listItemStyle} to="/">Home</Link></li>
-              <li style={listItemStyle}><Link style={listItemStyle} to="/logout">Logout</Link></li>
+        <div className='nav'>
+        <ul>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/logout">Logout</Link></li>
           </ul>
+        </div>
     );
 }
 
