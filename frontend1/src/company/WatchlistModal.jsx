@@ -101,6 +101,7 @@ const WatchlistModal = ({ isOpen, handleClose }) => {
             open = {isOpen}>
             <div className="modalContent">
                 <Typography variant="body2">Add to watchlist</Typography>
+                <Button onClick={() => closeWatchListModal()}>X</Button>
                 {/* Render exisitng watchlists */}
                 <div className="watchlistContainer">
                     {watchlist?.map((list, index) => (
