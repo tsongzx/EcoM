@@ -160,6 +160,8 @@ def get_user_using_id(db, id: str):
                                 hashed_password=user.password,
                                 email=user.email,
                                 full_name=user.full_name)
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
         
 @app.get("/user", response_model=schemas.UserInDB, tags=["User"])
 def get_user(
@@ -172,3 +174,54 @@ def get_user(
       # if user is None:
       #     raise credentials_exception
       return user
+
+def get_user_object_using_id(db, id: str):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if user is not None:
+        # return info of user in db
+        return user
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
+      
+# update password
+@app.put("/user/password", response_model=schemas.UserInDB, tags=["User"])
+def change_user_password(
+    token: str = Depends(oauth2_scheme),
+    request: schemas.PasswordUpdate = Depends(),
+    session: Session = Depends(get_session),
+):
+      token_data = is_authenticated(token)
+      user = get_user_object_using_id(session, userId=token_data.userId)
+      
+      # Alternatively, we can handle the below in the frontend 
+      if request.old_password == request.new_password:
+          # may be more secure to keep track of more old passwords
+          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot reuse old password")
+
+      if request.new_password != request.confirm_password:
+          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match")
+
+      encrypted_password = hash_password(request.new_password)
+      user.password = encrypted_password
+      session.commit()
+        
+      # alternatively just return empty {}
+      return {"message": "Password changed successfully"}
+    
+# update name
+@app.put("/user/full-name", response_model=schemas.UserInDB, tags=["User"])
+def change_user_full_name(
+    token: str = Depends(oauth2_scheme),
+    new_name: schemas.NameUpdate = Depends(),
+    session: Session = Depends(get_session),
+):
+      token_data = is_authenticated(token)
+      user = get_user_object_using_id(session, userId=token_data.userId)
+      
+      user.full_name = new_name
+      session.commit()
+        
+      # alternatively just return empty {}
+      return {"message": "Full name changed successfully"}
+
+# logout 

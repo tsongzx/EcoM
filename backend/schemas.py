@@ -24,4 +24,10 @@ class UserRegister(BaseModel):
 class UserInDB(User):
     hashed_password: str
     
+class PasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
     
+class NameUpdate(BaseModel):
+    new_name: str
