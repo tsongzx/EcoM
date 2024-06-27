@@ -5,6 +5,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
+import SimpleLineChart from '../SimpleLineChart.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -66,8 +67,8 @@ const Company = () => {
             </div>
             <div className = 'chartAndReccomendations'>
               <div className = 'chart'>
-                <p>chart placeholder</p>
                 {/* Charts Component Goes Here*/}
+                <SimpleLineChart/>
                 <div className='chartControls'>
                   <Button onClick={openWatchlistModal}>Add to List</Button>
                   <Button>AI Predict</Button>
@@ -80,6 +81,17 @@ const Company = () => {
 
             <div className='metrics'>
                 <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+                <p>placeholder metrics</p>
+
+                <p>placeholder metrics</p>
+
+
+                <p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p>
             </div>
         </>
 	);
