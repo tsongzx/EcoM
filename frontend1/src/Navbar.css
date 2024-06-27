@@ -1,6 +1,11 @@
 .nav {
     background-color: aqua;
     padding: 20px 10px;
+    margin-bottom: 10px;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 999;
 }
 
 ul {
