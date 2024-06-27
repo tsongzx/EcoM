@@ -5,3 +5,5 @@ PyJWT==2.8.0
 PyJWT==2.8.0
 SQLAlchemy==2.0.31
 SQLAlchemy_Utils==0.41.2
+mysqlclient==2.2.4
+passlib[bcrypt]==1.7.4
