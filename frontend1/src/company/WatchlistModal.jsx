@@ -22,23 +22,16 @@ const WatchlistModal = ({ isOpen, handleClose }) => {
         setNewWatchlistName('');
         handleClose();
     }
-    
-    useEffect(() => {
-        const handleKeyPressEsc = (event) => {
-            if (event.key === 'Escape') {
-                console.log('esc was pressed');
-                if (listName) {
-                    setListName(false);
-                } else {
-                    closeWatchListModal();
-                }
+    const handleKeyPressEsc = (event) => {
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            console.log('esc was pressed');
+            if (listName) {
+                setListName(false);
+            } else {
+                closeWatchListModal();
             }
-        };
-        window.addEventListener('keydown', handleKeyPressEsc);
-        return () => {
-            window.removeEventListener('keydown', handleKeyPressEsc);
         }
-    }, [listName, closeWatchListModal]);
+    };
 
     //when someone updates the text box
     const handleNewWatchListName = (event) => {
@@ -99,7 +92,7 @@ const WatchlistModal = ({ isOpen, handleClose }) => {
     return (
         <Modal 
             open = {isOpen}>
-            <div className="modalContent">
+            <div className="modalContent" onKeyDown={handleKeyPressEsc}>
                 <Typography variant="body2">Add to watchlist</Typography>
                 <Button onClick={() => closeWatchListModal()}>X</Button>
                 {/* Render exisitng watchlists */}
