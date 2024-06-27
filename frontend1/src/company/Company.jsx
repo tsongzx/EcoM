@@ -4,6 +4,7 @@ import { Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css'
+import WatchlistModal from './WatchlistModal.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -20,6 +21,10 @@ const Company = () => {
     setWatchlistModalOpen(true);
   }
 
+  const handleCloseWatchList = () => {
+    setWatchlistModalOpen(false);
+  }
+
 	return (
         <>
         <Navbar/>
@@ -31,6 +36,7 @@ const Company = () => {
             >
               Return to Dashboard
             </Button>
+            <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList}/>
             <div className = 'companyHeading'>
                 {/* {displayCompanyName ? (
                     <div>
@@ -63,7 +69,7 @@ const Company = () => {
                 <p>chart placeholder</p>
                 {/* Charts Component Goes Here*/}
                 <div className='chartControls'>
-                  <Button>Add to List</Button>
+                  <Button onClick={openWatchlistModal}>Add to List</Button>
                   <Button>AI Predict</Button>
                   <Button>Compare</Button>
                 </div>
