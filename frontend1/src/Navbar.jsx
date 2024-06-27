@@ -1,16 +1,29 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 
 const Navbar = () => {
-    //display two different login items depending on whether the user has logged in.
-    //GOING TO CONVERT THESE TO BUTTONS DOWN THE LINE
+    const navigate = useNavigate();
+
+    // Go back to the first page
+    const handleLogout = () => {
+        navigate('/');
+    };
+
+    // Go back to the dashboard
+    const handleHome = () => {
+        navigate('/dashboard');
+    }
+
+    
+
     return (
         <div className='nav'>
-        <ul>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/logout">Logout</Link></li>
-          </ul>
+            <ul>
+                {/* <li><Link to="/">Home</Link></li> */}
+                <li><a href="/dashboard" onClick={handleHome}>Home</a></li>
+                <li><a href="/" onClick={handleLogout}>Logout</a></li>
+            </ul>
         </div>
     );
 }
