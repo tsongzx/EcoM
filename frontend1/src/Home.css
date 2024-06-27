@@ -65,3 +65,10 @@
     flex-direction: column;
     padding: 10px;
 }
+
+.homeLearnMore {
+    position: absolute;
+    bottom: 50px;
+    display: flex;
+    flex-direction: column;
+}
