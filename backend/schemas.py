@@ -7,7 +7,7 @@ class Token(BaseModel):
     token_type: str # honestly might not need this?
 
 class TokenData(BaseModel):
-    username: Union[str, None] = None
+    userId: Union[str, None] = None
 
 class User(BaseModel):
     id: int
@@ -22,9 +22,12 @@ class UserRegister(BaseModel):
     password: Union[str, None] = None
     
 class UserInDB(User):
-    # id: int
-    # email: Union[str, None] = None
-    # full_name: Union[str, None] = None
     hashed_password: str
     
+class PasswordUpdate(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
     
+class NameUpdate(BaseModel):
+    new_name: str
