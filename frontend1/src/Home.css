@@ -83,4 +83,17 @@
     border: solid 1px black;
     border-radius: 10px;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+}
+
+#learnMore:hover {
+    color:rgb(127, 127, 127);
+}
+
+#learnMore:hover svg {
+    fill:rgb(127, 127, 127);
 }
