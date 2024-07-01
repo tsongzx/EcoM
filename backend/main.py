@@ -225,3 +225,18 @@ def change_user_full_name(
       return {"message": "Full name changed successfully"}
 
 # logout 
+
+#***************************************************************
+#                        List Functions
+#***************************************************************
+
+# @app.get("/lists", response_model=schemas.UserInDB, tags=["Lists"])
+# def get_lists(
+#     token: str = Depends(oauth2_scheme),
+#     session: Session = Depends(get_session)
+# ):
+#     token_data = is_authenticated(token)
+#     lists = session.query(models.UserLists).filter(models.UserLists.user_id == token_data.userId).all()
+    
+    
+    
