@@ -10,6 +10,10 @@ from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas
 import models
+
+###Added by gavin
+from fastapi.middleware.cors import CORSMiddleware
+################
   
 def get_session():
   session = SessionLocal()
@@ -34,7 +38,18 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI(openapi_tags=tags_metadata)
 
+#####Added by Gavin######
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Replace with your frontend URL in production
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+#################
+
 def verify_password(plain_password, hashed_password):
+    print(f"Verifying password for hashed_password: {hashed_password}")
     return pwd_context.verify(plain_password, hashed_password)
 
 def hash_password(password):
