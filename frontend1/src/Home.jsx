@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button } from '@mui/material';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
@@ -6,9 +6,9 @@ import imageCat from './assets/IMG_2678.jpg';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const Home = () => {
-
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [navbar, setNavbar] = useState(false);
@@ -33,10 +33,6 @@ const Home = () => {
   };
 
   const handleLogin = (email, password) => {
-    // console.log('Logging in...');
-    // // Add your login logic here
-    // handleCloseLogin();
-    // navigate('./Dashboard');
     asyncLogin(email, password);
   };
 
@@ -46,24 +42,24 @@ const Home = () => {
       formData.append("username", email);
       formData.append("password", password);
       
-      const response = await axios.post('http://127.0.0.1:8000/auth/login',
-        formData
-      );
+      const response = await axios.post('http://127.0.0.1:8000/auth/login', formData);
 
       if (response.status === 200) {
         console.log('User logged in successfully:', response.data);
+        const token = response.data.access_token;
+        Cookies.set('authToken', token); // Session cookie
         handleCloseLogin();
         navigate('./Dashboard');
       }
     } catch (error) {
       console.log(error);
-      if (error.response.status === 401) {
-        setErrorMessage('Incorrect email or password.')
+      if (error.response && error.response.status === 401) {
+        setErrorMessage('Incorrect email or password.');
       } else {
         setErrorMessage('Login error: ' + error);
       }
     }
-  }
+  };
 
   const handleRegister = (name, email, password) => {
     asyncRegister(name, email, password);
@@ -79,14 +75,17 @@ const Home = () => {
 
       if (response.status === 200) {
         console.log('User registered successfully:', response.data);
+        const token = response.data.access_token;
+        Cookies.set('authToken', token);
+
         handleCloseRegister();
         navigate('./Dashboard');
       } else {
         setErrorMessage('Registration failed: ' + response.data.message);
       }
     } catch (error) {
-      if (error.response.status === 400) {
-        setErrorMessage('Email already registered.')
+      if (error.response && error.response.status === 400) {
+        setErrorMessage('Email already registered.');
       } else {
         setErrorMessage('Registration error: ' + error.message);
       }
@@ -103,14 +102,21 @@ const Home = () => {
     setLoginModalOpen(true);
   };
 
-  const showNavBar = () => {
-    if (window.scrollY >= window.innerHeight - 300) {
-      setNavbar(true);
-    } else {
-      setNavbar(false);
-    }
-  };
-  window.addEventListener('scroll', showNavBar);
+  useEffect(() => {
+    const showNavBar = () => {
+      if (window.scrollY >= window.innerHeight - 300) {
+        setNavbar(true);
+      } else {
+        setNavbar(false);
+      }
+    };
+    window.addEventListener('scroll', showNavBar);
+
+    // Cleanup function to remove the event listener
+    return () => {
+      window.removeEventListener('scroll', showNavBar);
+    };
+  }, []);
 
   return (
     <div id='Home'>
