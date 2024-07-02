@@ -1,6 +1,6 @@
 from typing import Union
 from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm, HTTPBearer
 from datetime import datetime, timedelta, timezone
 import jwt
 from jwt.exceptions import InvalidTokenError
@@ -33,6 +33,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 app = FastAPI(openapi_tags=tags_metadata)
+security = HTTPBearer()
+
+# @app.get('/')
+# def main(authorization: str = Depends(security)):
+#     print("something happend")
+#     return authorization.credentials
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -119,7 +125,7 @@ async def auth_register(
 #                        User Functions
 #***************************************************************
 
-async def is_authenticated(token: str = Depends(oauth2_scheme)) -> schemas.TokenData:
+async def is_authenticated(db, token: str) -> schemas.TokenData:
     # credentials: HTTPAuthorizationCredentials = await super(JWTBearer, self).__call__(request)
 #         if credentials:
 #             if not credentials.scheme == "Bearer":
@@ -138,7 +144,7 @@ async def is_authenticated(token: str = Depends(oauth2_scheme)) -> schemas.Token
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         userId: str = payload.get("userId")
-        if userId is None or not valid_userId(userId):
+        if userId is None or not await valid_userId(db, userId):
             raise credentials_exception
                 
         # return token data
@@ -146,10 +152,8 @@ async def is_authenticated(token: str = Depends(oauth2_scheme)) -> schemas.Token
     except jwt.exceptions.InvalidTokenError:
         raise credentials_exception
 
-async def valid_userId(userId: str, 
-    session: Session = Depends(get_session)
-) -> bool:
-    user = session.query(models.User).filter_by(id=userId).first()
+async def valid_userId(db, userId: str) -> bool:
+    user = db.query(models.User).filter_by(id=userId).first()
     return True if user else False
   
 def get_user_using_id(db, id: str):
@@ -164,12 +168,14 @@ def get_user_using_id(db, id: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
         
 @app.get("/user", response_model=schemas.UserInDB, tags=["User"])
-def get_user(
+async def get_user(
     token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     session: Session = Depends(get_session)
 ):
-      token_data = is_authenticated(token)
-      user = get_user_using_id(session, userId=token_data.userId)
+      token_data = await is_authenticated(session, token)
+      # token_data = await is_authenticated(session, authorization.credentials)
+      user = get_user_using_id(session, id=token_data.userId)
       # this shouldn't happen i think so probs can remove
       # if user is None:
       #     raise credentials_exception
@@ -184,14 +190,16 @@ def get_user_object_using_id(db, id: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
       
 # update password
-@app.put("/user/password", response_model=schemas.UserInDB, tags=["User"])
-def change_user_password(
+@app.put("/user/password", tags=["User"])
+async def change_user_password(
     token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     request: schemas.PasswordUpdate = Depends(),
     session: Session = Depends(get_session),
 ):
-      token_data = is_authenticated(token)
-      user = get_user_object_using_id(session, userId=token_data.userId)
+      # token_data = await is_authenticated(session, authorization.credentials)
+      token_data = await is_authenticated(session, token)
+      user = get_user_object_using_id(session, id=token_data.userId)
       
       # Alternatively, we can handle the below in the frontend 
       if request.old_password == request.new_password:
@@ -210,19 +218,22 @@ def change_user_password(
     
 # update name
 @app.put("/user/full-name", response_model=schemas.UserInDB, tags=["User"])
-def change_user_full_name(
+async def change_user_full_name(
     token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     new_name: schemas.NameUpdate = Depends(),
     session: Session = Depends(get_session),
 ):
-      token_data = is_authenticated(token)
-      user = get_user_object_using_id(session, userId=token_data.userId)
+      token_data = await is_authenticated(session, token)
+      # token_data = await is_authenticated(session, authorization.credentials)
+      user = get_user_object_using_id(session, id=token_data.userId)
       
-      user.full_name = new_name
+      user.full_name = new_name.new_name
       session.commit()
         
-      # alternatively just return empty {}
-      return {"message": "Full name changed successfully"}
+      # alternatively just return empty {} or message
+      userInDB = get_user_using_id(session, id=token_data.userId)
+      return userInDB
 
 # logout 
 
@@ -230,13 +241,18 @@ def change_user_full_name(
 #                        List Functions
 #***************************************************************
 
-# @app.get("/lists", response_model=schemas.UserInDB, tags=["Lists"])
+# @app.get("/lists", tags=["Lists"])
+# #  response_model=schemas.UserLists,
 # def get_lists(
 #     token: str = Depends(oauth2_scheme),
-#     session: Session = Depends(get_session)
+#     db: Session = Depends(get_session),
+#     authorization: str = Depends(security)
 # ):
-#     token_data = is_authenticated(token)
-#     lists = session.query(models.UserLists).filter(models.UserLists.user_id == token_data.userId).all()
+#     # token_data = is_authenticated(token)
+#     # lists = db.query(models.UserList).filter(models.UserList.user_id == token_data.userId).all()
+#     # print(lists)
+#     lists = db.query(models.UserList).filter(models.UserList.user_id == authorization).all()
+#     print(lists)
     
     
     

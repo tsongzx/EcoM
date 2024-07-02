@@ -7,7 +7,7 @@ class Token(BaseModel):
     token_type: str # honestly might not need this?
 
 class TokenData(BaseModel):
-    userId: Union[str, None] = None
+    userId: Union[int, None] = None
 
 class User(BaseModel):
     id: int
