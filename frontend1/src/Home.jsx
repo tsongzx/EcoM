@@ -41,14 +41,14 @@ const Home = () => {
   };
 
   const asyncLogin = async (email, password) => {
-    console.log(email);
-    console.log(password);
     try {
-      const response = await axios.post('http://127.0.0.1:8000/auth/login', {
-        email,
-        password
-      });
-
+      const formData = new FormData();
+      formData.append("username", email);
+      formData.append("password", password);
+      
+      const response = await axios.post('http://127.0.0.1:8000/auth/login',
+        formData
+      );
 
       if (response.status === 200) {
         console.log('User logged in successfully:', response.data);

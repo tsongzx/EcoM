@@ -4,12 +4,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta, timezone
 import jwt
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
+# from passlib.context import CryptContext
+import bcrypt
 from db import Base, engine, SessionLocal
 from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas
 import models
+# import logging
+# logger = logging.getLogger()
 
 ###Added by gavin
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +35,7 @@ SECRET_KEY = "45aa99285e9155a8b8792a3075c62fbdba8f71a9d921a12bcb8a6e0105f73e5a"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -49,11 +52,16 @@ app.add_middleware(
 #################
 
 def verify_password(plain_password, hashed_password):
+    password_byte_enc = plain_password.encode('utf-8')
     print(f"Verifying password for hashed_password: {hashed_password}")
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(password_byte_enc, hashed_password)
 
 def hash_password(password):
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+    return hashed_password
+    # return pwd_context.hash(password)
 
 def get_user_using_email(db, email: str):
     user = db.query(models.User).filter(models.User.email == email).first()
@@ -68,6 +76,7 @@ def authenticate_user(db, email: str, password: str):
     user = get_user_using_email(db, email)
     if not user:
         return False
+    print("user is in db");    
     if not verify_password(password, user.hashed_password):
         return False
     return user

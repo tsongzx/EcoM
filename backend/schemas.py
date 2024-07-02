@@ -22,7 +22,7 @@ class UserRegister(BaseModel):
     password: Union[str, None] = None
     
 class UserInDB(User):
-    hashed_password: str
+    hashed_password: bytes
     
 class PasswordUpdate(BaseModel):
     old_password: str
