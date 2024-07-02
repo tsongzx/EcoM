@@ -246,12 +246,12 @@ async def change_user_full_name(
 @app.get("/lists", tags=["Lists"])
 #  response_model=schemas.UserLists,
 async def get_lists(
-    # token: str = Depends(oauth2_scheme),
-    authorization: str = Depends(security),
+    token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(db, token)
-    token_data = await is_authenticated(session, authorization.credentials)
+    token_data = await is_authenticated(session, token)
+    # token_data = await is_authenticated(session, authorization.credentials)
     lists = session.query(models.UserList).filter(models.UserList.user_id == token_data.userId).all()
     print(lists)
     
@@ -261,13 +261,13 @@ async def get_lists(
 #  response_model=schemas.UserLists,
 # returns companies in a list
 async def get_list(
-    # token: str = Depends(oauth2_scheme),
     list_name: str,
-    authorization: str = Depends(security),
+    token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(db, token)
-    await is_authenticated(session, authorization.credentials)
+    await is_authenticated(session, token)
+    # await is_authenticated(session, authorization.credentials)
     list = session.query(models.UserList).filter_by(list_name=list_name).first()
     
     if list is None:
@@ -279,13 +279,13 @@ async def get_list(
 @app.post("/list", tags=["List"], response_model=list_schemas.ListCreate)
 # returns companies in a list
 async def create_list(
-    # token: str = Depends(oauth2_scheme),
     list_name: str,
-    authorization: str = Depends(security),
+    token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ) -> list_schemas.ListCreate:
-    # token_data = await is_authenticated(db, token)
-    token_data = await is_authenticated(session, authorization.credentials)
+    token_data = is_authenticated(session, token)
+    # token_data = await is_authenticated(session, authorization.credentials)
     existing_list = session.query(models.UserList).filter_by(list_name=list_name).first()
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
@@ -302,13 +302,13 @@ async def create_list(
 @app.delete("/list", tags=["List"])
 # returns companies in a list
 async def delete_list(
-    # token: str = Depends(oauth2_scheme),
     list_name: str,
-    authorization: str = Depends(security),
+    # authorization: str = Depends(security),
+    token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(db, token)
-    await is_authenticated(session, authorization.credentials)
+    await is_authenticated(session, token)
+    # await is_authenticated(session, authorization.credentials)
     list = session.query(models.UserList).filter_by(list_name=list_name).first()
     statement = delete(models.UserList).where(models.UserList.list_name == list_name)
     session.execute(statement)
@@ -323,13 +323,13 @@ async def delete_list(
 @app.post("/list/company", tags=["List"])
 # returns companies in a list
 async def add_company_to_list(
-    # token: str = Depends(oauth2_scheme),
     request: list_schemas.CompanyToAddToList,
-    authorization: str = Depends(security),
+    token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(db, token)
-    await is_authenticated(session, authorization.credentials)
+    await is_authenticated(session, token)
+    # await is_authenticated(session, authorization.credentials)
     # error checks for invalid list name or company name?
     company = session.query(models.CompanyData).filter_by(company_name=request.company_name).first()
     list = session.query(models.UserList).filter_by(list_name=request.list_name).first()
