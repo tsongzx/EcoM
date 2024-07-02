@@ -1,9 +1,9 @@
 import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 import Home from './Home.jsx';
-import { Navigate } from 'react-router-dom';
+import Dashboard from './Dashboard.jsx';
+import Company from './company/Company.jsx';
 
 function App() {
   return (
@@ -11,9 +11,9 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<Home />}/>
-          {/* <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} /> */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/company" element={<Company />} />
+          <Route path="/company/:companyName" element={<Company />} />
         </Routes>
       </div>
     </Router>

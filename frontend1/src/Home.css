@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+#homeTitle {
+    font-family: Montserrat;
+    font-size: 6em;
+    letter-spacing: 0.04rem;
+    margin-bottom: 0px;
+}
+
+#Home Button {
+    right: '0';
+    font-family: Montserrat;
+}
+
+#Home .titleButton {
+    width: calc(50% - 5px);
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+#Home .registerButton {
+    background-color: white;
+    color: black;
+    border: solid #1976d2 1px;
+}
+
+#renderedNavbar {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid #1976d2;
+    top: 0;
+    position: sticky;
+    z-index: 999;
+}
+
+#unrenderedNavbar {
+    display: none;
+}
+
+#homeAbout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: aquamarine;
+}
+
+.aboutContainer {
+    display: flex;
+    flex-direction: row;
+    background-color: blue;
+    width: 60%;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.aboutContainer img {
+    width: 300px;
+    height: 300px;
+}
+
+.aboutTextContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.homeLearnMore {
+    position: absolute;
+    bottom: 50px;
+    display: flex;
+    flex-direction: column;
+}
+
+#learnMore {
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1em;
+    border: solid 1px black;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: transparent;
+    border: none;
+}
+
+#learnMore:hover {
+    color:rgb(127, 127, 127);
+}
+
+#learnMore:hover svg {
+    fill:rgb(127, 127, 127);
+}
