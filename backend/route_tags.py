@@ -12,4 +12,12 @@ tags_metadata = [
         #     "url": "https://fastapi.tiangolo.com/",
         # },
     },
+    {
+        "name": "Lists",
+        "description": "Managing user lists.",
+    },
+    {
+        "name": "List",
+        "description": "Managing specific lists.",
+    },
 ]
