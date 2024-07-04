@@ -14,6 +14,7 @@ import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
 
+from watchlist import get_watchlist, delete_from_watchlist, add_to_watchlist
   
 def get_session():
   session = SessionLocal()
@@ -86,6 +87,7 @@ def generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 # ****************************************************************
 #                          Auth Functions
@@ -394,3 +396,26 @@ async def add_company_to_list(
 # @api.get("/my-route/", responses={200: {"response": model200}, 404: {"response": model404}, 500: {"response": model500}})
 #     async def api_route():
 #         return "I'm a wonderful route"
+
+@app.get("/watchlist", response_model=schemas.Watchlist, tags=["Watchlist"])
+def getWatchlist(
+    id: str,
+    session: Session = Depends(get_session),
+):
+    get_watchlist(session, id)
+
+@app.put("/watchlist/delete", tags=["Watchlist"])
+def deleteFromWatchlist(
+    id: str,
+    company_id: str,
+    session: Session = Depends(get_session)
+):
+    delete_from_watchlist(session, id, company_id)
+
+@app.put("/watchlist/add", tags=["Watchlist"])
+def addToWatchlist(
+    id: str,
+    company_id: str,
+    session: Session = Depends(get_session)
+):
+    add_to_watchlist(session, id, company_id)
