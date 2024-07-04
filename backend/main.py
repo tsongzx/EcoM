@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas
 import models
+from watchlist import get_watchlist, delete_from_watchlist, add_to_watchlist
   
 def get_session():
   session = SessionLocal()
@@ -67,6 +68,7 @@ def generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 # ****************************************************************
 #                          Auth Functions
@@ -225,3 +227,26 @@ def change_user_full_name(
       return {"message": "Full name changed successfully"}
 
 # logout 
+
+@app.get("/watchlist", response_model=schemas.Watchlist, tags=["Watchlist"])
+def getWatchlist(
+    id: str,
+    session: Session = Depends(get_session),
+):
+    get_watchlist(session, id)
+
+@app.put("/watchlist/delete", tags=["Watchlist"])
+def deleteFromWatchlist(
+    id: str,
+    company_id: str,
+    session: Session = Depends(get_session)
+):
+    delete_from_watchlist(session, id, company_id)
+
+@app.put("/watchlist/add", tags=["Watchlist"])
+def addToWatchlist(
+    id: str,
+    company_id: str,
+    session: Session = Depends(get_session)
+):
+    add_to_watchlist(session, id, company_id)

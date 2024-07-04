@@ -15,7 +15,7 @@ logger = logging.getLogger()
 
 # usin default driver - mysqlclient
 username = 'root'
-password = 'password'
+password = ''
 host = 'localhost' # or use IP address
 database_name = 'crumpeteers'
 database_url = f'mysql://{username}:{password}@{host}/{database_name}'
