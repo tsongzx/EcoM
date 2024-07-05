@@ -20,6 +20,7 @@ host = 'localhost' # or use IP address
 database_name = 'mydb'
 # database_url = f'mysql://{username}:{password}@{host}/{database_name}'
 database_url = f'mysql+pymysql://{username}:{password}@{host}/{database_name}'
+
 if not database_exists(database_url):
     logger.info("creating db")
     create_database(database_url)

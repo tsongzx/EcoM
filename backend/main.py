@@ -13,6 +13,7 @@ import schemas.list_schemas as list_schemas
 import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
+
   
 def get_session():
   session = SessionLocal()
@@ -43,7 +44,6 @@ security = HTTPBearer()
 #     print("something happend")
 #     return authorization.credentials
 
-#####Added by Gavin######
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Replace with your frontend URL in production
@@ -51,7 +51,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
-#################
+
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
