@@ -14,8 +14,6 @@ import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
 
-from watchlist import get_watchlist, delete_from_watchlist, add_to_watchlist
-  
 def get_session():
   session = SessionLocal()
   try:
@@ -397,25 +395,45 @@ async def add_company_to_list(
 #     async def api_route():
 #         return "I'm a wonderful route"
 
-@app.get("/watchlist", response_model=schemas.Watchlist, tags=["Watchlist"])
-def getWatchlist(
-    id: str,
+@app.get("/watchlist", tags=["Watchlist"])
+async def get_watchlist(
+    token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ):
-    get_watchlist(session, id)
+    token_data = await is_authenticated(session, token)
+    watchlist = session.query(models.WatchList).filter(models.Watchlist.user_id == token_data.userId).first()
+    return watchlist
 
-@app.put("/watchlist/delete", tags=["Watchlist"])
-def deleteFromWatchlist(
-    id: str,
+@app.delete("/watchlist", tags=["Watchlist"])
+async def delete_from_watchlist(
     company_id: str,
-    session: Session = Depends(get_session)
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
 ):
-    delete_from_watchlist(session, id, company_id)
+    token_data = await is_authenticated(session, token)
+    watchlist_id = session.query(models.WatchList).filter(models.Watchlist.user_id == token_data.userId).first().list_id
+    statement = delete(models.List).where(models.List.list_id == watchlist_id and models.List.company_id == company_id)
+    session.execute(statement)
+    session.commit()
 
-@app.put("/watchlist/add", tags=["Watchlist"])
-def addToWatchlist(
-    id: str,
+    return {"message" : f"Successfully deleted company from watchlist"}
+
+
+@app.put("/watchlist", tags=["Watchlist"])
+async def add_to_watchlist(
     company_id: str,
-    session: Session = Depends(get_session)
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
 ):
-    add_to_watchlist(session, id, company_id)
+    token_data = await is_authenticated(session, token)
+    watchlist_id = session.query(models.WatchList).filter(models.Watchlist.user_id == token_data.userId).first().id
+    if watchlist_id is None:
+        new_watchlist = models.WatchList(user_id=token_data.userId)
+        session.add(new_watchlist)
+        session.commit()
+        watchlist_id = new_watchlist.id
+    new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
+    session.add(new_watchlist_company)
+    session.commit()
+    session.refresh(new_watchlist_company)
+    return {"message" : f"Successfully added company to watchlist"}

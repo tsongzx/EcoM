@@ -42,7 +42,6 @@ class WatchList(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    watchlist_name: Mapped[str] = mapped_column(String(100), nullable=False)
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
