@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
@@ -9,6 +9,7 @@ import SimpleLineChart from '../SimpleLineChart.jsx';
 
 const Company = () => {
   const location = useLocation();
+  const { companyId } = useParams();
   const { companyName } = location.state || {};
 	const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
