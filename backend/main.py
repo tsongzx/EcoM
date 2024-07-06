@@ -402,7 +402,7 @@ async def get_watchlist(
     authorization: str = Depends(security)
 ):
     token_data = await is_authenticated(session, token)
-    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
+    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).all()
     return watchlist
 
 @app.delete("/watchlist", tags=["Watchlist"])
