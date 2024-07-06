@@ -34,8 +34,8 @@ class List(Base):
     __tablename__ = 'List'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    list_id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    company_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    list_id: Mapped[int] = mapped_column(nullable=False)
+    company_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
 
 class WatchList(Base):
@@ -50,12 +50,12 @@ class CompanyData(Base):
     __tablename__ = 'CompanyList'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    company_name:Mapped[str] = mapped_column(String(100), nullable=False)
+    company_name: Mapped[str] = mapped_column(String(100), nullable=False)
     # TODO: Various other ESG parameters TBD
 
 class RecentList(Base):
     __tablename__ = 'RecentList'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
