@@ -35,4 +35,3 @@ class NameUpdate(BaseModel):
 class Watchlist(BaseModel):
     user_id: int
     watchlist_id: int
-    watchlist_name: str

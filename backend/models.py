@@ -38,7 +38,7 @@ class List(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
 class WatchList(Base):
-    __tablename__ = 'WatchLists'
+    __tablename__ = 'WatchList'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
