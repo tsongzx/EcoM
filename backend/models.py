@@ -36,7 +36,7 @@ class List(Base):
     list_id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     company_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-    
+
 class WatchList(Base):
     __tablename__ = 'WatchList'
 

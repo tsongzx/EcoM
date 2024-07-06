@@ -431,7 +431,7 @@ async def add_to_watchlist(
     token_data = await is_authenticated(session, token)
     watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
     if watchlist is None:
-        new_watchlist = models.WatchList(id=1,user_id=token_data.userId)
+        new_watchlist = models.WatchList(user_id=token_data.userId)
         session.add(new_watchlist)
         session.commit()
         watchlist_id = new_watchlist.id
