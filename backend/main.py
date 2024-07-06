@@ -472,7 +472,7 @@ async def add_to_recently_viewed(
         recent_id = recentList.id
     recent_companies_length = session.query(models.List).filter(models.List.list_id == recent_id).count()
 
-    if recent_companies_length >= 3:
+    if recent_companies_length >= 20:
         statement = session.query(models.List).where(models.List.list_id == recent_id).order_by(models.List.id).first()
         session.delete(statement)
         session.commit()
