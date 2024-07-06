@@ -403,7 +403,8 @@ async def get_watchlist(
 ):
     token_data = await is_authenticated(session, token)
     watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
-    return watchlist
+    watchlist_companies = session.query(models.List).filter(models.List.list_id == watchlist.id).all()
+    return watchlist_companies
 
 @app.delete("/watchlist", tags=["Watchlist"])
 async def delete_from_watchlist(
