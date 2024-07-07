@@ -443,3 +443,44 @@ async def add_to_watchlist(
     session.commit()
     session.refresh(new_watchlist_company)
     return {"message" : f"Successfully added company to watchlist"}
+
+@app.get("/recently_viewed", tags=["recents"])
+async def get_recently_viewed(
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    authorization: str = Depends(security)
+):
+    token_data = await is_authenticated(session, token)
+    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == token_data.userId).first()
+    recentCompanies = session.query(models.List).filter(models.List.list_id == recentList.id).order_by(models.List.created_at).all()
+    return recentCompanies
+
+@app.put("/recently_viewed", tags=["recents"])
+async def add_to_recently_viewed(
+    company_id: str,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    authorization: str = Depends(security)
+):
+    token_data = await is_authenticated(session, token)
+    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == token_data.userId).first()
+    if recentList is None:
+        new_recent_list = models.RecentList(user_id=token_data.userId)
+        session.add(new_recent_list)
+        session.commit()
+        recent_id = new_recent_list.id
+    else:
+        recent_id = recentList.id
+    recent_companies_length = session.query(models.List).filter(models.List.list_id == recent_id).count()
+
+    if recent_companies_length >= 20:
+        statement = session.query(models.List).where(models.List.list_id == recent_id).order_by(models.List.id).first()
+        session.delete(statement)
+        session.commit()
+    
+    new_recent = models.List(list_id=recent_id, company_id=company_id)
+    session.add(new_recent)
+    session.commit()
+    session.refresh(new_recent)
+
+    return {"message" : f"Successfully added company to recent list"}
