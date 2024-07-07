@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
+import Cookies from 'js-cookie';
 
 const Navbar = () => {
     const navigate = useNavigate();
 
     // Go back to the first page
     const handleLogout = () => {
+        Cookies.remove('authToken');
         navigate('/');
     };
 

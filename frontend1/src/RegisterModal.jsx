@@ -1,40 +1,35 @@
-import {React, useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Link } from '@mui/material';
 
-const RegisterModal = ({ open, handleCloseRegister, handleRegister, goToLogin }) => {
+const RegisterModal = ({ open, handleCloseRegister, handleRegister, goToLogin, setErrorMessage, errorMessage }) => {
 
-  // Current state variables for registering
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
-  // User clicks register button
+  useEffect(() => {
+    setErrorMessage('');
+  }, []);
+
   const onRegister = () => {
-
-    // Empty parameters
     if (name === '' || email === '' || password === '' || confirmPassword === '') {
       setErrorMessage('Please fill in all fields.');
-      // Insufficient password length
     } else if (password.length < 8) {
       setErrorMessage('Password must be at least 8 characters.');
-      // Passwords do not match
     } else if (password !== confirmPassword) {
-      setErrorMessage('Passwords do not match.')
+      setErrorMessage('Passwords do not match.');
     } else {
-      // Goes to homepage
+
+      handleRegister(name, email, password);
       setErrorMessage('');
-      setName('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      handleRegister(name, email, password, confirmPassword);
+      // setName('');
+      // setEmail('');
+      // setPassword('');
+      // setConfirmPassword('');
     }
-    
   };
 
-  // User chooses to login from the register homepage
   const navigateToLogin = () => {
     setName('');
     setEmail('');
@@ -44,23 +39,32 @@ const RegisterModal = ({ open, handleCloseRegister, handleRegister, goToLogin })
     goToLogin();
   };
 
-  // User clicks the cancel button in the register modal
   const onCancel = () => {
     setName('');
     setEmail('');
     setPassword('');
     setConfirmPassword('');
+    setErrorMessage('');
+    handleCloseRegister();
+  };
+
+  const clickOutRegister = () => {
+    setName('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    setErrorMessage('');
     handleCloseRegister();
   }
 
   return (
-    <Dialog open={open} onClose={handleCloseRegister}>
+    <Dialog open={open} onClose={clickOutRegister}>
       <DialogTitle style={{ textAlign: 'center' }}>Register</DialogTitle>
       <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
-        <TextField autoFocus margin="dense" label="Name" type="text" fullWidth value={name} onChange={(e) => setName(e.target.value)}/>
-        <TextField margin="dense" label="Email Address" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)}/>
-        <TextField margin="dense" label="Password" type="password" fullWidth value={password} onChange={(e) => setPassword(e.target.value)}/>
-        <TextField margin="dense" label="Confirm Password" type="password" fullWidth value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
+        <TextField autoFocus margin="dense" label="Name" type="text" fullWidth value={name} onChange={(e) => setName(e.target.value)} />
+        <TextField margin="dense" label="Email Address" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
+        <TextField margin="dense" label="Password" type="password" fullWidth value={password} onChange={(e) => setPassword(e.target.value)} />
+        <TextField margin="dense" label="Confirm Password" type="password" fullWidth value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
         {errorMessage && (
           <Typography color="error" variant="body2" style={{ marginTop: '16px' }}>
             {errorMessage}
@@ -73,8 +77,8 @@ const RegisterModal = ({ open, handleCloseRegister, handleRegister, goToLogin })
           </Link>
         </Typography>
         <DialogActions style={{ justifyContent: 'space-between' }}>
-            <Button onClick={onCancel} color="primary">Cancel</Button>
-            <Button onClick={onRegister} color="primary">Register</Button>
+          <Button onClick={onCancel} color="primary">Cancel</Button>
+          <Button onClick={onRegister} color="primary">Register</Button>
         </DialogActions>
       </DialogContent>
     </Dialog>

@@ -36,18 +36,18 @@ class UserList(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
 
 class List(Base):
-    __tablename__ = 'Lists'
-
-    list_id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
-    company_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-    
-class WatchList(Base):
-    __tablename__ = 'WatchLists'
+    __tablename__ = 'List'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    watchlist_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    list_id: Mapped[int] = mapped_column(nullable=False)
+    company_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
+
+class WatchList(Base):
+    __tablename__ = 'WatchList'
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
@@ -86,3 +86,10 @@ class CompanyData(Base):
       validate_strings=True,
     ))
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
+
+class RecentList(Base):
+    __tablename__ = 'RecentList'
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
