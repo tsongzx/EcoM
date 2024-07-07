@@ -41,7 +41,7 @@ class WatchList(Base):
     __tablename__ = 'WatchList'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    user_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
