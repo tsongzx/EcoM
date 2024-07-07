@@ -14,7 +14,6 @@ import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
 
-  
 def get_session():
   session = SessionLocal()
   try:
@@ -40,9 +39,9 @@ app = FastAPI(openapi_tags=tags_metadata)
 security = HTTPBearer()
 
 # @app.get('/')
-# def main(authorization: str = Depends(security)):
-#     print("something happend")
-#     return authorization.credentials
+def main(authorization: str = Depends(security)):
+    print("something happend")
+    return authorization.credentials
 
 app.add_middleware(
     CORSMiddleware,
@@ -86,6 +85,7 @@ def generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
 
 # ****************************************************************
 #                          Auth Functions
@@ -394,3 +394,52 @@ async def add_company_to_list(
 # @api.get("/my-route/", responses={200: {"response": model200}, 404: {"response": model404}, 500: {"response": model500}})
 #     async def api_route():
 #         return "I'm a wonderful route"
+
+@app.get("/watchlist", tags=["Watchlist"])
+async def get_watchlist(
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    authorization: str = Depends(security)
+):
+    token_data = await is_authenticated(session, token)
+    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
+    watchlist_companies = session.query(models.List).filter(models.List.list_id == watchlist.id).all()
+    return watchlist_companies
+
+@app.delete("/watchlist", tags=["Watchlist"])
+async def delete_from_watchlist(
+    company_id: str,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    authorization: str = Depends(security)
+):
+    token_data = await is_authenticated(session, token)
+    watchlist_id = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first().id
+    statement = delete(models.List).where(models.List.list_id == watchlist_id and models.List.company_id == company_id)
+    session.execute(statement)
+    session.commit()
+
+    return {"message" : f"Successfully deleted company from watchlist"}
+
+
+@app.put("/watchlist", tags=["Watchlist"])
+async def add_to_watchlist(
+    company_id: str,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session),
+    authorization: str = Depends(security)
+):
+    token_data = await is_authenticated(session, token)
+    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
+    if watchlist is None:
+        new_watchlist = models.WatchList(user_id=token_data.userId)
+        session.add(new_watchlist)
+        session.commit()
+        watchlist_id = new_watchlist.id
+    else:
+        watchlist_id = watchlist.id
+    new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
+    session.add(new_watchlist_company)
+    session.commit()
+    session.refresh(new_watchlist_company)
+    return {"message" : f"Successfully added company to watchlist"}
