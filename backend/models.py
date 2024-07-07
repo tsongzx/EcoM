@@ -12,7 +12,7 @@ Pillar = Literal["E", "S", "G"]
 
 # e.g
 class User(Base):
-    __tablename__ = 'users'
+    __tablename__ = 'Users'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String(100), nullable=False)
