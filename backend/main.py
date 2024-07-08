@@ -272,17 +272,17 @@ async def get_lists(
 #  response_model=schemas.UserLists,
 # returns companies in a list
 async def get_list(
-    list_name: str,
+    list_id: int,
     token: str = Depends(oauth2_scheme),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
     await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
-    list = session.query(models.UserList).filter_by(list_name=list_name).first()
+    list = session.query(models.UserList).filter_by(id=list_id).first()
     
     if list is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List doesn't exist. Invalid list name.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List doesn't exist. Invalid list id.")
       
     companies = session.query(models.List).filter_by(list_id=list.id).all()    
     return companies
@@ -297,7 +297,7 @@ async def create_list(
 ) -> list_schemas.ListCreate:
     token_data = is_authenticated(session, token)
     # token_data = await is_authenticated(session, authorization.credentials)
-    existing_list = session.query(models.UserList).filter_by(list_name=list_name).first()
+    existing_list = session.query(models.UserList).filter_by(user_id=token_data.userId).filter_by(id=list_name).first()
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
 
@@ -313,76 +313,69 @@ async def create_list(
 @app.delete("/list", tags=["List"])
 # returns companies in a list
 async def delete_list(
-    list_name: str,
+    list_id: int,
     # authorization: str = Depends(security),
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
 ):
     await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
-    list = session.query(models.UserList).filter_by(list_name=list_name).first()
-    statement = delete(models.UserList).where(models.UserList.list_name == list_name)
+    statement = delete(models.UserList).where(models.UserList.id == list_id)
     session.execute(statement)
-    statement = delete(models.List).where(models.List.list_id == list.id)
+    statement = delete(models.List).where(models.List.list_id == list_id)
     session.execute(statement)
     
     session.commit()
     
-    return {"message" : f"Successfully deleted list {list_name}"}
+    return {"message" : f"Successfully deleted list {list_id}"}
   
  
 @app.post("/list/company", tags=["List"])
 # returns companies in a list
 async def add_company_to_list(
-    request: list_schemas.CompanyToAddToList,
+    request: list_schemas.CompanyToListMapping,
     token: str = Depends(oauth2_scheme),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
     await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
-    # error checks for invalid list name or company name?
-    company = session.query(models.CompanyData).filter_by(company_name=request.company_name).first()
-    list = session.query(models.UserList).filter_by(list_name=request.list_name).first()
+    company = session.query(models.CompanyData).filter_by(id=request.company_id).first()
+    list = session.query(models.UserList).filter_by(id=request.list_id).first()
     if company is None or list is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company or list does not exist")
   
-    existing_company = session.query(models.List).filter_by(list_id=list.id)\
+    existing_company = session.query(models.List).filter_by(list_id=request.list_id)\
         .filter_by(company_id=company.id)\
         .first()
         
     if existing_company:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company already added to list")
    
-    new_company = models.List(list_id=list.id, company_id=company.id)
+    new_company = models.List(list_id=request.list_id, company_id=request.company_id)
 
     session.add(new_company)
     session.commit()
     session.refresh(new_company)
      
-    return {"message" : f"Successfully added {request.company_name} to {request.list_name}"}
+    return {"message" : f"Successfully added {company.company_name} to list {request.list_id}"}
   
+ 
+@app.delete("/list/company", tags=["List"])
+# returns companies in a list
+async def delete_company_from_list(
+    request: list_schemas.CompanyToListMapping,
+    token: str = Depends(oauth2_scheme),
+    # authorization: str = Depends(security),
+    session: Session = Depends(get_session),
+):
+    token_data = await is_authenticated(session, token)
+    # await is_authenticated(session, authorization.credentials)
+    statement = delete(models.List).where(models.List.list_id == request.list_id and models.List.company_id == request.company_id)
+    session.execute(statement)
+    session.commit()
     
-# to do add delete from list
-# @app.delete("/list", tags=["List"])
-# # returns companies in a list
-# async def delete_list(
-#     # token: str = Depends(oauth2_scheme),
-#     list_name: str,
-#     authorization: str = Depends(security),
-#     session: Session = Depends(get_session),
-# ):
-#     # token_data = await is_authenticated(db, token)
-#     await is_authenticated(session, authorization.credentials)
-#     list = session.query(models.UserList).filter_by(list_name=list_name).first()
-#     statement = delete(models.UserList).where(models.UserList.list_name == list_name)
-#     session.execute(statement)
-#     statement = delete(models.List).where(models.List.list_id == list.id)
-#     session.execute(statement)
-    
-#     session.commit()
-    
-#     return {"message" : f"Successfully deleted list {list_name}"}
+    return {"message" : f"Successfully deleted company {request.company_id} from list {request.list_id}"}
   
 
 # to do: add error codes

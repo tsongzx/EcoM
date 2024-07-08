@@ -30,7 +30,7 @@ class UserList(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     # removed primary key = True from user_id - can change back (removed it to generate unique id but it might work)
-    user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(nullable=False)
     list_name: Mapped[str] = mapped_column(String(100), nullable=False)
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
@@ -40,7 +40,7 @@ class List(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     list_id: Mapped[int] = mapped_column(nullable=False)
-    company_id: Mapped[int] = mapped_column(unique=True, nullable=False)
+    company_id: Mapped[int] = mapped_column(nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
 
 class WatchList(Base):
