@@ -6,6 +6,7 @@ import Navbar from '../Navbar.jsx';
 import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
+import CompareModal from '../compare/CompareModal.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -14,6 +15,7 @@ const Company = () => {
 	const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
+  const [compareModalOpen, setCompareModalOpen] = useState(false);
 
   const handleReturn = () => {
     window.history.back();
@@ -25,6 +27,10 @@ const Company = () => {
 
   const handleCloseWatchList = () => {
     setWatchlistModalOpen(false);
+  }
+
+  const openCompareModal = () => {
+    setCompareModalOpen(true);
   }
 
 	return (
@@ -73,7 +79,7 @@ const Company = () => {
                 <div className='chartControls'>
                   <Button onClick={openWatchlistModal}>Add to List</Button>
                   <Button>AI Predict</Button>
-                  <Button>Compare</Button>
+                  <Button onClick={openCompareModal}>Compare</Button>
                 </div>
               </div>
               <p>recommendations placeholder</p>
@@ -94,6 +100,7 @@ const Company = () => {
 
                 <p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p>
             </div>
+            <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen}/>
         </>
 	);
 };

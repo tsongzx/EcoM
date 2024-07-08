@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home.jsx';
 import Dashboard from './Dashboard.jsx';
 import Company from './company/Company.jsx';
+import Compare from './compare/Compare.jsx';
 
 function App() {
   return (
