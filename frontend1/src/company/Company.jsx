@@ -44,7 +44,7 @@ const Company = () => {
             >
               Return to Dashboard
             </Button>
-            <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList}/>
+            <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId}/>
             <div className = 'companyHeading'>
                 {/* {displayCompanyName ? (
                     <div>
