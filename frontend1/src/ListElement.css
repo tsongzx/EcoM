@@ -1,0 +1,12 @@
+.listElement {
+    width: 80vw;
+    height: 50px;
+    border: solid black 1px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+}
+
+.listElement:hover {
+    border-color: purple;
+}
