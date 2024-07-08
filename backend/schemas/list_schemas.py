@@ -12,6 +12,6 @@ class List(BaseModel):
 class ListCreate(BaseModel):
     list_id: int
 
-class CompanyToAddToList(BaseModel):
-    list_name: str
-    company_name: str
+class CompanyToListMapping(BaseModel):
+    list_id: int
+    company_id: int
