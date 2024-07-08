@@ -23,7 +23,7 @@ export const fetchLists = async() => {
 }
 
 //creates a new Watchlist with name : name
-export const createList = async ({name}) => {
+export const createList = async (name) => {
     //create list
     try {
         const response = await axios.post('http://127.0.0.1:8000/list', {
@@ -43,7 +43,7 @@ export const createList = async ({name}) => {
 };
 
 //add a company to list id
-export const addCompanyToList = async ({listId, companyId }) => {
+export const addCompanyToList = async (listId, companyId ) => {
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
             list_id: listId,
@@ -59,13 +59,53 @@ export const addCompanyToList = async ({listId, companyId }) => {
     }
 }
 
+export const removeCompanyFromList = async(listId, companyId) => {
+    try {
+        const response = axios.delete('http://127.0.0.1:8000/list/company', {
+            list_id: listId,
+            company_id: companyId,
+        }, {headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }});
+        if (response.status === 200) {
+            console.log('Successfully removed from list');
+        }
+    } catch (error) {
+        console.log(`Problem removing companyId ${companyId} from list ${listId}, ${error}`);
+    }
+}
+
 //get watchlists for modal (name and isChecked) This function will run ONLY ONCE at the start of the WatchListModal initialisation
 //returns list of JSON objects {id: '', name: '', isChecked: ''}
-export const getFormattedUserLists = async ({companyId}) => {
+export const getFormattedUserLists = async (companyId) => {
     //first fetch all the lists the user has
-    const lists = fetchLists();
+    const lists = await fetchLists();
     //for each list Id check if the company is in it and append to a list of JSON
-
+    const newList = await Promise.all(lists.map(async(list) => ({
+        id: list.id,
+        name: list.list_name,
+        isChecked: await companyIsInList(list.id, companyId),
+    })));
     //returns a list of arrays of the form of a JSOn with list.id, list.checked and list.name
+    console.log(newList);
+    return newList;
+}
 
+export const companyIsInList = async(listId, companyId) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/list', {
+            list_id: listId
+        }, {headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }});
+        console.log(response.data);
+        const companyExists = response.data.some(company => company.company_id === companyId);
+        return companyExists;
+
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
 }

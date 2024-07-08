@@ -4,7 +4,7 @@ import { Button, Typography, Checkbox, TextField, Box } from "@mui/material";
 import './WatchlistModal.css'
 // import axios from "axios";
 import Cookies from "js-cookie";
-import {fetchLists, createList, addCompanyToList} from "../helper.js";
+import {getFormattedUserLists, createList, addCompanyToList, removeCompanyFromList} from "../helper.js";
 /**
  * Handling Watchlist modification
  * When the Modal Closes all the changes are reflected
@@ -22,6 +22,16 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
     // When someone clicks the button to add a new watchlist
     const handleListName = () => setListName(true);
+
+    //Initialise useEffect to set intial state of watchlist
+    useEffect(() => {
+        const fetchWatchlist = async () => {
+            const formattedLists = await getFormattedUserLists(companyId);
+            setWatchlist(formattedLists);
+        };
+
+        fetchWatchlist();
+    }, [companyId]);
 
     const closeWatchListModal = () => {
         console.log('closing watchlist Modal...');
@@ -50,9 +60,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
             console.log('cannot have watchlist without a name');
             return;
         };
-
-        setListName(false);
-        
+        setListName(false); 
         // update the state of the checkbox, default new checkbox to be true, this list can be passed back
         // to Company to update what watchlists have been checked
         setWatchlist([...watchlist, { name: newWatchlistName, checked: true }]);
@@ -67,12 +75,18 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     //updates the watchlists that contain the company
     const handleCheckboxChange = (event, index) => {
         console.log(watchlist);
-        console.log(`Checkbox at ${index} changed to ${event.target.checked ? 'checked' : 'unchecked'}`);
+        console.log(`Checkbox at ${index} changed to ${event.target.isChecked ? 'checked' : 'unchecked'}`);
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
-            newWatchlist[index] = { ...newWatchlist[index], checked: event.target.checked }; // Update the checked property
+            newWatchlist[index] = { ...newWatchlist[index], isChecked: event.target.checked }; // Update the checked property
             return newWatchlist; // Return the updated array to update state
         });
+        //Add Company to List
+        if (event.target.isChecked) {
+            addCompanyToList(watchlist[index].id, companyId);
+        } else {
+            removeCompanyFromList(watchlist[index].id, companyId);
+        }
     }
 
     //update the button and handle checkbox change, this would require a separate thing that keeps track of the checkboxes
@@ -84,9 +98,15 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     const updateCheckStatus = (index) => {
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
-            newWatchlist[index] = { ...newWatchlist[index], checked: !newWatchlist[index].checked }; // Update the checked property
+            newWatchlist[index] = { ...newWatchlist[index], isChecked: !newWatchlist[index].checked }; // Update the checked property
             return newWatchlist; // Return the updated array to update state
         });
+
+        if (watchlist[index].isChecked) {
+            addCompanyToList(watchlist[index].id, companyId);
+        } else {
+            removeCompanyFromList(watchlist[index].id, companyId);
+        }
     }
 
     // also need to apply padding on the bottom of the Modal so that the stick new watchlist doesn't conflict with it
@@ -106,8 +126,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
                 {/* Render exisitng watchlists */}
                 <div className="watchlistContainer">
                     {watchlist?.map((list, index) => (
-                        <Button key={index} onClick={() => handleButtonClick(index)}>{list.name}
-                            <Checkbox {...label} checked={list.checked} onChange={(event) => handleCheckboxChange(event, index)}/>
+                        <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
+                            <Checkbox {...label} checked={list.isChecked} onChange={(event) => handleCheckboxChange(event, index)}/>
                         </Button>
                     ))}
                 </div>
