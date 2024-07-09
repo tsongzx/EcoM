@@ -1,3 +1,4 @@
+import { listClasses } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -19,6 +20,26 @@ export const fetchLists = async() => {
         return response.data.lists;
     } catch (error) {
         console.log(`error fetching the user's watchlists`, error);
+    }
+}
+
+//given a list id, get all the companies that are in that list
+export const fetchCompaniesInList = async(listId) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/list', {
+            list_id: listId
+        }, {
+            header: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        const companyIds = response.data.map(company => company.id);
+        console.log(`List: ${listId}, companies: ${companyIds}`);
+        return companyIds;
+
+    } catch (error) {
+        console.log('problem fetching companies in list ', id, ' ', error);
     }
 }
 
