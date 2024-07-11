@@ -3,6 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, Autocomplete, TextField } f
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import ListElement from 'ListElement.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,8 +12,8 @@ const Dashboard = () => {
   const companies = ['Company 1', 'Company 2', 'Company 3'];
 
   const [selectedCompany, setSelectedCompany] = useState(null);
-
-
+  const [lists, setLists] = useState([]);
+  
   useEffect (() => {
     if (selectedCompany !== null) {
       console.log(selectedCompany);
