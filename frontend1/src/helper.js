@@ -102,7 +102,7 @@ export const getFormattedUserLists = async (companyId) => {
     //first fetch all the lists the user has
     const lists = await fetchLists();
     if (lists === null) {
-        return;
+        return [];
     }
     //for each list Id check if the company is in it and append to a list of JSON
     const newList = await Promise.all(lists.map(async(list) => ({

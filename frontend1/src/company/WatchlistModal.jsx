@@ -125,7 +125,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
                 <Button onClick={() => closeWatchListModal()}>X</Button>
                 {/* Render exisitng watchlists */}
                 <div className="watchlistContainer">
-                    {watchlist?.map((list, index) => (
+                    {Array.isArray(watchlist) && watchlist?.map((list, index) => (
                         <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
                             <Checkbox {...label} checked={list.isChecked} onChange={(event) => handleCheckboxChange(event, index)}/>
                         </Button>

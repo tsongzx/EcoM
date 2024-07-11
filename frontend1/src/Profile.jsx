@@ -21,6 +21,7 @@ const Profile = () => {
     //Get user Information on mount
     useEffect(() => {
         const userInfo = getUserInfo();
+        console.log(`got user information ${userInfo.name}, ${userInfo.password}`);
         setName(userInfo.full_name);
         setPassword(userInfo.password);
         setEmail(userInfo.email);
@@ -95,7 +96,7 @@ const Profile = () => {
 
     // 3) Update the User's name
     const handleCloseUpdateName = () => {
-        if (name === updatedName) {
+        if (name === updatedName || updatedName.length === 0) {
             return;
         }
         setShowUpdateName(false);
