@@ -6,7 +6,7 @@ const token = Cookies.get('authToken');
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
     //contain that information inside watchlist in the set State
-
+    console.log(`getting the user's lists`);
     //also return whether the list contains such element
     try {
         const response = await axios.get('http://127.0.0.1:8000/lists', {
@@ -16,6 +16,7 @@ export const fetchLists = async() => {
             }
         });
         console.log('successfully returned lists');
+        console.log(response.data.lists);
         return response.data.lists;
     } catch (error) {
         console.log(`error fetching the user's watchlists`, error);

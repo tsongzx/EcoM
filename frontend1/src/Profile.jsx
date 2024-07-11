@@ -35,6 +35,7 @@ const Profile = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log(`fetched user's information ${response.data.user}`);
             return response.data.user;
         } catch (error) {
             console.log(error);
@@ -48,6 +49,8 @@ const Profile = () => {
     // 2) Update the User's password (include confirm password)
     const handleUpdatePassword = () => {
         //check password is different to the old one
+        console.log('handing updated password...');
+        console.log(`old: ${password}, new: ${updatePassword}, confirmed: ${updatedConfirmPassword}`);
         if (updatedPassword === password) {
             setErrorMessage('Cannot use previous password');
             setUpdatedPassword('');
@@ -90,12 +93,13 @@ const Profile = () => {
             return response.data;
         } catch (error) {
             console.log(error);
-            setErrorMessage('There was an oopsie:', error);
+            setErrorMessage('There was an oopsie updating password:', error);
         }
     }
 
     // 3) Update the User's name
     const handleCloseUpdateName = () => {
+        console.log(`updating name ${name} to ${updatedName}`);
         if (name === updatedName || updatedName.length === 0) {
             return;
         }
@@ -116,6 +120,7 @@ const Profile = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log('updateName to PUT: http://127.0.0.1:8000/user/full-name ran successfully');
         } catch (error) {
             console.log(error);
         }

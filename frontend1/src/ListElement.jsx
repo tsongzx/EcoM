@@ -11,6 +11,7 @@ const ListElement = ({id, name, dateCreated}) => {
     const [listIsOpen, setlistIsOpen] = useState(false);
     const [companies, setCompanies] = useState([]);
     const [nCompanies, setNCompanies] = useState(-1);
+    console.log(`creating list: ${id}: ${name} made on ${dateCreated}`);
 
     const handleOpenList = () => {
         //Open the Modal For the WatchList

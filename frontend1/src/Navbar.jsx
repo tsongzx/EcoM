@@ -28,7 +28,10 @@ const Navbar = () => {
                 <li><a href="/" onClick={handleLogout}>Logout</a></li>
             </ul>
             <button onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</button>
-            {isProfileOpen && (<Profile/>)}
+            {isProfileOpen && (<div>
+                <button onClick={() => {setIsProfileOpen(false)}}>close</button>
+                <Profile/>
+            </div>)}
         </div>
     );
 }
