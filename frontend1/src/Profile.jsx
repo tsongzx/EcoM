@@ -127,7 +127,17 @@ const Profile = () => {
     }
 
     // 4) When the user presses enter or esc, it exits a text box or submits
+    const handleKeyPressEnter = (event) => {
+        if (event.key === 'Enter') {
+            //submit 
+        }
+    }
 
+    const handleKeyPressEsc = (event) => {
+        if (event.key === 'Escape' || event.keyCode === 27) {
+            
+        } 
+    }
     // 5) User can Choose the theme too
     return (
         <div className="profilePage">
