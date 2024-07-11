@@ -7,9 +7,10 @@ import CompanyElement from "./CompanyElement.jsx";
  * @param {*} param0 gets passed in the id of the LIST, fetches the information on the list
  * @returns 
  */
-const ListElement = ({id, name, noCompanies}) => {
+const ListElement = ({id, name, dateCreated}) => {
     const [listIsOpen, setlistIsOpen] = useState(false);
     const [companies, setCompanies] = useState([]);
+    const [nCompanies, setNCompanies] = useState(-1);
 
     const handleOpenList = () => {
         //Open the Modal For the WatchList
@@ -18,6 +19,7 @@ const ListElement = ({id, name, noCompanies}) => {
         if (companies.length === 0) {
             const companyList = fetchCompaniesInList(id);
             setCompanies(companyList);
+            setNCompanies(companies.length);
         }
     }
 
@@ -25,7 +27,8 @@ const ListElement = ({id, name, noCompanies}) => {
         <div>
             <button className="listElement" onClick={handleOpenList}>
                 <p>{name}</p>
-                <p>{noCompanies}</p>
+                <p>{nCompanies} companies</p>
+                <p>{dateCreated}</p>
             </button>
             {listIsOpen && <div className="listCompanies">
                 {companies?.map((cId) => {

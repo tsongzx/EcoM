@@ -4,6 +4,7 @@ import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import ListElement from 'ListElement.jsx';
+import { fetchLists } from './helper.js';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -21,7 +22,11 @@ const Dashboard = () => {
     }
   }, [selectedCompany, navigate]);
 
-
+  //get all the user's watchlists
+  useEffect(() => {
+    const userLists = fetchLists();
+    setLists(userLists);
+  }, []);
 
   return (
     <>
@@ -94,6 +99,9 @@ const Dashboard = () => {
                 My Lists (None)
               </Typography>
             </Paper>
+            {lists?.map((list) =>{
+              <ListElement id={list.id} name={list.list_name} dateCreated={list.created_at}/>
+            })}
           </Grid>
         </Grid>
       </div>
