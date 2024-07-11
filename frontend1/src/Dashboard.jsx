@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, Autocomplete, TextField } f
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import ListElement from 'ListElement.jsx';
+import ListElement from './ListElement.jsx';
 import { fetchLists } from './helper.js';
 
 const Dashboard = () => {
@@ -99,7 +99,7 @@ const Dashboard = () => {
                 My Lists (None)
               </Typography>
             </Paper>
-            {lists?.map((list) =>{
+            {Array.isArray(lists) && lists?.map((list) =>{
               <ListElement id={list.id} name={list.list_name} dateCreated={list.created_at}/>
             })}
           </Grid>

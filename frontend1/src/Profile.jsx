@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Cookies from "js-cookie";
 /**
  * 
  */
@@ -12,6 +14,31 @@ const Profile = () => {
     const [updatedPassword, setUpdatedPassword] = useState('');
     const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
+    const [email, setEmail] = useState('');
+
+    const token = Cookies.get('authToken');
+
+    //Get user Information on mount
+    useEffect(() => {
+        const userInfo = getUserInfo();
+        setName(userInfo.full_name);
+        setPassword(userInfo.password);
+        setEmail(userInfo.email);
+    },[]);
+
+    const getUserInfo = async () => {
+        try {
+            const response = await axios.get('http://127.0.0.1:8000/user', {
+                header: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data.user;
+        } catch (error) {
+            console.log(error);
+        }
+    }
     // 0) It could be passed in a URL such that the return key 
     // will navigate the user back to where they left off
 
@@ -117,6 +144,7 @@ const Profile = () => {
                     <input type={password} defaultValue={password} readOnly/>
                     <button onClick={() => {setShowUpdatePassword(true)}}>edit</button>
                 </div>)}
+                <p>{email}</p>
                 <p>{errorMessage}</p>
                 <div className="profilePageLists">
 

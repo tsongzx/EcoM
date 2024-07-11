@@ -1,4 +1,3 @@
-import { listClasses } from "@mui/material";
 import axios from "axios";
 import Cookies from "js-cookie";
 
@@ -39,7 +38,7 @@ export const fetchCompaniesInList = async(listId) => {
         return companyIds;
 
     } catch (error) {
-        console.log('problem fetching companies in list ', id, ' ', error);
+        console.log('problem fetching companies in list ', listId, ' ', error);
     }
 }
 
@@ -102,6 +101,9 @@ export const removeCompanyFromList = async(listId, companyId) => {
 export const getFormattedUserLists = async (companyId) => {
     //first fetch all the lists the user has
     const lists = await fetchLists();
+    if (lists === null) {
+        return;
+    }
     //for each list Id check if the company is in it and append to a list of JSON
     const newList = await Promise.all(lists.map(async(list) => ({
         id: list.id,
