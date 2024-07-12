@@ -18,12 +18,18 @@ const Profile = () => {
 
     const token = Cookies.get('authToken');
 
+    // const nameInput = document.getElementById('pfpName');
+    // const oldPInput = document.getElementById('pfpOPass');
+    // const newPInput = document.getElementById('pfpNPass');
+    // const conPInput = document.getElementById('pfpCPass');
+
     //Get user Information on mount
     useEffect(async() => {
         const userInfo = await getUserInfo();
         console.log('userINFO inside INIT USE EFFECT', userInfo);
         console.log(`got user information ${userInfo.name}, ${userInfo.password}`);
         setName(userInfo.full_name);
+        setUpdatedName(userInfo.full_name);
         setEmail(userInfo.email);
     },[]);
 
@@ -52,7 +58,10 @@ const Profile = () => {
         //check password is different to the old one
         console.log('handing updated password...');
         console.log(`old: ${password}, new: ${updatePassword}, confirmed: ${updatedConfirmPassword}`);
-        if (updatedPassword === password) {
+        if (password === '') {
+            setShowUpdatePassword(false);
+        }
+        else if (updatedPassword === password) {
             setErrorMessage('Cannot use previous password');
         }
         else if (!(updatedPassword === updatedConfirmPassword)) {
@@ -64,7 +73,7 @@ const Profile = () => {
         else {
             //push changes to backend
             updatePassword(password, updatedPassword, updatedConfirmPassword);
-            showUpdatePassword(false);
+            setShowUpdatePassword(false);
         }
         //reset password values
         setPassword('');
@@ -121,7 +130,7 @@ const Profile = () => {
 
     // 4) When the user presses enter or esc, it exits a text box or submits
     const handleKeyPressEnter = (event) => {
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' || event.keyCode === 13) {
             //submit 
         }
     }
@@ -136,7 +145,7 @@ const Profile = () => {
         <div className="profilePage">
             {showUpdateName 
                 ? (<div>
-                    <input defaultValue={name} onChange={(event) => {setUpdatedName(event.target.value)}}/>
+                    <input id="pfpName" defaultValue={name} onChange={(event) => {setUpdatedName(event.target.value)}}/>
                     <button onClick={handleCloseUpdateName}>OK</button>
                 </div>) 
                 : (<div>
@@ -145,9 +154,9 @@ const Profile = () => {
                 </div>)}
                 {showUpdatePassword 
                 ? (<div>
-                    <input type="password" onChange={(event) => {setPassword(event.target.value)}}/>
-                    <input type="password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
-                    <input type="password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
+                    <input id="pfpOPass" type="password" placeholder="old password" onChange={(event) => {setPassword(event.target.value)}}/>
+                    <input id="pfpNPass" type="password" placeholder="new password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
+                    <input id="pfpCPass" type="password" placeholder="confirm password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
                     <button onClick={handleUpdatePassword}>OK</button>
                 </div>) 
                 : (<div>

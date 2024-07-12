@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 import { Button } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -7,6 +7,9 @@ import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
+import { getRecentlyViewed, addToFavourites, deleteFromFavourites } from '../helper.js';
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const Company = () => {
   const location = useLocation();
@@ -16,6 +19,35 @@ const Company = () => {
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [isInFavs, setIsInFavs] = useState(false);
+  const token = Cookies.get('authToken');
+
+  useEffect(async () => {
+    // Add to recently viewed
+    await addToRecentlyViewed(companyId);
+    // Check if in Favourites
+    const recentList = await getRecentlyViewed();
+    if (Array.isArray(recentList) && recentList.includes(companyId)) {
+      setIsInFavs(true);
+    } else {
+      setIsInFavs(false);
+    }
+  },[]);
+
+  const addToRecentlyViewed = async (cId) => {
+    try {
+      const response = await axios.put('http://127.0.0.1:8000/recently_viewed', 
+        { company_id: cId }
+        , {headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }});
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+      return;
+    }
+  }
 
   const handleReturn = () => {
     window.history.back();
@@ -31,6 +63,16 @@ const Company = () => {
 
   const openCompareModal = () => {
     setCompareModalOpen(true);
+  }
+
+  const handleToggleFavourite = () => {
+    setIsInFavs(!isInFavs);
+    //depending on isInFavs, either add or delete from favourites (called WatchList in backend)
+    if (isInFavs) {
+      addToFavourites(companyId);
+    } else {
+      deleteFromFavourites(companyId);
+    }
   }
 
 	return (
@@ -69,7 +111,7 @@ const Company = () => {
                 </div>
                 <div className = 'quickControls'>
                     <Button>Save Report</Button>
-                    <Button>Like</Button>
+                    <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
                 </div>
             </div>
             <div className = 'chartAndReccomendations'>

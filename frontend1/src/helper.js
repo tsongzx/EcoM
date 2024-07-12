@@ -6,7 +6,7 @@ const token = Cookies.get('authToken');
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
     //contain that information inside watchlist in the set State
-    console.log(`getting the user's lists`);
+    console.log(`getting the user's lists...`);
     //also return whether the list contains such element
     try {
         const response = await axios.get('http://127.0.0.1:8000/lists', {
@@ -15,9 +15,9 @@ export const fetchLists = async() => {
                 'Authorization': `Bearer ${token}`
             }
         });
-        console.log('successfully returned lists');
-        console.log(response.data.lists);
-        return response.data.lists;
+        console.log('successfully returned lists', response.data.length);
+        console.log(response.data);
+        return response.data;
     } catch (error) {
         console.log(`error fetching the user's watchlists`, error);
         return [];
@@ -28,7 +28,7 @@ export const fetchLists = async() => {
 export const fetchCompaniesInList = async(listId) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/list', {
-            list_id: listId
+            list_id: listId,
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export const fetchCompaniesInList = async(listId) => {
 
 //creates a new Watchlist with name : name
 export const createList = async (name) => {
-    console.log(`CREATELIST: ${name}`);
+    console.log(`CREATELIST: ${name}, ${typeof name}`);
     //create list
     try {
         const response = await axios.post(`http://127.0.0.1:8000/list`, {
@@ -118,6 +118,7 @@ export const getFormattedUserLists = async (companyId) => {
     return newList;
 }
 
+//Check whether a company is in a list, returns a boolean
 export const companyIsInList = async(listId, companyId) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/list', {
@@ -133,5 +134,64 @@ export const companyIsInList = async(listId, companyId) => {
     } catch (error) {
         console.log(error);
         return false;
+    }
+}
+
+//return list of company id
+export const getFavouritesList = async() => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/watchlist', {}
+            , {headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }});
+        return response.data;
+    } catch (error) {
+        console.log(`error getting user's favourites: ${error}`);
+    }
+}
+
+export const addToFavourites = async(companyId) => {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/watchlist', {
+            company_id: companyId
+        }
+            , {headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }});
+        return response.data;
+    } catch (error) {
+        console.log(`error adding to favourites: ${error}`);
+    }
+}
+
+export const deleteFromFavourites = async(companyId) => {
+    try {
+        const response = await axios.delete('http://127.0.0.1:8000/watchlist', {
+            company_id: companyId
+        }
+            , {headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }});
+        return response.data;
+    } catch (error) {
+        console.log(`error deleting from favourites: ${error}`);
+    }
+}
+
+
+//return list of recently viewed
+export const getRecentlyViewed = async() => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/recently_viewed', {}
+            , {headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }});
+        return response.data;
+    } catch (error) {
+        console.log(`error getting recently viewed: ${error}`);
     }
 }

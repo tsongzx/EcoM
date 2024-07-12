@@ -18,6 +18,7 @@ const Dashboard = () => {
   useEffect (() => {
     if (selectedCompany !== null) {
       console.log(selectedCompany);
+      //TODO: Should pass in Company ID instead of NAME
       navigate(`/company/${encodeURIComponent(selectedCompany)}`, { state: { companyName: selectedCompany } });
     }
   }, [selectedCompany, navigate]);
