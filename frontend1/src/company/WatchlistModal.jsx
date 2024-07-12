@@ -55,7 +55,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     }
 
     // when someone submits the new watchlist name
-    const handleAddNewWatchlist = () => {
+    const handleAddNewWatchlist = async () => {
         if (newWatchlistName.trim() === '') {
             console.log('cannot have watchlist without a name');
             return;
@@ -63,9 +63,9 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         setListName(false); 
         // update the state of the checkbox, default new checkbox to be true, this list can be passed back
         // to Company to update what watchlists have been checked
-        setWatchlist([...watchlist, { name: newWatchlistName, checked: true }]);
+        setWatchlist([...watchlist, { name: newWatchlistName, isChecked: true }]);
         //Automatically Add the company
-        const listId = createList(newWatchlistName);
+        const listId = await createList(newWatchlistName);
         addCompanyToList(listId, companyId);
         console.log('creating new watchlist called ', newWatchlistName);
         setNewWatchlistName('');
@@ -75,7 +75,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     //updates the watchlists that contain the company
     const handleCheckboxChange = (event, index) => {
         console.log(watchlist);
-        console.log(`Checkbox at ${index} changed to ${event.target.isChecked ? 'checked' : 'unchecked'}`);
+        console.log(`Checkbox at ${index} changed to ${event.target.checked ? 'checked' : 'unchecked'}`);
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
             newWatchlist[index] = { ...newWatchlist[index], isChecked: event.target.checked }; // Update the checked property
@@ -98,7 +98,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     const updateCheckStatus = (index) => {
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
-            newWatchlist[index] = { ...newWatchlist[index], isChecked: !newWatchlist[index].checked }; // Update the checked property
+            newWatchlist[index] = { ...newWatchlist[index], isChecked: !newWatchlist[index].isChecked }; // Update the checked property
             return newWatchlist; // Return the updated array to update state
         });
 

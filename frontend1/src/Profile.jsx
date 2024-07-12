@@ -19,26 +19,27 @@ const Profile = () => {
     const token = Cookies.get('authToken');
 
     //Get user Information on mount
-    useEffect(() => {
-        const userInfo = getUserInfo();
+    useEffect(async() => {
+        const userInfo = await getUserInfo();
+        console.log('userINFO inside INIT USE EFFECT', userInfo);
         console.log(`got user information ${userInfo.name}, ${userInfo.password}`);
         setName(userInfo.full_name);
-        setPassword(userInfo.password);
         setEmail(userInfo.email);
     },[]);
 
     const getUserInfo = async () => {
         try {
             const response = await axios.get('http://127.0.0.1:8000/user', {
-                header: {
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
             console.log(`fetched user's information ${response.data.user}`);
-            return response.data.user;
+            console.log(response.data.email);
+            return response.data;
         } catch (error) {
-            console.log(error);
+            console.log('error getting user information ',error);
         }
     }
     // 0) It could be passed in a URL such that the return key 
@@ -53,39 +54,33 @@ const Profile = () => {
         console.log(`old: ${password}, new: ${updatePassword}, confirmed: ${updatedConfirmPassword}`);
         if (updatedPassword === password) {
             setErrorMessage('Cannot use previous password');
-            setUpdatedPassword('');
-            setUpdatedConfirmPassword('');
-            return;
         }
-        if (!(updatedPassword === updatedConfirmPassword)) {
+        else if (!(updatedPassword === updatedConfirmPassword)) {
             setErrorMessage('Passwords do not match');
-            setUpdatedPassword('');
-            setUpdatedConfirmPassword('');
-            return;
         }
-        if (updatedPassword.length < 8) {
+        else if (updatedPassword.length < 8) {
             setErrorMessage('Password has to be greater than 8 characters');
-            setUpdatedPassword('');
-            setUpdatedConfirmPassword('');
-            return;
         }
-        //push changes to backend
-        updatePassword(password, updatedPassword, updatedConfirmPassword);
+        else {
+            //push changes to backend
+            updatePassword(password, updatedPassword, updatedConfirmPassword);
+            showUpdatePassword(false);
+        }
         //reset password values
-        setPassword(updatedPassword);
+        setPassword('');
         setUpdatedPassword('');
         setUpdatedConfirmPassword('');
-        showUpdatePassword(false);
+        return;
     }
 
     const updatePassword = async (old, newP, newConfirmed) => {
         try {
-            const response = await axios.put('http://127.0.0.1:8000/user/full-name', {
+            const response = await axios.put('http://127.0.0.1:8000/user/password', {
                 old_password: old,
                 new_password: newP,
                 confirm_password: newConfirmed
             }, {
-                header: {
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
@@ -112,15 +107,13 @@ const Profile = () => {
 
     const updateName = async (name) => {
         try {
-            const response = await axios.put('http://127.0.0.1:8000/user/full-name', {
-                new_name: name
-            }, {
-                header: {
+            const response = await axios.put(`http://127.0.0.1:8000/user/full-name?new_name=${name}`, {}, {
+                headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log('updateName to PUT: http://127.0.0.1:8000/user/full-name ran successfully');
+            console.log('updateName to PUT: http://127.0.0.1:8000/user/full-name ran successfully', response.data);
         } catch (error) {
             console.log(error);
         }
@@ -152,13 +145,13 @@ const Profile = () => {
                 </div>)}
                 {showUpdatePassword 
                 ? (<div>
+                    <input type="password" onChange={(event) => {setPassword(event.target.value)}}/>
                     <input type="password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
                     <input type="password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
                     <button onClick={handleUpdatePassword}>OK</button>
                 </div>) 
                 : (<div>
-                    <input type={password} defaultValue={password} readOnly/>
-                    <button onClick={() => {setShowUpdatePassword(true)}}>edit</button>
+                    <button onClick={() => {setShowUpdatePassword(true)}}>Update Password</button>
                 </div>)}
                 <p>{email}</p>
                 <p>{errorMessage}</p>

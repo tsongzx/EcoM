@@ -10,7 +10,7 @@ export const fetchLists = async() => {
     //also return whether the list contains such element
     try {
         const response = await axios.get('http://127.0.0.1:8000/lists', {
-            header: {
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -20,6 +20,7 @@ export const fetchLists = async() => {
         return response.data.lists;
     } catch (error) {
         console.log(`error fetching the user's watchlists`, error);
+        return [];
     }
 }
 
@@ -29,7 +30,7 @@ export const fetchCompaniesInList = async(listId) => {
         const response = await axios.get('http://127.0.0.1:8000/list', {
             list_id: listId
         }, {
-            header: {
+            headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
@@ -45,26 +46,27 @@ export const fetchCompaniesInList = async(listId) => {
 
 //creates a new Watchlist with name : name
 export const createList = async (name) => {
+    console.log(`CREATELIST: ${name}`);
     //create list
     try {
-        const response = await axios.post('http://127.0.0.1:8000/list', {
-            'list_name': name,
+        const response = await axios.post(`http://127.0.0.1:8000/list`, {
+            list_name: name
         }, 
         {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }});
         //if successful
-        console.log('successfully added List name: ', name,  ' list id :', response.data.list_id);
-        return response.data.list_id;
+        console.log('successfully added List name: ', name,  ' list id :', response.data);
+        return response.data;
     } catch (error) {
         console.log(error);
     }
-
 };
 
 //add a company to list id
 export const addCompanyToList = async (listId, companyId ) => {
+    console.log(`incoming addCompany ${listId}, ${companyId}`);
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
             list_id: listId,
@@ -102,7 +104,7 @@ export const removeCompanyFromList = async(listId, companyId) => {
 export const getFormattedUserLists = async (companyId) => {
     //first fetch all the lists the user has
     const lists = await fetchLists();
-    if (lists === null) {
+    if (!Array.isArray(lists)) {
         return [];
     }
     //for each list Id check if the company is in it and append to a list of JSON
