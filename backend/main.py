@@ -297,7 +297,7 @@ async def create_list(
 ) -> list_schemas.ListCreate:
     token_data = is_authenticated(session, token)
     # token_data = await is_authenticated(session, authorization.credentials)
-    existing_list = session.query(models.UserList).filter_by(user_id=token_data.userId).filter_by(id=list_name).first()
+    existing_list = session.query(models.UserList).filter_by(user_id=token_data.userId).filter_by(list_name=list_name).first()
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
 
