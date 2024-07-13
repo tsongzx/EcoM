@@ -24,10 +24,12 @@ const Company = () => {
 
   useEffect(async () => {
     // Add to recently viewed
-    await addToRecentlyViewed(companyId);
+    // array should be of size 2
+    const companyId_int = Number(companyId.split(" ")[1]);
+    await addToRecentlyViewed(companyId_int);
     // Check if in Favourites
     const recentList = await getRecentlyViewed();
-    if (Array.isArray(recentList) && recentList.includes(companyId)) {
+    if (Array.isArray(recentList) && recentList.includes(companyId_int)) {
       setIsInFavs(true);
     } else {
       setIsInFavs(false);
@@ -35,10 +37,15 @@ const Company = () => {
   },[]);
 
   const addToRecentlyViewed = async (cId) => {
+    console.log(cId);
+    if (!token) {
+      console.error('No authToken cookie found');
+    }
+    console.log(token);
     try {
-      const response = await axios.put('http://127.0.0.1:8000/recently_viewed', 
-        { company_id: cId }
-        , {headers: {
+      const response = await axios.post(`http://127.0.0.1:8000/recently_viewed?company_id=${cId}`,
+        {}, 
+        {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }});
@@ -68,10 +75,12 @@ const Company = () => {
   const handleToggleFavourite = () => {
     setIsInFavs(!isInFavs);
     //depending on isInFavs, either add or delete from favourites (called WatchList in backend)
+    const companyId_int = Number(companyId.split(" ")[1]);
+    
     if (isInFavs) {
-      addToFavourites(companyId);
+      addToFavourites(companyId_int);
     } else {
-      deleteFromFavourites(companyId);
+      deleteFromFavourites(companyId_int);
     }
   }
 

@@ -13,6 +13,8 @@ import schemas.list_schemas as list_schemas
 import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import func
+
 
 def get_session():
   session = SessionLocal()
@@ -33,15 +35,15 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 app = FastAPI(openapi_tags=tags_metadata)
-security = HTTPBearer()
+# security = HTTPBearer()
 
 # @app.get('/')
-def main(authorization: str = Depends(security)):
-    print("something happend")
-    return authorization.credentials
+# def main(authorization: str = Depends(security)):
+#     print("something happend")
+#     return authorization.credentials
 
 app.add_middleware(
     CORSMiddleware,
@@ -91,6 +93,16 @@ def generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
 #                          Auth Functions
 # ****************************************************************
 
+@app.post("/token", response_model=user_schemas.Token)
+async def get_token(
+    user: user_schemas.UserInDB,
+):
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = generate_token(
+        data={"userId": user.id}, expires_delta=access_token_expires
+    )
+    return user_schemas.Token(access_token=access_token, token_type="bearer")
+
 @app.post("/auth/login", response_model=user_schemas.Token,  tags=["Auth"])
 async def auth_login(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -104,12 +116,9 @@ async def auth_login(
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = generate_token(
-        data={"userId": user.id}, expires_delta=access_token_expires
-    )
-    return user_schemas.Token(access_token=access_token, token_type="bearer")
-
+    
+    return await get_token(user)
+  
 @app.post("/auth/register", response_model=user_schemas.Token, tags=["Auth"])
 async def auth_register(
     user: user_schemas.UserRegister,
@@ -127,12 +136,7 @@ async def auth_register(
     session.commit()
     session.refresh(new_user)
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = generate_token(
-        data={"userId": new_user.id}, expires_delta=access_token_expires
-    )
-    return user_schemas.Token(access_token=access_token, token_type="bearer")
-
+    return await get_token(user)
 
 #***************************************************************
 #                        User Functions
@@ -150,7 +154,7 @@ async def is_authenticated(db, token: str) -> user_schemas.TokenData:
 #             raise HTTPException(status_code=403, detail="Invalid authorization code.")
 
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=status.HTTP_418_IM_A_TEAPOT,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -162,7 +166,15 @@ async def is_authenticated(db, token: str) -> user_schemas.TokenData:
                 
         # return token data
         return user_schemas.TokenData(userId=userId)
+    except jwt.exceptions.ExpiredSignatureError:
+      # Handle token expiration
+      raise HTTPException(
+          status_code=status.HTTP_401_UNAUTHORIZED,
+          detail="Token has expired",
+          headers={"WWW-Authenticate": "Bearer"},
+      )
     except jwt.exceptions.InvalidTokenError:
+        print("invalid token?!")
         raise credentials_exception
 
 async def valid_userId(db, userId: str) -> bool:
@@ -186,8 +198,10 @@ async def get_user(
     # authorization: str = Depends(security),
     session: Session = Depends(get_session)
 ) -> user_schemas.UserInDB:
+      print(token)
       token_data = await is_authenticated(session, token)
       # token_data = await is_authenticated(session, authorization.credentials)
+      print("obtained token data")
       user = get_user_using_id(session, id=token_data.userId)
       # this shouldn't happen i think so probs can remove
       # if user is None:
@@ -205,14 +219,14 @@ def get_user_object_using_id(db, id: str):
 # update password
 @app.put("/user/password", tags=["User"])
 async def change_user_password(
-    token: str = Depends(oauth2_scheme),
+    request: user_schemas.PasswordUpdate,
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
-    request: user_schemas.PasswordUpdate = Depends(),
     session: Session = Depends(get_session),
 ):
       # token_data = await is_authenticated(session, authorization.credentials)
-      token_data = await is_authenticated(session, token)
-      user = get_user_object_using_id(session, id=token_data.userId)
+      # token_data = await is_authenticated(session, token)
+      user = get_user_object_using_id(session, id=user.id)
       
       # Alternatively, we can handle the below in the frontend 
       if request.old_password == request.new_password:
@@ -232,20 +246,20 @@ async def change_user_password(
 # update name
 @app.put("/user/full-name", response_model=user_schemas.UserInDB, tags=["User"])
 async def change_user_full_name(
-    token: str = Depends(oauth2_scheme),
+    new_name: user_schemas.NameUpdate,
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
-    new_name: user_schemas.NameUpdate = Depends(),
     session: Session = Depends(get_session),
 ) -> user_schemas.UserInDB:
-      token_data = await is_authenticated(session, token)
+      # token_data = await is_authenticated(session, token)
       # token_data = await is_authenticated(session, authorization.credentials)
-      user = get_user_object_using_id(session, id=token_data.userId)
+      user = get_user_object_using_id(session, id=user.id)
       
       user.full_name = new_name.new_name
       session.commit()
         
       # alternatively just return empty {} or message
-      userInDB = get_user_using_id(session, id=token_data.userId)
+      userInDB = get_user_using_id(session, id=user.id)
       return userInDB
 
 # logout 
@@ -257,14 +271,12 @@ async def change_user_full_name(
 @app.get("/lists", tags=["Lists"])
 #  response_model=schemas.UserLists,
 async def get_lists(
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    token_data = await is_authenticated(session, token)
     # token_data = await is_authenticated(session, authorization.credentials)
-    lists = session.query(models.UserList).filter(models.UserList.user_id == token_data.userId).all()
-    print(lists)
+    lists = session.query(models.UserList).filter(models.UserList.user_id == user.id).all()
     
     return lists
     
@@ -273,11 +285,11 @@ async def get_lists(
 # returns companies in a list
 async def get_list(
     list_id: int,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    await is_authenticated(session, token)
+    # await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
     list = session.query(models.UserList).filter_by(id=list_id).first()
     
@@ -291,17 +303,19 @@ async def get_list(
 # returns companies in a list
 async def create_list(
     list_name: str,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ) -> list_schemas.ListCreate:
-    token_data = is_authenticated(session, token)
+    # token_data = is_authenticated(session, token)
     # token_data = await is_authenticated(session, authorization.credentials)
-    existing_list = session.query(models.UserList).filter_by(user_id=token_data.userId).filter_by(list_name=list_name).first()
+    existing_list = session.query(models.UserList).filter_by(user_id=user.id).filter_by(list_name=list_name).first()
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
 
-    new_list = models.UserList(user_id=token_data.userId, list_name=list_name)
+    max_id = session.query(func.max(models.List.list_id)).scalar()
+    new_list_id = max_id + 1 if max_id is not None else 1
+    new_list = models.UserList(id=new_list_id, user_id=user.id, list_name=list_name)
 
     session.add(new_list)
     session.commit()
@@ -315,10 +329,10 @@ async def create_list(
 async def delete_list(
     list_id: int,
     # authorization: str = Depends(security),
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    await is_authenticated(session, token)
+    # await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
     statement = delete(models.UserList).where(models.UserList.id == list_id)
     session.execute(statement)
@@ -327,18 +341,18 @@ async def delete_list(
     
     session.commit()
     
-    return {"message" : f"Successfully deleted list {list_id}"}
+    return {"message" : f"Successfully deleted list {list_id.id}"}
   
  
 @app.post("/list/company", tags=["List"])
 # returns companies in a list
 async def add_company_to_list(
     request: list_schemas.CompanyToListMapping,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    await is_authenticated(session, token)
+    # await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
     company = session.query(models.CompanyData).filter_by(id=request.company_id).first()
     list = session.query(models.UserList).filter_by(id=request.list_id).first()
@@ -365,11 +379,11 @@ async def add_company_to_list(
 # returns companies in a list
 async def delete_company_from_list(
     request: list_schemas.CompanyToListMapping,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    token_data = await is_authenticated(session, token)
+    # token_data = await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
     statement = delete(models.List).where(models.List.list_id == request.list_id and models.List.company_id == request.company_id)
     session.execute(statement)
@@ -390,24 +404,27 @@ async def delete_company_from_list(
 
 @app.get("/watchlist", tags=["Watchlist"])
 async def get_watchlist(
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-    authorization: str = Depends(security)
+    # authorization: str = Depends(security)
 ):
-    token_data = await is_authenticated(session, token)
-    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
+    # token_data = await is_authenticated(session, token)
+    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first()
+    
+    if watchlist == None:
+      return [] 
     watchlist_companies = session.query(models.List).filter(models.List.list_id == watchlist.id).all()
     return watchlist_companies
 
 @app.delete("/watchlist", tags=["Watchlist"])
 async def delete_from_watchlist(
     company_id: int,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-    authorization: str = Depends(security)
+    # authorization: str = Depends(security)
 ):
-    token_data = await is_authenticated(session, token)
-    watchlist_id = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first().id
+    # token_data = await is_authenticated(session, token)
+    watchlist_id = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first().id
     statement = delete(models.List).where(models.List.list_id == watchlist_id and models.List.company_id == company_id)
     session.execute(statement)
     session.commit()
@@ -415,17 +432,19 @@ async def delete_from_watchlist(
     return {"message" : f"Successfully deleted company from watchlist"}
 
 
-@app.put("/watchlist", tags=["Watchlist"])
+@app.post("/watchlist", tags=["Watchlist"])
 async def add_to_watchlist(
     company_id: int,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-    authorization: str = Depends(security)
+    # authorization: str = Depends(security)
 ):
-    token_data = await is_authenticated(session, token)
-    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
+    # token_data = await is_authenticated(session, token)
+    watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first()
     if watchlist is None:
-        new_watchlist = models.WatchList(id=max(models.List.id) + 1, user_id=token_data.userId)
+        max_id = session.query(func.max(models.List.list_id)).scalar()
+        new_watchlist_id = max_id + 1 if max_id is not None else 1
+        new_watchlist = models.WatchList(id=new_watchlist_id, user_id=user.id)
         session.add(new_watchlist)
         session.commit()
         watchlist_id = new_watchlist.id
@@ -439,26 +458,30 @@ async def add_to_watchlist(
 
 @app.get("/recently_viewed", tags=["recents"])
 async def get_recently_viewed(
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-    authorization: str = Depends(security)
+    # authorization: str = Depends(security)
 ):
-    token_data = await is_authenticated(session, token)
-    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == token_data.userId).first()
+    # token_data = await is_authenticated(session, token)
+    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == user.id).first()
+    if recentList == None:
+      return []
     recentCompanies = session.query(models.List).filter(models.List.list_id == recentList.id).order_by(models.List.created_at).all()
     return recentCompanies
 
-@app.put("/recently_viewed", tags=["recents"])
+@app.post("/recently_viewed", tags=["recents"])
 async def add_to_recently_viewed(
     company_id: int,
-    token: str = Depends(oauth2_scheme),
+    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-    authorization: str = Depends(security)
+    # authorization: str = Depends(security)
 ):
-    token_data = await is_authenticated(session, token)
-    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == token_data.userId).first()
+    # token_data = await is_authenticated(session, token)
+    recentList = session.query(models.RecentList).filter(models.RecentList.user_id == user.id).first()
     if recentList is None:
-        new_recent_list = models.RecentList(id=max(models.List.id) + 1, user_id=token_data.userId)
+        max_id = session.query(func.max(models.List.list_id)).scalar()
+        new_recent_id = max_id + 1 if max_id is not None else 1
+        new_recent_list = models.RecentList(id=new_recent_id, user_id=user.id)
         session.add(new_recent_list)
         session.commit()
         recent_id = new_recent_list.id

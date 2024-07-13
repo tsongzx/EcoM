@@ -8,6 +8,7 @@ export const fetchLists = async() => {
     //contain that information inside watchlist in the set State
     console.log(`getting the user's lists...`);
     //also return whether the list contains such element
+    // console.log(token);
     try {
         const response = await axios.get('http://127.0.0.1:8000/lists', {
             headers: {
@@ -26,10 +27,9 @@ export const fetchLists = async() => {
 
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
+    console.log(token);
     try {
-        const response = await axios.get('http://127.0.0.1:8000/list', {
-            list_id: listId,
-        }, {
+        const response = await axios.get('http://127.0.0.1:8000/list?list_id=${listId}', {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
@@ -49,10 +49,9 @@ export const createList = async (name) => {
     console.log(`CREATELIST: ${name}, ${typeof name}`);
     //create list
     try {
-        const response = await axios.post(`http://127.0.0.1:8000/list`, {
-            list_name: name
-        }, 
-        {headers: {
+        const response = await axios.post(`http://127.0.0.1:8000/list?list_name=${name}`,
+          {},
+          {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }});
@@ -121,9 +120,8 @@ export const getFormattedUserLists = async (companyId) => {
 //Check whether a company is in a list, returns a boolean
 export const companyIsInList = async(listId, companyId) => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/list', {
-            list_id: listId
-        }, {headers: {
+        const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`,
+        {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         }});
@@ -140,8 +138,8 @@ export const companyIsInList = async(listId, companyId) => {
 //return list of company id
 export const getFavouritesList = async() => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/watchlist', {}
-            , {headers: {
+        const response = await axios.get('http://127.0.0.1:8000/watchlist', 
+            {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }});
@@ -153,10 +151,9 @@ export const getFavouritesList = async() => {
 
 export const addToFavourites = async(companyId) => {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/watchlist', {
-            company_id: companyId
-        }
-            , {headers: {
+        const response = await axios.post(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
+          {},  
+          {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }});
@@ -168,10 +165,8 @@ export const addToFavourites = async(companyId) => {
 
 export const deleteFromFavourites = async(companyId) => {
     try {
-        const response = await axios.delete('http://127.0.0.1:8000/watchlist', {
-            company_id: companyId
-        }
-            , {headers: {
+        const response = await axios.delete(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
+            {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }});
@@ -185,8 +180,8 @@ export const deleteFromFavourites = async(companyId) => {
 //return list of recently viewed
 export const getRecentlyViewed = async() => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/recently_viewed', {}
-            , {headers: {
+        const response = await axios.get('http://127.0.0.1:8000/recently_viewed', 
+            {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }});

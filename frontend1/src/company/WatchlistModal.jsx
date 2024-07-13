@@ -66,7 +66,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         setWatchlist([...watchlist, { name: newWatchlistName, isChecked: true }]);
         //Automatically Add the company
         const listId = await createList(newWatchlistName);
-        addCompanyToList(listId, companyId);
+        const companyId_int = Number(companyId.split(" ")[1]);
+        addCompanyToList(listId.list_id, companyId_int);
         console.log('creating new watchlist called ', newWatchlistName);
         setNewWatchlistName('');
         console.log(watchlist);
