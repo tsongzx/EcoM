@@ -14,6 +14,9 @@ const Dashboard = () => {
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [lists, setLists] = useState([]);
+  //still need to implement displaying the recently viewed and stuff here but the api calls are made
+  const [ recents, setRecents ]= useState([]);
+  const [ favs, setFavs ] = useState([]);
   
   useEffect (() => {
     if (selectedCompany !== null) {
