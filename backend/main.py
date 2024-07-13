@@ -401,7 +401,7 @@ async def get_watchlist(
 
 @app.delete("/watchlist", tags=["Watchlist"])
 async def delete_from_watchlist(
-    company_id: str,
+    company_id: int,
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
     authorization: str = Depends(security)
@@ -417,7 +417,7 @@ async def delete_from_watchlist(
 
 @app.put("/watchlist", tags=["Watchlist"])
 async def add_to_watchlist(
-    company_id: str,
+    company_id: int,
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
     authorization: str = Depends(security)
@@ -425,7 +425,7 @@ async def add_to_watchlist(
     token_data = await is_authenticated(session, token)
     watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == token_data.userId).first()
     if watchlist is None:
-        new_watchlist = models.WatchList(user_id=token_data.userId)
+        new_watchlist = models.WatchList(id=max(models.List.id) + 1, user_id=token_data.userId)
         session.add(new_watchlist)
         session.commit()
         watchlist_id = new_watchlist.id
@@ -450,7 +450,7 @@ async def get_recently_viewed(
 
 @app.put("/recently_viewed", tags=["recents"])
 async def add_to_recently_viewed(
-    company_id: str,
+    company_id: int,
     token: str = Depends(oauth2_scheme),
     session: Session = Depends(get_session),
     authorization: str = Depends(security)
