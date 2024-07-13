@@ -458,7 +458,7 @@ async def add_to_recently_viewed(
     token_data = await is_authenticated(session, token)
     recentList = session.query(models.RecentList).filter(models.RecentList.user_id == token_data.userId).first()
     if recentList is None:
-        new_recent_list = models.RecentList(user_id=token_data.userId)
+        new_recent_list = models.RecentList(id=max(models.List.id) + 1, user_id=token_data.userId)
         session.add(new_recent_list)
         session.commit()
         recent_id = new_recent_list.id
