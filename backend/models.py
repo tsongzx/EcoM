@@ -50,3 +50,43 @@ class CompanyData(Base):
     company_id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     company_name:Mapped[str] = mapped_column(String(100), nullable=False)
     # TODO: Various other ESG parameters TBD
+    
+class Indicators(Base):
+    __tablename__ = 'CompanyList'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    
+class OfficialFrameworks(Base):
+    __tablename__ = 'OfficialFrameworks'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    framework_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=False)
+
+class UserFrameworks(Base):
+    __tablename__ = 'UserFrameworks'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    framework_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=False)
+    user_id: Mapped[int] = mapped_column(primary_key=True, unique=False, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    
+class Metrics(Base):
+    __tablename__ = 'Metrics'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    
+class CustomMetrics(Base):
+    __tablename__ = 'CustomMetrics'
+    
+    id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
+    officialFramework = Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
+    framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    
