@@ -5,6 +5,7 @@ import Home from './Home.jsx';
 import Dashboard from './Dashboard.jsx';
 import Company from './company/Company.jsx';
 import Compare from './compare/Compare.jsx';
+import Profile from './Profile.jsx';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/company/:companyId" element={<Company />} />
           <Route path="/compare" element={<Compare/>}/>
+          <Route path="/profile" element={<Profile/>}/>
         </Routes>
       </div>
     </Router>
