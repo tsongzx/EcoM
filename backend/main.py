@@ -403,7 +403,7 @@ async def delete_company_from_list(
 ):
     # token_data = await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
-    statement = delete(models.List).where(models.List.list_id == request.list_id and models.List.company_id == request.company_id)
+    statement = delete(models.List).where((models.List.list_id == request.list_id) & (models.List.company_id == request.company_id))
     session.execute(statement)
     session.commit()
     
