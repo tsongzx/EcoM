@@ -374,7 +374,25 @@ async def add_company_to_list(
      
     return {"message" : f"Successfully added {company.company_name} to list {request.list_id}"}
   
- 
+@app.get("/list/company", tags=["List"])
+# returns companies in a list
+async def is_company_in_list(
+    list_id: int,
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> bool:
+    company = session.query(models.CompanyData).filter_by(id=company_id).first()
+    list = session.query(models.UserList).filter_by(id=list_id).first()
+    if company is None or list is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company or list does not exist")
+  
+    existing_company = session.query(models.List).filter_by(list_id=list_id)\
+        .filter_by(company_id=company.id)\
+        .first()
+            
+    return True if existing_company else False
+   
 @app.delete("/list/company", tags=["List"])
 # returns companies in a list
 async def delete_company_from_list(

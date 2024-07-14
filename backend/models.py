@@ -86,7 +86,7 @@ class CompanyData(Base):
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
 class Indicators(Base):
-    __tablename__ = 'Indicators'
+    __tablename__ = 'IndicatorsList'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
