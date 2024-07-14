@@ -4,6 +4,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home.jsx';
 import Dashboard from './Dashboard.jsx';
 import Company from './company/Company.jsx';
+import Compare from './compare/Compare.jsx';
+import Profile from './Profile.jsx';
 
 function App() {
   return (
@@ -12,8 +14,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />}/>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/company" element={<Company />} />
-          <Route path="/company/:companyName" element={<Company />} />
+          <Route path="/company/:companyId" element={<Company />} />
+          <Route path="/compare" element={<Compare/>}/>
+          <Route path="/profile" element={<Profile/>}/>
         </Routes>
       </div>
     </Router>

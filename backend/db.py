@@ -10,18 +10,16 @@ logger = logging.getLogger()
 
 # https://stackoverflow.com/questions/10770377/how-to-create-db-in-mysql-with-sqlalchemy
 
-# usin pymysql driver
-# database_url = 'mysql+pymysql://username:password@host/database_name'
-
-# usin default driver - mysqlclient
-username = 'root'
-password = 'password'
-host = 'localhost' # or use IP address
+username = 'admin'
+password = 'crumpeteers'
+host = 'crumpeteers.chg60uma2isb.ap-southeast-2.rds.amazonaws.com' # or use IP address
 database_name = 'crumpeteers'
-database_url = f'mysql://{username}:{password}@{host}/{database_name}'
-if not database_exists(database_url):
-    logger.info("creating db")
-    create_database(database_url)
+# database_url = f'mysql://{username}:{password}@{host}/{database_name}'
+database_url = f'mysql+pymysql://{username}:{password}@{host}/{database_name}'
+
+# if not database_exists(database_url):
+#     logger.info("creating db")
+#     create_database(database_url)
 
 # turn on echo to see SQL statements that SQLAlchemy sends to your database.
 # turn off when in production

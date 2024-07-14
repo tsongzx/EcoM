@@ -7,7 +7,7 @@ class Token(BaseModel):
     token_type: str # honestly might not need this?
 
 class TokenData(BaseModel):
-    userId: Union[str, None] = None
+    userId: Union[int, None] = None
 
 class User(BaseModel):
     id: int
@@ -31,3 +31,7 @@ class PasswordUpdate(BaseModel):
     
 class NameUpdate(BaseModel):
     new_name: str
+
+class Watchlist(BaseModel):
+    user_id: int
+    watchlist_id: int

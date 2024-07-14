@@ -3,6 +3,8 @@ import { Grid, Paper, Typography, Card, CardContent, Autocomplete, TextField } f
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import ListElement from './ListElement.jsx';
+import { fetchLists } from './helper.js';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -11,16 +13,24 @@ const Dashboard = () => {
   const companies = ['Company 1', 'Company 2', 'Company 3'];
 
   const [selectedCompany, setSelectedCompany] = useState(null);
-
-
+  const [lists, setLists] = useState([]);
+  //still need to implement displaying the recently viewed and stuff here but the api calls are made
+  const [ recents, setRecents ]= useState([]);
+  const [ favs, setFavs ] = useState([]);
+  
   useEffect (() => {
     if (selectedCompany !== null) {
       console.log(selectedCompany);
+      //TODO: Should pass in Company ID instead of NAME
       navigate(`/company/${encodeURIComponent(selectedCompany)}`, { state: { companyName: selectedCompany } });
     }
   }, [selectedCompany, navigate]);
 
-
+  //get all the user's watchlists
+  useEffect(() => {
+    const userLists = fetchLists();
+    setLists(userLists);
+  }, []);
 
   return (
     <>
@@ -93,6 +103,9 @@ const Dashboard = () => {
                 My Lists (None)
               </Typography>
             </Paper>
+            {Array.isArray(lists) && lists?.map((list) =>{
+              <ListElement id={list.id} name={list.list_name} dateCreated={list.created_at}/>
+            })}
           </Grid>
         </Grid>
       </div>
