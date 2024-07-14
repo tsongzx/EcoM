@@ -50,7 +50,7 @@ class WatchList(Base):
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
-class CompanyData(Base):
+class CompanyList(Base):
     __tablename__ = 'CompanyList'
    
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
@@ -86,11 +86,13 @@ class CompanyData(Base):
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
 class Indicators(Base):
-    __tablename__ = 'CompanyList'
+    __tablename__ = 'IndicatorsList'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
-    
+    description: Mapped[str] = mapped_column(String(1000))
+    source: Mapped[str] = mapped_column(String(200))
+
 class OfficialFrameworks(Base):
     __tablename__ = 'OfficialFrameworks'
     
@@ -104,8 +106,8 @@ class UserFrameworks(Base):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     framework_name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
-    user_id: Mapped[int] = mapped_column(primary_key=True, unique=False, nullable=False)
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    user_id: Mapped[int] = mapped_column(unique=False, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
 class Metrics(Base):
     __tablename__ = 'Metrics'
@@ -118,11 +120,11 @@ class CustomMetrics(Base):
     __tablename__ = 'CustomMetrics'
     
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
-    officialFramework = Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
+    officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(datetime.UTC))
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
 
 class RecentList(Base):
     __tablename__ = 'RecentList'
