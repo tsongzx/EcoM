@@ -86,7 +86,7 @@ class CompanyData(Base):
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
 class Indicators(Base):
-    __tablename__ = 'CompanyList'
+    __tablename__ = 'IndicatorsList'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -118,7 +118,7 @@ class CustomMetrics(Base):
     __tablename__ = 'CustomMetrics'
     
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
-    officialFramework = Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
+    officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)

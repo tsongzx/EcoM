@@ -13,7 +13,7 @@ export const fetchLists = async() => {
         const response = await axios.get('http://127.0.0.1:8000/lists', {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
         console.log('successfully returned lists', response.data.length);
@@ -32,7 +32,7 @@ export const fetchCompaniesInList = async(listId) => {
         const response = await axios.get('http://127.0.0.1:8000/list?list_id=${listId}', {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
         const companyIds = response.data.map(company => company.id);
@@ -53,7 +53,7 @@ export const createList = async (name) => {
           {},
           {headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
         //if successful
         console.log('successfully added List name: ', name,  ' list id :', response.data);
@@ -72,7 +72,7 @@ export const addCompanyToList = async (listId, companyId ) => {
             company_id: companyId,
         }, {headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
         //if successfully added
         console.log(response.data);
@@ -88,7 +88,7 @@ export const removeCompanyFromList = async(listId, companyId) => {
             company_id: companyId,
         }, {headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
         if (response.status === 200) {
             console.log('Successfully removed from list');
@@ -123,7 +123,7 @@ export const companyIsInList = async(listId, companyId) => {
         const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`,
         {headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
         console.log(response.data);
         const companyExists = response.data.some(company => company.company_id === companyId);
@@ -141,7 +141,7 @@ export const getFavouritesList = async() => {
         const response = await axios.get('http://127.0.0.1:8000/watchlist', 
             {headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
         return response.data;
     } catch (error) {
@@ -155,7 +155,7 @@ export const addToFavourites = async(companyId) => {
           {},  
           {headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
         return response.data;
     } catch (error) {
@@ -168,7 +168,7 @@ export const deleteFromFavourites = async(companyId) => {
         const response = await axios.delete(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
             {headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
         return response.data;
     } catch (error) {
@@ -183,7 +183,7 @@ export const getRecentlyViewed = async() => {
         const response = await axios.get('http://127.0.0.1:8000/recently_viewed', 
             {headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
         return response.data;
     } catch (error) {
