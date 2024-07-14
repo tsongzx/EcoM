@@ -443,7 +443,7 @@ async def delete_from_watchlist(
 ):
     # token_data = await is_authenticated(session, token)
     watchlist_id = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first().id
-    statement = delete(models.List).where(models.List.list_id == watchlist_id and models.List.company_id == company_id)
+    statement = delete(models.List).where((models.List.list_id == watchlist_id) & (models.List.company_id == company_id))
     session.execute(statement)
     session.commit()
 
