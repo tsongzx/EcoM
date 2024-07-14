@@ -82,10 +82,11 @@ export const addCompanyToList = async (listId, companyId ) => {
 }
 
 export const removeCompanyFromList = async(listId, companyId) => {
+    console.log(companyId);
     try {
         const response = axios.delete('http://127.0.0.1:8000/list/company', {
-            list_id: listId,
-            company_id: companyId,
+            list_id: Number(listId),
+            company_id: Number(companyId.split(" ")[1])
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -118,22 +119,42 @@ export const getFormattedUserLists = async (companyId) => {
 }
 
 //Check whether a company is in a list, returns a boolean
-export const companyIsInList = async(listId, companyId) => {
-    try {
-        const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`,
-        {headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${Cookies.get('authToken')}`
-        }});
-        console.log(response.data);
-        const companyExists = response.data.some(company => company.company_id === companyId);
-        return companyExists;
+// export const companyIsInList = async(listId, companyId) => {
+//     try {
+//         const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`,
+//         {headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Bearer ${Cookies.get('authToken')}`
+//         }});
+//         console.log(response.data);
+//         const companyExists = response.data.some(company => company.company_id === companyId);
+//         return companyExists;
 
+//     } catch (error) {
+//         console.log(error);
+//         return false;
+//     }
+// }
+
+export const companyIsInList = async (listId, companyId) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/list/company', {
+            params: {
+                list_id: Number(listId),
+                company_id: Number(companyId.split(" ")[1])
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        console.log(response.data);
+        return response.data;
     } catch (error) {
         console.log(error);
         return false;
     }
-}
+};
 
 //return list of company id
 export const getFavouritesList = async() => {
