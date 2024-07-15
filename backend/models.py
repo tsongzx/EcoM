@@ -136,5 +136,7 @@ class Company(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
     company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
-    description: Mapped[str] = mapped_column(String(1000), nullable=True) 
-
+    perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
+    # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
+    headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
+        
