@@ -17,9 +17,9 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
     INTO TABLE Companies 
     FIELDS TERMINATED BY '|' 
       ENCLOSED BY '"'
-    LINES TERMINATED BY '\r\n'
+    LINES TERMINATED BY '\n'
     IGNORE 1 ROWS 
-    (company_name, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy);
+    (company_name, perm_id, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, headquarter_country);
   SHOW WARNINGS;
 EOF
   echo $f 'ran'

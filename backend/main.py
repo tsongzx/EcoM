@@ -519,42 +519,40 @@ async def add_to_recently_viewed(
 
     return {"message" : f"Successfully added company to recent list"}
 
-@app.post("/company", tags=["company"])
+@app.get("/company", tags=["company"])
 async def get_all_company(
     authorization: str = Depends(security),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companyData = session.query(models.Company).all()
+    companyData = session.query(models.Company).limit(20).all()
     return companyData
 
-@app.post("/company/{company_name}", tags=["company"])
+@app.get("/company/{company_id}", tags=["company"])
 async def get_company(
-    company_name: str,
-    authorization: str = Depends(security),
+    company_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companyData = session.query(models.CompanyData).filter(models.CompanyData.company_name == company_name).first()
+    companyData = session.query(models.Company).filter(models.Company.id == company_id).first()
     return companyData
 
-@app.post("/company/indicators/{company_name}", tags=["company"])
-async def get_company_metrics(
+@app.get("/company/indicators/{company_name}", tags=["company"])
+async def get_company_indicators(
     company_name: str,
-    authorization: str = Depends(security),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     company_data = session.query(models.CompanyData).filter(models.CompanyData.company_name == company_name).all()
-    company_metrics = []
-    for data in company_data:
-        metrics = {
-            "metric_name": data.metric_name,
-            "metric_description": data.metric_description,
-            "metric_unit": data.metric_unit,
-            "metric_value": data.metric_value,
-            "metric_year": data.metric_year,
-            "metric_period": data.metric_period,
-        }
-        company_metrics.append(metrics)
-    return company_metrics
+    # company_indicators = []
+    # for data in company_data:
+    #     indicators = {
+    #         "Name": data.metric_name,
+    #         "Description": data.metric_description,
+    #         "Unit": data.metric_unit,
+    #         "Value": data.metric_value,
+    #         "Year": data.metric_year,
+    #         "Period": data.metric_period,
+    #     }
+    #     company_indicators.append(indicators)
+    return company_data
