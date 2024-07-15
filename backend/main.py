@@ -313,7 +313,21 @@ async def create_list(
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
 
-    max_id = session.query(func.max(models.List.list_id)).scalar()
+    max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+    max_id_2 = session.query(func.max(models.RecentList.id)).scalar()
+    max_id_3 = session.query(func.max(models.WatchList.id)).scalar()
+    max_id_4 = session.query(func.max(models.UserList.id)).scalar()
+
+    if max_id_1 == None:
+        max_id_1 = 0
+    if max_id_2 == None:
+        max_id_2 = 0
+    if max_id_3 == None:
+        max_id_3 = 0
+    if max_id_4 == None:
+        max_id_4 = 0
+
+    max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
     new_list_id = max_id + 1 if max_id is not None else 1
     new_list = models.UserList(id=new_list_id, user_id=user.id, list_name=list_name)
 
@@ -460,7 +474,21 @@ async def add_to_watchlist(
     # token_data = await is_authenticated(session, token)
     watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first()
     if watchlist is None:
-        max_id = session.query(func.max(models.List.list_id)).scalar()
+        max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+        max_id_2 = session.query(func.max(models.UserList.id)).scalar()
+        max_id_3 = session.query(func.max(models.RecentList.id)).scalar()
+        max_id_4 = session.query(func.max(models.WatchList.id)).scalar()
+
+        if max_id_1 == None:
+            max_id_1 = 0
+        if max_id_2 == None:
+            max_id_2 = 0
+        if max_id_3 == None:
+            max_id_3 = 0
+        if max_id_4 == None:
+            max_id_4 = 0
+
+        max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
         new_watchlist_id = max_id + 1 if max_id is not None else 1
         new_watchlist = models.WatchList(id=new_watchlist_id, user_id=user.id)
         session.add(new_watchlist)
@@ -497,7 +525,21 @@ async def add_to_recently_viewed(
     # token_data = await is_authenticated(session, token)
     recentList = session.query(models.RecentList).filter(models.RecentList.user_id == user.id).first()
     if recentList is None:
-        max_id = session.query(func.max(models.List.list_id)).scalar()
+        max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+        max_id_2 = session.query(func.max(models.UserList.id)).scalar()
+        max_id_3 = session.query(func.max(models.WatchList.id)).scalar()
+        max_id_4 = session.query(func.max(models.RecentList.id)).scalar()
+
+        if max_id_1 == None:
+            max_id_1 = 0
+        if max_id_2 == None:
+            max_id_2 = 0
+        if max_id_3 == None:
+            max_id_3 = 0
+        if max_id_4 == None:
+            max_id_4 = 0
+
+        max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
         new_recent_id = max_id + 1 if max_id is not None else 1
         new_recent_list = models.RecentList(id=new_recent_id, user_id=user.id)
         session.add(new_recent_list)
@@ -521,11 +563,13 @@ async def add_to_recently_viewed(
 
 @app.get("/company", tags=["company"])
 async def get_all_company(
+    page: int,
     authorization: str = Depends(security),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companyData = session.query(models.Company).limit(20).all()
+    offset = page * 20
+    companyData = session.query(models.Company).offset(offset).limit(20).all()
     return companyData
 
 @app.get("/company/{company_id}", tags=["company"])
