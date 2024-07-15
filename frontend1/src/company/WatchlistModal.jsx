@@ -12,6 +12,7 @@ import {getFormattedUserLists, createList, addCompanyToList, removeCompanyFromLi
  * @returns {JSX.Element}
  */
 const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
+    console.log(typeof(companyId));
     const [watchlist, setWatchlist] = useState([]); //this should be populated with whatever lists the user has via backend
     const [listName, setListName] = useState(false);
     const [newWatchlistName, setNewWatchlistName] = useState('');
@@ -68,8 +69,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         setWatchlist([...watchlist, { name: newWatchlistName, isChecked: true }]);
         //Automatically Add the company
         const listId = await createList(newWatchlistName);
-        const companyId_int = Number(companyId.split(" ")[1]);
-        addCompanyToList(listId.list_id, companyId_int);
+        // const companyId_int = Number(companyId.split(" ")[1]);
+        addCompanyToList(listId.list_id, companyId);
         console.log('creating new watchlist called ', newWatchlistName);
         setNewWatchlistName('');
         console.log(watchlist);
@@ -91,7 +92,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         if (hasChecked === true) {
             console.log('true');
             // addCompanyToList(watchlist[index].id, companyId);
-            addCompanyToList(watchlist[index].id, Number(companyId.split(" ")[1]));
+            addCompanyToList(watchlist[index].id, companyId);
         } else {
             removeCompanyFromList(watchlist[index].id, companyId);
         }

@@ -1,56 +1,73 @@
-import {React, useState, useEffect} from 'react';
-import { Grid, Paper, Typography, Card, CardContent, Autocomplete, TextField } from '@mui/material';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Grid, Paper, Typography, Card, CardContent } from '@mui/material';
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import ListElement from './ListElement.jsx';
-import { fetchLists } from './helper.js';
+import { fetchLists, fetchCompanies } from './helper.js';
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
   const industries = ['Industry 1', 'Industry 2', 'Industry 3', 'Industry 4', 'Industry 5'];
-  const companies = ['Company 1', 'Company 2', 'Company 3'];
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [lists, setLists] = useState([]);
-  //still need to implement displaying the recently viewed and stuff here but the api calls are made
-  const [ recents, setRecents ]= useState([]);
-  const [ favs, setFavs ] = useState([]);
-  
-  useEffect (() => {
+  const [recents, setRecents] = useState([]);
+  const [favs, setFavs] = useState([]);
+  const [listOfCompanies, setListOfCompanies] = useState([]);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  useEffect(() => {
     if (selectedCompany !== null) {
-      console.log(selectedCompany);
-      //TODO: Should pass in Company ID instead of NAME
-      navigate(`/company/${encodeURIComponent(selectedCompany)}`, { state: { companyName: selectedCompany } });
+      navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, { state: { companyId: selectedCompany.id, companyName: selectedCompany.company_name } });
     }
   }, [selectedCompany, navigate]);
 
-  //get all the user's watchlists
   useEffect(() => {
+    console.log(page);
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const companiesAvailable = await fetchCompanies(page);
+        setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
+        setHasMore(companiesAvailable.length > 0);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      }
+      setLoading(false);
+    };
+
     const userLists = fetchLists();
     setLists(userLists);
-  }, []);
+    fetchData();
+  }, [page]);
+
+  useEffect(() => {
+    console.log(listOfCompanies);
+  }, [listOfCompanies]);
+
+  const handleMenuScrollToBottom = () => {
+    if (!loading && hasMore) {
+      setPage(prevPage => prevPage + 1);
+    }
+  };
 
   return (
     <>
-      <Navbar /> 
+      <Navbar />
 
       <div style={{ maxWidth: '100vw', height: '100vh', paddingTop: '50px' }}>
         <Grid container direction="row" spacing={2} style={{ width: '100%', maxWidth: '100%', height: '100%' }}>
-          <Grid item xs={12} style={{ minHeight: '30%'}}>
+          <Grid item xs={12} style={{ minHeight: '30%' }}>
             <Paper style={{ height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row', boxShadow: 'none' }}>
               <Card style={{ width: '40%', boxShadow: 'none', minHeight: '30vh' }}>
                 <CardContent style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'column' }}>
                   <Typography variant="h6" gutterBottom style={{ color: 'lightgray', alignSelf: 'flex-start' }}>
                     Select Industry
                   </Typography>
-                  {/* <Autocomplete
-                    style={{ width: '50%', border: '1px solid red'}}
-                    options={industries}
-                    renderInput={(params) => <TextField {...params} label="Select an option" variant="outlined"/>}
-                    filterOptions={(options, state) => options.slice(0, 3)}
-                  /> */}
                   <Select
                     styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
                     options={industries.map(industry => ({ value: industry, label: industry }))}
@@ -64,20 +81,13 @@ const Dashboard = () => {
                   <Typography variant="h6" gutterBottom style={{ color: 'lightgray', alignSelf: 'flex-start' }}>
                     Select Company
                   </Typography>
-                  {/* <Autocomplete style={{ width: '50%'}}
-                    options={companies}
-                    renderInput={(params) => <TextField {...params} label="Select an option" variant="outlined" />}
-                    filterOptions={(options, state) => options.slice(0, 3)}
-                    onChange={(event, newValue) => {
-                      setSelectedCompany(newValue);
-                    }}
-                  /> */}
                   <Select
                     styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
-                    options={companies.map(company => ({ value: company, label: company }))}
+                    options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
                     placeholder="Select an option"
-                    onChange={(selectedOption) => setSelectedCompany(selectedOption.value)}
+                    onChange={(selectedOption) => setSelectedCompany(listOfCompanies.find(company => company.id === selectedOption.value))}
                     maxMenuHeight={100}
+                    onMenuScrollToBottom={handleMenuScrollToBottom}
                   />
                 </CardContent>
               </Card>
@@ -103,9 +113,9 @@ const Dashboard = () => {
                 My Lists (None)
               </Typography>
             </Paper>
-            {Array.isArray(lists) && lists?.map((list) =>{
-              <ListElement id={list.id} name={list.list_name} dateCreated={list.created_at}/>
-            })}
+            {Array.isArray(lists) && lists?.map((list) => (
+              <ListElement key={list.id} id={list.id} name={list.list_name} dateCreated={list.created_at}/>
+            ))}
           </Grid>
         </Grid>
       </div>
