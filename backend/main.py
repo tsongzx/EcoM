@@ -38,12 +38,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 app = FastAPI(openapi_tags=tags_metadata)
-# security = HTTPBearer()
+security = HTTPBearer()
 
-# @app.get('/')
-# def main(authorization: str = Depends(security)):
-#     print("something happend")
-#     return authorization.credentials
+@app.get('/')
+def main(authorization: str = Depends(security)):
+    print("something happend")
+    return authorization.credentials
 
 app.add_middleware(
     CORSMiddleware,
@@ -518,3 +518,43 @@ async def add_to_recently_viewed(
     session.refresh(new_recent)
 
     return {"message" : f"Successfully added company to recent list"}
+
+@app.post("/company", tags=["company"])
+async def get_all_company(
+    authorization: str = Depends(security),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(models.Company).all()
+    return companyData
+
+@app.post("/company/{company_name}", tags=["company"])
+async def get_company(
+    company_name: str,
+    authorization: str = Depends(security),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(models.CompanyData).filter(models.CompanyData.company_name == company_name).first()
+    return companyData
+
+@app.post("/company/indicators/{company_name}", tags=["company"])
+async def get_company_metrics(
+    company_name: str,
+    authorization: str = Depends(security),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    company_data = session.query(models.CompanyData).filter(models.CompanyData.company_name == company_name).all()
+    company_metrics = []
+    for data in company_data:
+        metrics = {
+            "metric_name": data.metric_name,
+            "metric_description": data.metric_description,
+            "metric_unit": data.metric_unit,
+            "metric_value": data.metric_value,
+            "metric_year": data.metric_year,
+            "metric_period": data.metric_period,
+        }
+        company_metrics.append(metrics)
+    return company_metrics
