@@ -47,8 +47,10 @@ const Home = () => {
       if (response.status === 200) {
         console.log('User logged in successfully:', response.data);
         const token = response.data.access_token;
-        Cookies.set('authToken', token); // Session cookie
+        Cookies.set('authToken', token);
         handleCloseLogin();
+        
+        // handleCloseLogin();
         navigate('./Dashboard');
       }
     } catch (error) {
