@@ -25,6 +25,29 @@ export const fetchLists = async() => {
     }
 }
 
+// Gets 20 companies at a time when the user first goes into the dashboard
+export const fetchCompanies = async(page) => {
+    console.log('Getting all the companies available');
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/company', 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                },
+                params: {
+                    page: page
+                }
+            }
+        );
+        const companies = response.data.slice(0, 20);
+        return companies;
+    } catch (error) {
+        console.log('Error fetching the companies', error);
+        return [];
+    }
+}
+
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
     console.log(token);
@@ -69,7 +92,7 @@ export const addCompanyToList = async (listId, companyId ) => {
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
             list_id: listId,
-            company_id: companyId,
+            company_id: parseInt(companyId),
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -141,7 +164,7 @@ export const companyIsInList = async (listId, companyId) => {
         const response = await axios.get('http://127.0.0.1:8000/list/company', {
             params: {
                 list_id: Number(listId),
-                company_id: Number(companyId.split(" ")[1])
+                company_id: companyId
             },
             headers: {
                 'Content-Type': 'application/json',
