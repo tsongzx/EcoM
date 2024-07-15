@@ -86,7 +86,7 @@ class CompanyData(Base):
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
 class Indicators(Base):
-    __tablename__ = 'IndicatorsList'
+    __tablename__ = 'CompanyList'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -106,6 +106,7 @@ class UserFrameworks(Base):
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
     user_id: Mapped[int] = mapped_column(primary_key=True, unique=False, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
 class Metrics(Base):
     __tablename__ = 'Metrics'
@@ -119,9 +120,11 @@ class CustomMetrics(Base):
     
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
     officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
+    officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
 
 class RecentList(Base):
@@ -130,3 +133,11 @@ class RecentList(Base):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
+
+class Company(Base):
+    __tablename__ = 'Companies'
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
+    company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(1000), nullable=True) 
+
