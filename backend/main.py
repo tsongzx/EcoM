@@ -496,11 +496,16 @@ async def add_to_watchlist(
         watchlist_id = new_watchlist.id
     else:
         watchlist_id = watchlist.id
-    new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
-    session.add(new_watchlist_company)
-    session.commit()
-    session.refresh(new_watchlist_company)
-    return {"message" : f"Successfully added company to watchlist"}
+    check_if_exists = session.query(models.List).where(models.List.list_id == watchlist_id).where(models.List.company_id == company_id).first()
+    if check_if_exists is None:
+        new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
+        session.add(new_watchlist_company)
+        session.commit()
+        session.refresh(new_watchlist_company)
+        return {"message" : f"Successfully added company to watchlist"}
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company already exists in watchlist")
+    
 
 @app.get("/recently_viewed", tags=["recents"])
 async def get_recently_viewed(
@@ -548,6 +553,12 @@ async def add_to_recently_viewed(
     else:
         recent_id = recentList.id
     recent_companies_length = session.query(models.List).filter(models.List.list_id == recent_id).count()
+
+    check_if_exists = session.query(models.List).where(models.List.list_id == recent_id).where(models.List.company_id == company_id).first()
+    if check_if_exists is not None:
+        statement = check_if_exists
+        session.delete(statement)
+        session.commit()
 
     if recent_companies_length >= 20:
         statement = session.query(models.List).where(models.List.list_id == recent_id).order_by(models.List.id).first()
