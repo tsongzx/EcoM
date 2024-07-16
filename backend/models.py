@@ -59,8 +59,8 @@ class Company(Base):
     # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
         
-class CompanyList(Base):
-    __tablename__ = 'CompanyList'
+class CompanyData(Base):
+    __tablename__ = 'CompanyData'
    
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
     company_name: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -77,13 +77,13 @@ class CompanyList(Base):
       create_constraint=True,
       validate_strings=True,
     ))
-    metric_description: Mapped[str] = mapped_column(String(350), nullable=False)
-    metric_name: Mapped[str] = mapped_column(String(100), nullable=False)
-    metric_unit: Mapped[str] = mapped_column(String(100), nullable=False)
-    metric_value: Mapped[str] = mapped_column(String(100), nullable=False)
-    metric_year: Mapped[str] = mapped_column(DateTime)
+    indicator_description: Mapped[str] = mapped_column(String(500), nullable=False)
+    indicator_name: Mapped[str] = mapped_column(String(100), nullable=False)
+    indicator_unit: Mapped[str] = mapped_column(String(100), nullable=False)
+    indicator_value: Mapped[float] = mapped_column(nullable=False)
+    indicator_year: Mapped[str] = mapped_column(DateTime)
     nb_points_of_observations: Mapped[int] = mapped_column()
-    metric_period:  Mapped[str] = mapped_column(String(100))
+    indicator_period:  Mapped[str] = mapped_column(String(100))
     provider_name:  Mapped[str] = mapped_column(String(100), nullable=False) 
     reported_date:  Mapped[DateTime] = mapped_column(DateTime) 
     pillar:  Mapped[Pillar] = mapped_column(Enum(
@@ -105,7 +105,7 @@ class Indicators(Base):
       create_constraint=True,
       validate_strings=True,
     ))
-    description: Mapped[str] = mapped_column(String(350), nullable=False)
+    description: Mapped[str] = mapped_column(String(500), nullable=False)
     name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     unit: Mapped[str] = mapped_column(String(100), nullable=False)
     pillar:  Mapped[Pillar] = mapped_column(Enum(
@@ -173,13 +173,4 @@ class RecentList(Base):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-
-class Company(Base):
-    __tablename__ = 'Companies'
-
-    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
-    company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
-    perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
-    # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
-    headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
-        
+            
