@@ -94,6 +94,7 @@ class CompanyList(Base):
     ))
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
+      #to do - change primary key from id to name 
 class Indicators(Base):
     __tablename__ = 'Indicators'
     
@@ -119,7 +120,7 @@ class Metrics(Base):
     __tablename__ = 'Metrics'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
     # description: Mapped[str] = mapped_column(String(1000))
 
 class MetricIndicators(Base):
@@ -127,8 +128,9 @@ class MetricIndicators(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-    indicator_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-
+    indicator_name: Mapped[str] = mapped_column(String(100), primary_key=False, unique=False, nullable=False)
+    indicator_id: Mapped[int] = mapped_column(primary_key=False, unique=False)
+    
 class OfficialFrameworks(Base):
     __tablename__ = 'OfficialFrameworks'
     
@@ -150,6 +152,7 @@ class OfficialFrameworkMetrics(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     
 class CustomMetrics(Base):
@@ -158,10 +161,12 @@ class CustomMetrics(Base):
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
     officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    # subcategory: Mapped[str] = mapped_column(String(100), nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-
+    
 class RecentList(Base):
     __tablename__ = 'RecentList'
 
