@@ -97,7 +97,7 @@ class CompanyList(Base):
       #to do - change primary key from id to name 
 class Indicators(Base):
     __tablename__ = 'Indicators'
-    
+ 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     data_type: Mapped[Data_Type] = mapped_column(Enum(
       *get_args(Data_Type),
@@ -166,10 +166,20 @@ class CustomMetrics(Base):
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-    
+
 class RecentList(Base):
     __tablename__ = 'RecentList'
 
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
+
+class Company(Base):
+    __tablename__ = 'Companies'
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
+    company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
+    perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
+    # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
+    headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
+        

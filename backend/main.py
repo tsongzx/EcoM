@@ -38,12 +38,12 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 app = FastAPI(openapi_tags=tags_metadata)
-# security = HTTPBearer()
+security = HTTPBearer()
 
-# @app.get('/')
-# def main(authorization: str = Depends(security)):
-#     print("something happend")
-#     return authorization.credentials
+@app.get('/')
+def main(authorization: str = Depends(security)):
+    print("something happend")
+    return authorization.credentials
 
 app.add_middleware(
     CORSMiddleware,
@@ -313,7 +313,21 @@ async def create_list(
     if existing_list:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="List name already in use")
 
-    max_id = session.query(func.max(models.List.list_id)).scalar()
+    max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+    max_id_2 = session.query(func.max(models.RecentList.id)).scalar()
+    max_id_3 = session.query(func.max(models.WatchList.id)).scalar()
+    max_id_4 = session.query(func.max(models.UserList.id)).scalar()
+
+    if max_id_1 == None:
+        max_id_1 = 0
+    if max_id_2 == None:
+        max_id_2 = 0
+    if max_id_3 == None:
+        max_id_3 = 0
+    if max_id_4 == None:
+        max_id_4 = 0
+
+    max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
     new_list_id = max_id + 1 if max_id is not None else 1
     new_list = models.UserList(id=new_list_id, user_id=user.id, list_name=list_name)
 
@@ -374,7 +388,25 @@ async def add_company_to_list(
      
     return {"message" : f"Successfully added {company.company_name} to list {request.list_id}"}
   
- 
+@app.get("/list/company", tags=["List"])
+# returns companies in a list
+async def is_company_in_list(
+    list_id: int,
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> bool:
+    company = session.query(models.CompanyData).filter_by(id=company_id).first()
+    list = session.query(models.UserList).filter_by(id=list_id).first()
+    if company is None or list is None:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company or list does not exist")
+  
+    existing_company = session.query(models.List).filter_by(list_id=list_id)\
+        .filter_by(company_id=company.id)\
+        .first()
+            
+    return True if existing_company else False
+   
 @app.delete("/list/company", tags=["List"])
 # returns companies in a list
 async def delete_company_from_list(
@@ -385,7 +417,7 @@ async def delete_company_from_list(
 ):
     # token_data = await is_authenticated(session, token)
     # await is_authenticated(session, authorization.credentials)
-    statement = delete(models.List).where(models.List.list_id == request.list_id and models.List.company_id == request.company_id)
+    statement = delete(models.List).where((models.List.list_id == request.list_id) & (models.List.company_id == request.company_id))
     session.execute(statement)
     session.commit()
     
@@ -425,7 +457,7 @@ async def delete_from_watchlist(
 ):
     # token_data = await is_authenticated(session, token)
     watchlist_id = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first().id
-    statement = delete(models.List).where(models.List.list_id == watchlist_id and models.List.company_id == company_id)
+    statement = delete(models.List).where((models.List.list_id == watchlist_id) & (models.List.company_id == company_id))
     session.execute(statement)
     session.commit()
 
@@ -442,7 +474,21 @@ async def add_to_watchlist(
     # token_data = await is_authenticated(session, token)
     watchlist = session.query(models.WatchList).filter(models.WatchList.user_id == user.id).first()
     if watchlist is None:
-        max_id = session.query(func.max(models.List.list_id)).scalar()
+        max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+        max_id_2 = session.query(func.max(models.UserList.id)).scalar()
+        max_id_3 = session.query(func.max(models.RecentList.id)).scalar()
+        max_id_4 = session.query(func.max(models.WatchList.id)).scalar()
+
+        if max_id_1 == None:
+            max_id_1 = 0
+        if max_id_2 == None:
+            max_id_2 = 0
+        if max_id_3 == None:
+            max_id_3 = 0
+        if max_id_4 == None:
+            max_id_4 = 0
+
+        max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
         new_watchlist_id = max_id + 1 if max_id is not None else 1
         new_watchlist = models.WatchList(id=new_watchlist_id, user_id=user.id)
         session.add(new_watchlist)
@@ -450,11 +496,16 @@ async def add_to_watchlist(
         watchlist_id = new_watchlist.id
     else:
         watchlist_id = watchlist.id
-    new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
-    session.add(new_watchlist_company)
-    session.commit()
-    session.refresh(new_watchlist_company)
-    return {"message" : f"Successfully added company to watchlist"}
+    check_if_exists = session.query(models.List).where(models.List.list_id == watchlist_id).where(models.List.company_id == company_id).first()
+    if check_if_exists is None:
+        new_watchlist_company = models.List(list_id=watchlist_id, company_id=company_id)
+        session.add(new_watchlist_company)
+        session.commit()
+        session.refresh(new_watchlist_company)
+        return {"message" : f"Successfully added company to watchlist"}
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Company already exists in watchlist")
+    
 
 @app.get("/recently_viewed", tags=["recents"])
 async def get_recently_viewed(
@@ -479,7 +530,21 @@ async def add_to_recently_viewed(
     # token_data = await is_authenticated(session, token)
     recentList = session.query(models.RecentList).filter(models.RecentList.user_id == user.id).first()
     if recentList is None:
-        max_id = session.query(func.max(models.List.list_id)).scalar()
+        max_id_1 = session.query(func.max(models.List.list_id)).scalar()
+        max_id_2 = session.query(func.max(models.UserList.id)).scalar()
+        max_id_3 = session.query(func.max(models.WatchList.id)).scalar()
+        max_id_4 = session.query(func.max(models.RecentList.id)).scalar()
+
+        if max_id_1 == None:
+            max_id_1 = 0
+        if max_id_2 == None:
+            max_id_2 = 0
+        if max_id_3 == None:
+            max_id_3 = 0
+        if max_id_4 == None:
+            max_id_4 = 0
+
+        max_id = max(max_id_1, max_id_2, max_id_3, max_id_4)
         new_recent_id = max_id + 1 if max_id is not None else 1
         new_recent_list = models.RecentList(id=new_recent_id, user_id=user.id)
         session.add(new_recent_list)
@@ -488,6 +553,12 @@ async def add_to_recently_viewed(
     else:
         recent_id = recentList.id
     recent_companies_length = session.query(models.List).filter(models.List.list_id == recent_id).count()
+
+    check_if_exists = session.query(models.List).where(models.List.list_id == recent_id).where(models.List.company_id == company_id).first()
+    if check_if_exists is not None:
+        statement = check_if_exists
+        session.delete(statement)
+        session.commit()
 
     if recent_companies_length >= 20:
         statement = session.query(models.List).where(models.List.list_id == recent_id).order_by(models.List.id).first()
@@ -500,3 +571,43 @@ async def add_to_recently_viewed(
     session.refresh(new_recent)
 
     return {"message" : f"Successfully added company to recent list"}
+
+@app.get("/company", tags=["company"])
+async def get_all_company(
+    page: int,
+    authorization: str = Depends(security),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    offset = page * 20
+    companyData = session.query(models.Company).offset(offset).limit(20).all()
+    return companyData
+
+@app.get("/company/{company_id}", tags=["company"])
+async def get_company(
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(models.Company).filter(models.Company.id == company_id).first()
+    return companyData
+
+@app.get("/company/indicators/{company_name}", tags=["company"])
+async def get_company_indicators(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    company_data = session.query(models.CompanyData).filter(models.CompanyData.company_name == company_name).all()
+    # company_indicators = []
+    # for data in company_data:
+    #     indicators = {
+    #         "Name": data.metric_name,
+    #         "Description": data.metric_description,
+    #         "Unit": data.metric_unit,
+    #         "Value": data.metric_value,
+    #         "Year": data.metric_year,
+    #         "Period": data.metric_period,
+    #     }
+    #     company_indicators.append(indicators)
+    return company_data

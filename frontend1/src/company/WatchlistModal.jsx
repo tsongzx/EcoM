@@ -12,12 +12,13 @@ import {getFormattedUserLists, createList, addCompanyToList, removeCompanyFromLi
  * @returns {JSX.Element}
  */
 const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
+    console.log(typeof(companyId));
     const [watchlist, setWatchlist] = useState([]); //this should be populated with whatever lists the user has via backend
     const [listName, setListName] = useState(false);
     const [newWatchlistName, setNewWatchlistName] = useState('');
 
     const token = Cookies.get('authToken');
-    console.log('opened watchlist modal for company: ', companyId, ' token ', token);
+    // console.log('opened watchlist modal for company: ', companyId, ' token ', token);
 
     const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
     // When someone clicks the button to add a new watchlist
@@ -27,14 +28,16 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     useEffect(() => {
         const fetchWatchlist = async () => {
             const formattedLists = await getFormattedUserLists(companyId);
+            console.log(formattedLists);
             setWatchlist(formattedLists);
         };
 
         fetchWatchlist();
     }, [companyId]);
 
+
     const closeWatchListModal = () => {
-        console.log('closing watchlist Modal...');
+        // console.log('closing watchlist Modal...');
         setNewWatchlistName('');
         handleClose();
     }
@@ -66,8 +69,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         setWatchlist([...watchlist, { name: newWatchlistName, isChecked: true }]);
         //Automatically Add the company
         const listId = await createList(newWatchlistName);
-        const companyId_int = Number(companyId.split(" ")[1]);
-        addCompanyToList(listId.list_id, companyId_int);
+        // const companyId_int = Number(companyId.split(" ")[1]);
+        addCompanyToList(listId.list_id, companyId);
         console.log('creating new watchlist called ', newWatchlistName);
         setNewWatchlistName('');
         console.log(watchlist);
@@ -75,15 +78,20 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
 
     //updates the watchlists that contain the company
     const handleCheckboxChange = (event, index) => {
-        console.log(watchlist);
+        const hasChecked = event.target.checked;
+        console.log(event.target.checked);
         console.log(`Checkbox at ${index} changed to ${event.target.checked ? 'checked' : 'unchecked'}`);
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
             newWatchlist[index] = { ...newWatchlist[index], isChecked: event.target.checked }; // Update the checked property
+            console.log(newWatchlist);
             return newWatchlist; // Return the updated array to update state
         });
         //Add Company to List
-        if (event.target.isChecked) {
+        // if (event.target.isChecked) {
+        if (hasChecked === true) {
+            console.log('true');
+            // addCompanyToList(watchlist[index].id, companyId);
             addCompanyToList(watchlist[index].id, companyId);
         } else {
             removeCompanyFromList(watchlist[index].id, companyId);
@@ -100,6 +108,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
             newWatchlist[index] = { ...newWatchlist[index], isChecked: !newWatchlist[index].isChecked }; // Update the checked property
+            console.log('here');
             return newWatchlist; // Return the updated array to update state
         });
 
@@ -127,7 +136,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
                 {/* Render exisitng watchlists */}
                 <div className="watchlistContainer">
                     {Array.isArray(watchlist) && watchlist?.map((list, index) => (
-                        <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
+                        // <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
+                        <Button key={index}>{list.name}
                             <Checkbox {...label} checked={list.isChecked} onChange={(event) => handleCheckboxChange(event, index)}/>
                         </Button>
                     ))}

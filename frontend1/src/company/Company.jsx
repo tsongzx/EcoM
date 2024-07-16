@@ -13,8 +13,7 @@ import Cookies from "js-cookie";
 
 const Company = () => {
   const location = useLocation();
-  const { companyId } = useParams();
-  const { companyName } = location.state || {};
+  const { companyId, companyName } = location.state || {};
 	const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
@@ -25,11 +24,13 @@ const Company = () => {
   useEffect(async () => {
     // Add to recently viewed
     // array should be of size 2
-    const companyId_int = Number(companyId.split(" ")[1]);
-    await addToRecentlyViewed(companyId_int);
+    // const companyId_int = Number(companyId.split(" ")[1]);
+    // await addToRecentlyViewed(companyId_int);
+    console.log(companyId);
+    await addToRecentlyViewed(companyId);
     // Check if in Favourites
     const recentList = await getRecentlyViewed();
-    if (Array.isArray(recentList) && recentList.includes(companyId_int)) {
+    if (Array.isArray(recentList) && recentList.includes(companyId)) {
       setIsInFavs(true);
     } else {
       setIsInFavs(false);
@@ -106,8 +107,8 @@ const Company = () => {
                 )} */}
                 <div className = 'metainfoContainer'>
                   <div className = 'companyName metainfo'>
-                    <h1>NDQ</h1>
-                    <h3>NASDAQ, inc. ETF</h3>
+                    <h1>{companyName}</h1>
+                    <h3>NASDAQ, inc. ETF - What is this for?</h3>
                   </div>
                   <div className = 'currentPrice metainfo'>
                     <h2> 58.78</h2>
