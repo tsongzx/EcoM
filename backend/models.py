@@ -49,8 +49,17 @@ class WatchList(Base):
     user_id: Mapped[int] = mapped_column(unique=True, nullable=False)
     # change to aest?
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
-    
-class CompanyData(Base):
+
+class Company(Base):
+    __tablename__ = 'Companies'
+
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
+    company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
+    perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
+    # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
+    headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
+        
+class CompanyList(Base):
     __tablename__ = 'CompanyList'
    
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
@@ -85,11 +94,42 @@ class CompanyData(Base):
     ))
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
       
+      #to do - change primary key from id to name 
 class Indicators(Base):
-    __tablename__ = 'IndicatorsList'
+    __tablename__ = 'Indicators'
+ 
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    data_type: Mapped[Data_Type] = mapped_column(Enum(
+      *get_args(Data_Type),
+      name="data_type",
+      create_constraint=True,
+      validate_strings=True,
+    ))
+    description: Mapped[str] = mapped_column(String(350), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    unit: Mapped[str] = mapped_column(String(100), nullable=False)
+    pillar:  Mapped[Pillar] = mapped_column(Enum(
+      *get_args(Pillar),
+      name="pillar",
+      create_constraint=True,
+      validate_strings=True,
+    ))
+    source: Mapped[str] = mapped_column(String(200))
+    
+class Metrics(Base):
+    __tablename__ = 'Metrics'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
-    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
+    # description: Mapped[str] = mapped_column(String(1000))
+
+class MetricIndicators(Base):
+    __tablename__ = 'MetricIndicators'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    indicator_name: Mapped[str] = mapped_column(String(100), primary_key=False, unique=False, nullable=False)
+    indicator_id: Mapped[int] = mapped_column(primary_key=False, unique=False)
     
 class OfficialFrameworks(Base):
     __tablename__ = 'OfficialFrameworks'
@@ -104,14 +144,15 @@ class UserFrameworks(Base):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     framework_name: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
-    user_id: Mapped[int] = mapped_column(primary_key=True, unique=False, nullable=False)
+    user_id: Mapped[int] = mapped_column(unique=False, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
     
-class Metrics(Base):
-    __tablename__ = 'Metrics'
+class OfficialFrameworkMetrics(Base):
+    __tablename__ = 'OfficialFrameworkMetrics'
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     
 class CustomMetrics(Base):
@@ -120,6 +161,8 @@ class CustomMetrics(Base):
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
     officialFramework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    # subcategory: Mapped[str] = mapped_column(String(100), nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     weighting: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
