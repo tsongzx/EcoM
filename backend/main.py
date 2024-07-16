@@ -14,6 +14,7 @@ import models
 from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
+from reportlab.pdfgen import canvas
 
 
 def get_session():
