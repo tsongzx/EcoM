@@ -527,8 +527,40 @@ async def get_framework(
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns:
-        _type_: _description_
+        _type_: retrieves information for a framework 
     """    
-    user_frameworks = session.query(framework_models.UserFrameworks).all()
-    return user_frameworks
+    if is_official_framework:
+        framework = session.query(framework_models.OfficialFrameworks).filter_by(id = framework_id).first()
+    else:
+        framework = session.query(framework_models.UserFrameworks).filter_by(id = framework_id).first()
+
+    return framework
   
+# @app.get("/framework/metrics", tags=["Framework"])
+# async def get_framework_metrics(
+#     is_official_framework: bool, 
+#     framework_id: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     """_summary_: retrieve details for a single framework
+
+#     Args:
+#         is_official_framework (bool): _description_
+#         framework_id (int): _description_
+#         user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+#         session (Session, optional): _description_. Defaults to Depends(get_session).
+
+#     Returns:
+#         _type_: _description_
+#     """    
+#     if is_official_framework:
+#         framework = session.query(framework_models.OfficialFrameworks).filter_by(id = framework_id).first()
+#     else:
+#         framework = session.query(framework_models.UserFrameworks).filter_by(id = framework_id).first()
+
+#     return framework
+
+# post - create new framework
+
+# 
