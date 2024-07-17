@@ -287,3 +287,22 @@ export const getMetricForFramework = async(official, frameworkId) => {
         console.log(`Error getting metric: ${error}`)
     }
 }
+
+export const getMetricName = async(metricId) => {
+    try {   
+        const response = await axios.get('http://127.0.0.1:8000/metric', 
+        {
+            params: {
+                metric_id: metricId
+            }, 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
