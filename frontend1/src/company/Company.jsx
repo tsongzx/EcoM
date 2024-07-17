@@ -7,7 +7,7 @@ import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
-import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework } from '../helper.js';
+import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework, getMetricName } from '../helper.js';
 import axios from "axios";
 import Cookies from "js-cookie";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -25,6 +25,8 @@ const Company = () => {
   const [selectedFramework, setSelectedFramework] = useState(null);
   const [indicatorInfo, setIndicatorInfo] = useState(null);
   const [expanded, setExpanded] = useState(false);
+  const [expanded1, setExpanded1] = useState(false);
+  const [metricNames, setMetricNames] = useState(null);
   const token = Cookies.get('authToken');
 
   useEffect(async () => {
@@ -49,12 +51,24 @@ const Company = () => {
     setIndicatorInfo(availableIndicatorInfo);
   },[]);
 
-  useEffect(async() => {
-    console.log(selectedFramework);
-    if (selectedFramework) {
-      const metrics = await getMetricForFramework(true, selectedFramework);
-      console.log(metrics);
-    }
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log(selectedFramework);
+      if (selectedFramework) {
+        const metrics = await getMetricForFramework(true, selectedFramework);
+        if (metrics) {
+          const nameOfMetrics = [];
+          for (const item of Object.values(metrics)) {
+            const name = await getMetricName(item.metric_id);
+            nameOfMetrics.push(name);
+          }
+          setMetricNames(nameOfMetrics);
+        }
+        console.log(metrics);
+      }
+    };
+  
+    fetchData();
   }, [selectedFramework]);
 
   useEffect(() => {
@@ -63,6 +77,10 @@ const Company = () => {
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
+  };
+
+  const handleExpandClick1 = () => {
+    setExpanded1(!expanded1);
   };
 
   const addToRecentlyViewed = async (cId) => {
@@ -170,7 +188,7 @@ const Company = () => {
               {/* Recommended Companies Component goes here*/}
             </div>
             <Card>
-              <FormControl style={{marginLeft: '20px', cursor: 'pointer'}} component="fieldset">
+              <FormControl style={{ marginLeft: '20px', cursor: 'pointer'}} component="fieldset">
                 <FormLabel component="legend" onClick={handleExpandClick}>
                   Select Framework
                   <IconButton onClick={handleExpandClick} size="small">
@@ -181,6 +199,23 @@ const Company = () => {
                   <RadioGroup>
                     {officialFrameworks && Object.entries(officialFrameworks).map(([key, framework]) => (
                       <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} onChange={handleFrameworkChange}/>
+                    ))}
+                  </RadioGroup>
+                </Collapse>
+              </FormControl>
+            </Card>
+            <Card style={{ marginTop: '100px' }}>
+              <FormControl style={{marginLeft: '20px', cursor: 'pointer'}} component="fieldset">
+                <FormLabel component="legend" onClick={handleExpandClick1}>
+                  Metrics and Indicators
+                  <IconButton onClick={handleExpandClick1} size="small">
+                    {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </FormLabel>
+                <Collapse in={expanded1}>
+                  <RadioGroup>
+                    {metricNames && metricNames.map((name, index) => (
+                      <FormControlLabel key={index} value={name} control={<Radio />} label={name} />
                     ))}
                   </RadioGroup>
                 </Collapse>
