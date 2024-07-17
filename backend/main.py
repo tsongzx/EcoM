@@ -136,7 +136,7 @@ async def auth_register(
     session.commit()
     session.refresh(new_user)
 
-    return await get_token(user)
+    return await get_token(new_user)
 
 #***************************************************************
 #                        User Functions
