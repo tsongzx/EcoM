@@ -477,9 +477,58 @@ async def get_company_indicators(
 #***************************************************************
 #                        Framework Apis
 #***************************************************************
-# @app.get("/company/indicators/{company_name}", tags=["company"])
-# async def get_company_indicators(
-#     company_name: str,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
+
+@app.get("/official_framework/all", tags=["Framework"])
+async def get_official_frameworks(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: retrieve all official frameworks
+
+    Args:
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns: list of official framework objects
+        
+    """    
+    official_frameworks = session.query(framework_models.OfficialFrameworks).all()
+    return official_frameworks
+  
+@app.get("/user_framework/all", tags=["Framework"])
+async def get_user_frameworks(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: retrieve user defined frameworks
+
+    Args:
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns: list of user defined framework objects
+    """    
+    user_frameworks = session.query(framework_models.UserFrameworks).all()
+    return user_frameworks
+  
+@app.get("/framework", tags=["Framework"])
+async def get_framework(
+    is_official_framework: bool, 
+    framework_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: retrieve details for a single framework
+
+    Args:
+        is_official_framework (bool): _description_
+        framework_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: _description_
+    """    
+    user_frameworks = session.query(framework_models.UserFrameworks).all()
+    return user_frameworks
+  
