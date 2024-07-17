@@ -606,3 +606,16 @@ async def save_custom_framework(
     session.add_all(objects_to_insert)
     session.commit()
     return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
+
+#***************************************************************
+#                        Metric Apis
+#***************************************************************
+@app.get("/metric", response_model=str, tags=["Metrics"])
+async def get_metric_name(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> str :
+    metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first()
+      
+    return metric.name 
