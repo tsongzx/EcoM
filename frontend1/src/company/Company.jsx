@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Button } from '@mui/material';
+import { Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, IconButton, Collapse, Card } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
-import { getRecentlyViewed, addToFavourites, deleteFromFavourites } from '../helper.js';
+import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework } from '../helper.js';
 import axios from "axios";
 import Cookies from "js-cookie";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const Company = () => {
   const location = useLocation();
@@ -19,6 +21,10 @@ const Company = () => {
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
+  const [officialFrameworks, setOfficialFrameworks] = useState(null);
+  const [selectedFramework, setSelectedFramework] = useState(null);
+  const [indicatorInfo, setIndicatorInfo] = useState(null);
+  const [expanded, setExpanded] = useState(false);
   const token = Cookies.get('authToken');
 
   useEffect(async () => {
@@ -35,7 +41,29 @@ const Company = () => {
     } else {
       setIsInFavs(false);
     }
+
+    const availableOfficialFramework = await getOfficialFrameworks();
+    setOfficialFrameworks(availableOfficialFramework);
+
+    const availableIndicatorInfo = await getIndicatorInfo(displayCompanyName);
+    setIndicatorInfo(availableIndicatorInfo);
   },[]);
+
+  useEffect(async() => {
+    console.log(selectedFramework);
+    if (selectedFramework) {
+      const metrics = await getMetricForFramework(true, selectedFramework);
+      console.log(metrics);
+    }
+  }, [selectedFramework]);
+
+  useEffect(() => {
+    console.log(indicatorInfo);
+  }, [indicatorInfo]);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
 
   const addToRecentlyViewed = async (cId) => {
     console.log(cId);
@@ -83,6 +111,10 @@ const Company = () => {
     } else {
       deleteFromFavourites(companyId_int);
     }
+  }
+
+  const handleFrameworkChange = (event) => {
+    setSelectedFramework(Number(event.target.value) + 1);
   }
 
 	return (
@@ -137,21 +169,23 @@ const Company = () => {
               <p>recommendations placeholder</p>
               {/* Recommended Companies Component goes here*/}
             </div>
-
-            <div className='metrics'>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-                <p>placeholder metrics</p>
-
-                <p>placeholder metrics</p>
-
-
-                <p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p><p>placeholder metrics</p>
-            </div>
+            <Card>
+              <FormControl style={{marginLeft: '20px', cursor: 'pointer'}} component="fieldset">
+                <FormLabel component="legend" onClick={handleExpandClick}>
+                  Select Framework
+                  <IconButton onClick={handleExpandClick} size="small">
+                    {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                  </IconButton>
+                </FormLabel>
+                <Collapse in={expanded}>
+                  <RadioGroup>
+                    {officialFrameworks && Object.entries(officialFrameworks).map(([key, framework]) => (
+                      <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} onChange={handleFrameworkChange}/>
+                    ))}
+                  </RadioGroup>
+                </Collapse>
+              </FormControl>
+            </Card>
             <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen}/>
         </>
 	);

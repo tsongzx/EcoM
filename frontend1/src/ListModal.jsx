@@ -1,15 +1,30 @@
 import {React, useState, useEffect} from 'react';
 import { Modal, Typography, Grid, Paper, Card, CardContent, Button } from '@mui/material';
-import { fetchCompaniesInList } from './helper';
+import { fetchCompaniesInList, getCompanyFromRecentlyViewed } from './helper';
 
 const ListModal = ({ isOpen, onClose, list }) => {
 
   const [companiesInList, setCompaniesInList] = useState({});
 
   useEffect(async () => {
+    console.log(list);
     const companies = await fetchCompaniesInList(list.id);
     setCompaniesInList(companies);
-  }, [])
+  }, []);
+
+  useEffect( async () => {
+    // let companyNames = [];
+    // for (let company of companiesInList) {
+    //   console.log(company); /// WILL DO THIS ARVO
+    // }
+    let companyNames = [];
+    for (let company of Object.keys(companiesInList)) {
+      const company1 = companiesInList[company];
+      const companyInfo = await getCompanyFromRecentlyViewed(company1);
+      companyNames.push(companyInfo);
+    }
+    console.log(companyNames);
+  }, [companiesInList]);
 
 
   return (
