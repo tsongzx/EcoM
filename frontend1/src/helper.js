@@ -48,11 +48,32 @@ export const fetchCompanies = async(page) => {
     }
 }
 
+export const getCompanyFromRecentlyViewed = async (companyId) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_id: companyId
+                }
+            } 
+        );
+        const companyInfo = response.data;
+        return companyInfo;
+    } catch (error) {
+        console.log('Error fetching company', error);
+        return [];
+    }
+}
+
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
     console.log(token);
     try {
-        const response = await axios.get('http://127.0.0.1:8000/list?list_id=${listId}', {
+        const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`, {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -109,7 +130,7 @@ export const removeCompanyFromList = async(listId, companyId) => {
     try {
         const response = axios.delete('http://127.0.0.1:8000/list/company', {
             list_id: Number(listId),
-            company_id: Number(companyId.split(" ")[1])
+            company_id: Number(companyId.split(" ")[0])
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
