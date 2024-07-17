@@ -606,3 +606,42 @@ async def save_custom_framework(
     session.add_all(objects_to_insert)
     session.commit()
     return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
+
+# update framework route
+# to finis 
+@app.put("/framework/customise/", response_model=framework_schemas.Framework, tags=["Framework"])
+async def edit_custom_framework(
+    details: framework_schemas.CustomFramework,
+    metrics: List[framework_schemas.CustomFrameworkMetrics],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> framework_schemas.Framework:
+    
+    framework = framework_models.UserFrameworks(
+        framework_name=details.framework_name, 
+        description=details.description, 
+        user_id=details.user_id,
+    )
+    session.add(framework)
+    session.commit()
+    
+    objects_to_insert = []
+
+    for metric in metrics:
+        new_metric = framework_models.CustomMetrics(
+            is_official_framework=False,
+            framework_id=framework.id,
+            parent_id=metric.parent_id,
+            metric_id=metric.metric_id,
+            weighting=metric.weighting,
+        )
+        objects_to_insert.append(new_metric)
+
+    session.add_all(objects_to_insert)
+    session.commit()
+    return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
+
+# calculate framework score
+
+# et  
+
