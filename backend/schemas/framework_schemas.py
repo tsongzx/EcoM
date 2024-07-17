@@ -16,16 +16,17 @@ class CustomFrameworkMetrics(BaseModel):
 class Framework(BaseModel):
     is_official_framework: bool
     framework_id: int
+  
+class ModifyFrameworkMetrics(BaseModel):
+    is_official_framework: bool
+    framework_id: int
+    parent_id: int
+    metric_id: int
+    weighting: float
     
-# class UpdateCustomFrameworkMetrics(BaseModel):
-#     id: int
-#     is_official_framework: bool
-#     parent_id: int
-#     metric_id: int
-#     weighting: float
+class UpdateCustomFramework(BaseModel):
+    framework_name: str
+    description: str
     
 # class CustomiseMetrics(BaseModel):    
 
-# class Framework(BaseModel):
-#     is_official_framework: bool
-#     framework_id: int
