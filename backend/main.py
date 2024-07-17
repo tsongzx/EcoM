@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas.user_schemas as user_schemas
 import schemas.list_schemas as list_schemas
+import schemas.framework_schemas as framework_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -17,6 +18,7 @@ from sqlalchemy import delete
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
+from typing import List
 
 def get_session():
   session = SessionLocal()
@@ -508,10 +510,10 @@ async def get_user_frameworks(
 
     Returns: list of user defined framework objects
     """    
-    user_frameworks = session.query(framework_models.UserFrameworks).all()
+    user_frameworks = session.query(framework_models.UserFrameworks).filter_by(user_id=user.id).all()
     return user_frameworks
   
-@app.get("/framework", tags=["Framework"])
+@app.get("/framework/{framework_id}", tags=["Framework"])
 async def get_framework(
     is_official_framework: bool, 
     framework_id: int,
@@ -536,31 +538,71 @@ async def get_framework(
 
     return framework
   
-# @app.get("/framework/metrics", tags=["Framework"])
-# async def get_framework_metrics(
-#     is_official_framework: bool, 
-#     framework_id: int,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     """_summary_: retrieve details for a single framework
+@app.get("/framework/metrics/{framework_id}", tags=["Framework"])
+async def get_framework_metrics(
+    is_official_framework: bool, 
+    framework_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: retrieve metrics for a single framework.
 
-#     Args:
-#         is_official_framework (bool): _description_
-#         framework_id (int): _description_
-#         user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
-#         session (Session, optional): _description_. Defaults to Depends(get_session).
+    Args:
+        is_official_framework (bool): _description_
+        framework_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
 
-#     Returns:
-#         _type_: _description_
-#     """    
-#     if is_official_framework:
-#         framework = session.query(framework_models.OfficialFrameworks).filter_by(id = framework_id).first()
-#     else:
-#         framework = session.query(framework_models.UserFrameworks).filter_by(id = framework_id).first()
+    Returns:
+        _type_: returns the metrics in the framework, empty list if framework ID is invalid 
+    """
+    metrics = session.query(framework_models.CustomMetrics).filter_by(is_official_framework=is_official_framework, framework_id=framework_id).all() 
 
-#     return framework
+    # if no metrics found, no custom metric weights have been set for official framework 
+    if len(metrics) == 0 and is_official_framework:
+        metrics = session.query(framework_models.OfficialFrameworkMetrics).filter_by(framework_id = framework_id).all()
+    
+    return metrics
 
-# post - create new framework
+@app.post("/framework/customise/", response_model=framework_schemas.Framework, tags=["Framework"])
+async def save_custom_framework(
+    details: framework_schemas.CustomFramework,
+    metrics: List[framework_schemas.CustomFrameworkMetrics],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> framework_schemas.Framework:
+    """_summary_: saves user customised framework
 
-# 
+    Args:
+        details (framework_schemas.CustomFramework): _description_
+        metrics (List[framework_schemas.CustomFrameworkMetrics]): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        framework_schemas.Framework: contains is_official_framework bool and
+        framework id
+    """    
+    framework = framework_models.UserFrameworks(
+        framework_name=details.framework_name, 
+        description=details.description, 
+        user_id=details.user_id,
+    )
+    session.add(framework)
+    session.commit()
+    
+    objects_to_insert = []
+
+    for metric in metrics:
+        new_metric = framework_models.CustomMetrics(
+            is_official_framework=False,
+            framework_id=framework.id,
+            parent_id=metric.parent_id,
+            metric_id=metric.metric_id,
+            weighting=metric.weighting,
+        )
+        objects_to_insert.append(new_metric)
+
+    session.add_all(objects_to_insert)
+    session.commit()
+    return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)

@@ -27,4 +27,15 @@ class OfficialFrameworkMetrics(Base):
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-  
+      
+class CustomMetrics(Base):
+    __tablename__ = 'CustomMetrics'
+    
+    id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
+    is_official_framework: Mapped[bool]= mapped_column(primary_key=False, unique=False, nullable=False)
+    framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    # subcategory: Mapped[str] = mapped_column(String(100), nullable=False)
+    metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    weighting: Mapped[float] = mapped_column(primary_key=False, unique=False, nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime, default=datetime.datetime.now(timezone.utc))
