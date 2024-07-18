@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import './CreateFramework.css'
@@ -34,23 +34,23 @@ const CreateFramework = () => {
     const getAllMetrics = async() => {
         try {
             const response = await axios.get(`http://127.0.0.1:8000/metrics`,
-                {},
                 {headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${Cookies.get('authToken')}`
               }});
               //if successful
               console.log('SUCCESSFULLY FETCHED METRICS');
+              console.log(response.data);
               return response.data;
         } catch (error) {
             console.log(error);
+            return [];
         }
     }
 
-    const getMetricName = async(id) => {
+    const getMetricName = async(item) => {
         try {
-            const response = await axios.get(`http://127.0.0.1:8000/metric/${id}`,
-                {},
+            const response = await axios.get(`http://127.0.0.1:8000/metric/${item.id}`,
                 {headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -106,7 +106,7 @@ const CreateFramework = () => {
         <div>
             {metrics.map((metric, index) => (
                 <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
-                    key={metric.id} 
+                    key={index} 
                     onClick={() => handleButtonClick(index)}>
                     {metric.name ? metric.name : '...'}
                 </button>
@@ -115,7 +115,7 @@ const CreateFramework = () => {
             {showAddName && (<div>
                 <button onClick={() => setShowAddName(false)}>X</button>
                     <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard" />
-                <button onClick={handleSubmitNewFramework()}>save</button>
+                <button onClick={() => handleSubmitNewFramework()}>save</button>
             </div>)}
         </div>
     )

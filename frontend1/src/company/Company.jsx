@@ -12,6 +12,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CreateFramework from './CreateFramework.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -222,6 +223,8 @@ const Company = () => {
               </FormControl>
             </Card>
             <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen}/>
+
+            <CreateFramework/>
         </>
 	);
 };
