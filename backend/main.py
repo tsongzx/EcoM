@@ -708,38 +708,72 @@ async def delete_framework(
     return {"message" : f"Successfully deleted framework {framework_id}"}
 
 # calculate framework score
-# must modify - current very acky metod
-# @app.get("/framework/score", tags=["Framework"])
-# async def get_framework_score(
-#     is_official_framework: bool = Query(...), 
-#     framework_id: int = Query(...),
-#     # probs do smt wit tis Any: 
-#     metrics: Any = Depends(get_framework_metrics), 
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) -> int:
-#     if len(metrics) == 0:
-#         return 0
-#     # note to self: add subcateory metrics to officialframework metrics
-#     # set root (aka directly below framework) as  parentid as 0
-#     use_default = all(isinstance(item, framework_models.OfficialFrameworkMetrics) for item in metrics)
-#     score = 0
-#     for metric in metrics:
-#         metric_value = calculate_metric(metric.metric_id)
-#         if use_default:
-#             # calculate default 
-#             # get metrics wit te same parent
-#             # get metric scores (get_metric)
-#             # calculate score for subcateory
-#             score += metric_value
-#             # use default_weight
-#         else:
-#             # calculate usin custom metrics
-#             score += metric_value * metric.weighting
-#     return score
+@app.get("/official_framework/score/", tags=["Framework"])
+async def get_official_framework_score(
+    # is_official_framework: bool = Query(...), 
+    # framework_id: int = Query(...),
+    framework_id: int,
+    use_default: bool,
+    company_name: str,
+    # probs do smt wit tis Any: 
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> int:
+    metrics = get_framework_metrics(True, framework_id) 
 
-    # # non acky
-    # # someow create a tree - discuss wit eoff 
+    if len(metrics) == 0:
+        return 0
+    # note to self: add subcateory metrics to officialframework metrics
+    # set root (aka directly below framework) as  parentid as 0
+    score = 0
+    for metric in metrics:
+        metric_value = calculate_metric(metric.metric_id, company_name)
+        if use_default:
+            # calculate default 
+            # get metrics wit te same parent
+            # get metric scores (get_metric)
+            # calculate score for subcateory
+            score += metric_value
+            # use default_weight
+        else:
+            # calculate usin custom metrics
+            score += metric_value * metric.weighting
+    return score
+
+# must modify - current very acky metod
+@app.get("/user_framework/score/", tags=["Framework"])
+async def get_user_framework_score(
+    # is_official_framework: bool = Query(...), 
+    # framework_id: int = Query(...),
+    framework_id: int,
+    company_name: str,
+    # probs do smt wit tis Any: 
+    metrics: Any = Depends(get_framework_metrics), 
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> int:
+    if len(metrics) == 0:
+        return 0
+    # note to self: add subcateory metrics to officialframework metrics
+    # set root (aka directly below framework) as  parentid as 0
+    use_default = all(isinstance(item, framework_models.OfficialFrameworkMetrics) for item in metrics)
+    score = 0
+    for metric in metrics:
+        metric_value = calculate_metric(metric.metric_id, company_name)
+        if use_default:
+            # calculate default 
+            # get metrics wit te same parent
+            # get metric scores (get_metric)
+            # calculate score for subcateory
+            score += metric_value
+            # use default_weight
+        else:
+            # calculate usin custom metrics
+            score += metric_value * metric.weighting
+    return score
+
+    # non acky
+    # someow create a tree - discuss wit eoff 
     # for metric in metrics:
     #     metric_value = calculate_metric(metric.metric_id)
     #     if use_default:
@@ -754,7 +788,18 @@ async def delete_framework(
     #         score += metric_value * metric.weighting
     # return score
 # et  
-
+#***************************************************************
+#                        Indicator Apis
+#***************************************************************
+@app.get("/indicators", tags=["Indicators"])
+async def get_indicators(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
+      
+    return indicators
 #***************************************************************
 #                        Metric Apis
 #***************************************************************
@@ -777,15 +822,40 @@ async def get_all_metrics(
     metrics = session.query(metrics_models.Metrics).limit(54).all()
       
     return metrics 
-#***************************************************************
-#                        Indicator Apis
-#***************************************************************
-@app.get("/indicators", tags=["Indicators"])
-async def get_indicators(
+  
+@app.get("/calculate_metric", tags=["Metrics"])
+# need to modify this to the metric for a given year!!!
+async def calculate_metric(
     metric_id: int,
+    company_name: str,
+    # year filter
+    indicators: Any = Depends(get_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
-    indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
+    # fix this later
+    score = 0
+    for indicator in indicators:
+        # get value for indicator
+        value = session.query(company_models.CompanyData).filter_by(company_name=company_name,
+                                                                    indicator_name=indicator.indicator_name).first()
+        if value is None:
+            # indicator does not exist for that company for that year
+            continue
+        score += value.indicator_value
+    
+    return score / len(indicators)
+  
+#***************************************************************
+#                        Industry Apis
+#***************************************************************
+@app.get("/industry", tags=["Industry"])
+async def get_industry(
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    
+    company = session.query(company_models.Company).filter_by(id=company_id).first()
       
-    return indicators 
+    return "Unknown" if company.industry is None else company.industry  

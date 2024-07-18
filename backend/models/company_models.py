@@ -14,8 +14,9 @@ class Company(Base):
     company_name: Mapped[str] = mapped_column(String(200), unique=True, nullable=False)
     perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
     # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
+    industry:  Mapped[str] = mapped_column(String(100)) 
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
-        
+         
 class CompanyData(Base):
     __tablename__ = 'CompanyData'
    
