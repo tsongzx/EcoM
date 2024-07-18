@@ -105,6 +105,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     }
 
     const updateCheckStatus = (index) => {
+        console.log('old list');
+        console.log(watchlist);
         setWatchlist(prevWatchlist => {
             const newWatchlist = [...prevWatchlist]; // Create a copy of the previous state array
             newWatchlist[index] = { ...newWatchlist[index], isChecked: !newWatchlist[index].isChecked }; // Update the checked property
@@ -112,9 +114,14 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
             return newWatchlist; // Return the updated array to update state
         });
 
+        console.log(`New list`);
+        console.log(watchlist);
+    
         if (watchlist[index].isChecked) {
+            console.log(`${watchlist[index]} has a CHECKED state`);
             addCompanyToList(watchlist[index].id, companyId);
         } else {
+            console.log(`${watchlist[index]} has a UNCHECKED state`);
             removeCompanyFromList(watchlist[index].id, companyId);
         }
     }
@@ -137,7 +144,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
                 <div className="watchlistContainer">
                     {Array.isArray(watchlist) && watchlist?.map((list, index) => (
                         // <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
-                        <Button key={index}>{list.name}
+                        <Button key={index} onClick={() => handleButtonClick(index)}>{list.name}
                             <Checkbox {...label} checked={list.isChecked} onChange={(event) => handleCheckboxChange(event, index)}/>
                         </Button>
                     ))}

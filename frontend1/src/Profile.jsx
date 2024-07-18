@@ -94,6 +94,7 @@ const Profile = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            setErrorMessage('');
             return response.data;
         } catch (error) {
             console.log(error);
@@ -111,10 +112,11 @@ const Profile = () => {
         setName(updatedName);
 
         //push changes to backend
-        updateName(name);
+        updateName(updatedName);
     }
 
     const updateName = async (name) => {
+        console.log(`Updating name to: ${name}`);
         try {
             const response = await axios.put(`http://127.0.0.1:8000/user/full-name?new_name=${name}`, {}, {
                 headers: {
@@ -123,6 +125,7 @@ const Profile = () => {
                 }
             });
             console.log('updateName to PUT: http://127.0.0.1:8000/user/full-name ran successfully', response.data);
+            setErrorMessage('');
         } catch (error) {
             console.log(error);
         }
