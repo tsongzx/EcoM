@@ -71,7 +71,6 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
 
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
-    console.log(token);
     try {
         const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`, {
             headers: {
@@ -79,6 +78,7 @@ export const fetchCompaniesInList = async(listId) => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
+        console.log(response.data);
         const companyIds = response.data.map(company => company.id);
         console.log(`List: ${listId}, companies: ${companyIds}`);
         return companyIds;
@@ -163,23 +163,6 @@ export const getFormattedUserLists = async (companyId) => {
 }
 
 //Check whether a company is in a list, returns a boolean
-// export const companyIsInList = async(listId, companyId) => {
-//     try {
-//         const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`,
-//         {headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Bearer ${Cookies.get('authToken')}`
-//         }});
-//         console.log(response.data);
-//         const companyExists = response.data.some(company => company.company_id === companyId);
-//         return companyExists;
-
-//     } catch (error) {
-//         console.log(error);
-//         return false;
-//     }
-// }
-
 export const companyIsInList = async (listId, companyId) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/list/company', {
@@ -253,5 +236,73 @@ export const getRecentlyViewed = async() => {
         return response.data;
     } catch (error) {
         console.log(`error getting recently viewed: ${error}`);
+    }
+}
+
+export const getOfficialFrameworks = async() => {
+    try {
+        const response  = await axios.get('http://127.0.0.1:8000/official_framework/all', 
+            {headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }});
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting frameworks: ${error}`)
+    }
+}
+
+export const getIndicatorInfo = async(companyName) => {
+    console.log(companyName);
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/indicators/${companyName}`, 
+            { params: {
+                company_name: companyName
+            }, headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }});
+            return response.data;  
+    } catch (error) {
+        console.log(`Error getting indicators: ${error}`);
+    }
+}
+
+export const getMetricForFramework = async(official, frameworkId) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/framework/metrics/${frameworkId}`, 
+        {
+            params: {
+                is_official_framework: Boolean(official),
+                framework_id: frameworkId
+            }, 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`)
+    }
+}
+
+export const getMetricName = async(metricId) => {
+    try {   
+        const response = await axios.get('http://127.0.0.1:8000/metric', 
+        {
+            params: {
+                metric_id: metricId
+            }, 
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
     }
 }

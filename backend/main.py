@@ -608,7 +608,6 @@ async def create_framework(
     session.commit()
     return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
 
-# test below ere!!
 @app.put("/user_framework/modify/", tags=["Framework"])
 async def modify_user_framework(
     framework_id: int,
@@ -756,3 +755,15 @@ async def delete_framework(
     # return score
 # et  
 
+#***************************************************************
+#                        Metric Apis
+#***************************************************************
+@app.get("/metric", response_model=str, tags=["Metrics"])
+async def get_metric_name(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> str :
+    metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first()
+      
+    return metric.name 

@@ -40,6 +40,7 @@ const Dashboard = () => {
         setHasMore(companiesAvailable.length > 0);
 
         const userLists = await fetchLists();
+        console.log(userLists);
         setLists(userLists);
 
         const recentlyViewed = await getRecentlyViewed();
@@ -65,6 +66,7 @@ const Dashboard = () => {
   }, [page]);
 
   useEffect(() => {
+    console.log(recents);
     getRecentlyViewedCompanyNames(recents);
   }, [recents]);
 
@@ -104,9 +106,9 @@ const Dashboard = () => {
   const getRecentlyViewedCompanyNames = async(recents) => {
     console.log(recents);
     let nameList = [];
-    for (let recent of recents) {
-      console.log(recent.company_id);
-      const individualCompany = await getCompanyFromRecentlyViewed(recent.company_id);
+    for (let recent of Object.keys(recents)) {
+      console.log(recents[recent].company_id);
+      const individualCompany = await getCompanyFromRecentlyViewed(recents[recent].company_id);
       nameList.push(individualCompany.company_name);
     }
     console.log(nameList);
