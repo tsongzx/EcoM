@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
-import { Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, IconButton, Collapse, Card } from '@mui/material';
+import { Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, IconButton, Collapse, Card, Grid, TableContainer, Table, Paper, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
-import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework, getMetricName } from '../helper.js';
+import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework, getMetricName, getIndicatorsForMetric } from '../helper.js';
 import axios from "axios";
 import Cookies from "js-cookie";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -27,6 +27,8 @@ const Company = () => {
   const [expanded, setExpanded] = useState(false);
   const [expanded1, setExpanded1] = useState(false);
   const [metricNames, setMetricNames] = useState(null);
+  // const [selectedMetric, setSelectedMetric] = useState(null);
+  // const [selectedMetricIndicators, setSelectedMetricIndicators] = useState([]);
   const token = Cookies.get('authToken');
 
   useEffect(async () => {
@@ -60,7 +62,7 @@ const Company = () => {
           const nameOfMetrics = [];
           for (const item of Object.values(metrics)) {
             const name = await getMetricName(item.metric_id);
-            nameOfMetrics.push(name);
+            nameOfMetrics.push({ id: item.metric_id, name: name });
           }
           setMetricNames(nameOfMetrics);
         }
@@ -135,6 +137,17 @@ const Company = () => {
     setSelectedFramework(Number(event.target.value) + 1);
   }
 
+  // const handleMetricChange = async (event) => {
+  //   const metricId = Number(event.target.value);
+  //   setSelectedMetric(metricId);
+  //   try {
+  //     const indicators = await getIndicatorsForMetric(metricId);
+  //     setSelectedMetricIndicators(indicators);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
+
 	return (
         <>
         <Navbar/>
@@ -205,22 +218,55 @@ const Company = () => {
               </FormControl>
             </Card>
             <Card style={{ marginTop: '100px' }}>
-              <FormControl style={{marginLeft: '20px', cursor: 'pointer'}} component="fieldset">
-                <FormLabel component="legend" onClick={handleExpandClick1}>
-                  Metrics and Indicators
-                  <IconButton onClick={handleExpandClick1} size="small">
-                    {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                  </IconButton>
-                </FormLabel>
-                <Collapse in={expanded1}>
-                  <RadioGroup>
-                    {metricNames && metricNames.map((name, index) => (
-                      <FormControlLabel key={index} value={name} control={<Radio />} label={name} />
+            <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
+              <FormLabel component="legend" onClick={handleExpandClick1}>
+                Metrics and Indicators
+                <IconButton onClick={handleExpandClick1} size="small">
+                  {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </FormLabel>
+              <Collapse in={expanded1}>
+                <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
+                  <RadioGroup style={{ width: '50%', border: '1px solid red'}} >
+                    {metricNames && metricNames.map((metric, index) => (
+                      <FormControlLabel key={index} value={metric.name} control={<Radio />} label={metric.name} />
                     ))}
                   </RadioGroup>
-                </Collapse>
-              </FormControl>
-            </Card>
+                  {/* {selectedMetric && (
+                    <div style={{ marginTop: '20px' }}>
+                      <h3>Indicators for {metricNames.find(metric => metric.id === selectedMetric + 1)?.name}</h3>
+                      <ul>
+                        {selectedMetricIndicators.map((indicator, index) => (
+                          <li key={index}>{indicator.name}: {indicator.value}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )} */}
+                  <Grid item xs={6} style={{ width: '50%', border: '1px solid red'}}>
+                    <TableContainer component={Paper} style={{ marginTop: '20px' }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
+                            <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                        {metricNames && Object.values(metricNames).map((metric, index) => (
+                          <TableRow key={index}>
+                            <TableCell style={{ borderRight: '1px solid #ddd' }}>{metric.name}</TableCell>
+                            <TableCell style={{ borderBottom: '1px solid #ddd' }}></TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </Grid>
+                </div>
+              </Collapse>
+            </FormControl>
+          </Card>
+
             <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen}/>
         </>
 	);
