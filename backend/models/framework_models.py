@@ -27,7 +27,9 @@ class OfficialFrameworkMetrics(Base):
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     parent_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-      
+    # to add
+    # default_weight: Mapped[float] = mapped_column(primary_key=False, unique=False)
+        
 class CustomMetrics(Base):
     __tablename__ = 'CustomMetrics'
     
