@@ -609,7 +609,7 @@ async def create_framework(
     return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
 
 # test below ere!!
-@app.put("/user_framework/modify/", response_model=framework_schemas.Framework, tags=["Framework"])
+@app.put("/user_framework/modify/", tags=["Framework"])
 async def modify_user_framework(
     framework_id: int,
     request: framework_schemas.UpdateCustomFramework,
@@ -635,7 +635,7 @@ async def modify_user_framework(
 @app.put("/framework/modify_metrics/", tags=["Framework"])
 async def modify_framework_metrics(
     framework_details: framework_schemas.Framework,
-    metrics: List[framework_schemas.ModifyFrameworkMetrics],
+    metrics: List[framework_schemas.CustomFrameworkMetrics],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
@@ -710,34 +710,34 @@ async def delete_framework(
 
 # calculate framework score
 # must modify - current very acky metod
-@app.get("/framework/score", tags=["Framework"])
-async def get_framework_score(
-    is_official_framework: bool = Query(...), 
-    framework_id: int = Query(...),
-    # probs do smt wit tis Any: 
-    metrics: Any = Depends(get_framework_metrics), 
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> int:
-    if len(metrics) == 0:
-        return 0
-    # note to self: add subcateory metrics to officialframework metrics
-    # set root (aka directly below framework) as  parentid as 0
-    use_default = all(isinstance(item, framework_models.OfficialFrameworkMetrics) for item in metrics)
-    score = 0
-    for metric in metrics:
-        metric_value = calculate_metric(metric.metric_id)
-        if use_default:
-            # calculate default 
-            # get metrics wit te same parent
-            # get metric scores (get_metric)
-            # calculate score for subcateory
-            score += metric_value
-            # use default_weight
-        else:
-            # calculate usin custom metrics
-            score += metric_value * metric.weighting
-    return score
+# @app.get("/framework/score", tags=["Framework"])
+# async def get_framework_score(
+#     is_official_framework: bool = Query(...), 
+#     framework_id: int = Query(...),
+#     # probs do smt wit tis Any: 
+#     metrics: Any = Depends(get_framework_metrics), 
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> int:
+#     if len(metrics) == 0:
+#         return 0
+#     # note to self: add subcateory metrics to officialframework metrics
+#     # set root (aka directly below framework) as  parentid as 0
+#     use_default = all(isinstance(item, framework_models.OfficialFrameworkMetrics) for item in metrics)
+#     score = 0
+#     for metric in metrics:
+#         metric_value = calculate_metric(metric.metric_id)
+#         if use_default:
+#             # calculate default 
+#             # get metrics wit te same parent
+#             # get metric scores (get_metric)
+#             # calculate score for subcateory
+#             score += metric_value
+#             # use default_weight
+#         else:
+#             # calculate usin custom metrics
+#             score += metric_value * metric.weighting
+#     return score
 
     # # non acky
     # # someow create a tree - discuss wit eoff 
