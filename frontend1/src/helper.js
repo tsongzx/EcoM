@@ -112,8 +112,8 @@ export const addCompanyToList = async (listId, companyId ) => {
     console.log(`incoming addCompany ${listId}, ${companyId}`);
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
-            list_id: listId,
-            company_id: companyId,
+            list_id: Number(listId),
+            company_id: Number(companyId),
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -127,6 +127,7 @@ export const addCompanyToList = async (listId, companyId ) => {
 
 export const removeCompanyFromList = async(listId, companyId) => {
     console.log(companyId);
+    console.log(Cookies.get('authToken'));
     try {
         const response = await axios.delete('http://127.0.0.1:8000/list/company', {
             list_id: Number(listId),
