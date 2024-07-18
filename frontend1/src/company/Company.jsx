@@ -122,7 +122,7 @@ const Company = () => {
   const handleToggleFavourite = () => {
     setIsInFavs(!isInFavs);
     //depending on isInFavs, either add or delete from favourites (called WatchList in backend)
-    const companyId_int = Number(companyId.split(" ")[1]);
+    const companyId_int = Number(companyId);
     
     if (isInFavs) {
       addToFavourites(companyId_int);

@@ -118,7 +118,9 @@ const Profile = () => {
     const updateName = async (name) => {
         console.log(`Updating name to: ${name}`);
         try {
-            const response = await axios.put(`http://127.0.0.1:8000/user/full-name?new_name=${name}`, {}, {
+            const response = await axios.put(`http://127.0.0.1:8000/user/full-name`, {
+                new_name: name
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`

@@ -130,7 +130,7 @@ export const removeCompanyFromList = async(listId, companyId) => {
     try {
         const response = axios.delete('http://127.0.0.1:8000/list/company', {
             list_id: Number(listId),
-            company_id: Number(companyId.split(" ")[0])
+            company_id: Number(companyId)
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
