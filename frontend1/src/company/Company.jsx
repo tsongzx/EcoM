@@ -27,8 +27,8 @@ const Company = () => {
   const [expanded, setExpanded] = useState(false);
   const [expanded1, setExpanded1] = useState(false);
   const [metricNames, setMetricNames] = useState(null);
-  // const [selectedMetric, setSelectedMetric] = useState(null);
-  // const [selectedMetricIndicators, setSelectedMetricIndicators] = useState([]);
+  const [selectedMetric, setSelectedMetric] = useState(null);
+  const [selectedMetricIndicators, setSelectedMetricIndicators] = useState([]);
   const token = Cookies.get('authToken');
 
   useEffect(async () => {
@@ -137,16 +137,18 @@ const Company = () => {
     setSelectedFramework(Number(event.target.value) + 1);
   }
 
-  // const handleMetricChange = async (event) => {
-  //   const metricId = Number(event.target.value);
-  //   setSelectedMetric(metricId);
-  //   try {
-  //     const indicators = await getIndicatorsForMetric(metricId);
-  //     setSelectedMetricIndicators(indicators);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const handleMetricChange = async (event) => {
+    console.log(event.target.value);
+    const metricId = Number(event.target.value);
+    setSelectedMetric(metricId);
+    try {
+      const indicators = await getIndicatorsForMetric(metricId);
+      console.log(indicators);
+      setSelectedMetricIndicators(indicators);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 	return (
         <>
@@ -227,11 +229,29 @@ const Company = () => {
               </FormLabel>
               <Collapse in={expanded1}>
                 <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
-                  <RadioGroup style={{ width: '50%', border: '1px solid red'}} >
-                    {metricNames && metricNames.map((metric, index) => (
-                      <FormControlLabel key={index} value={metric.name} control={<Radio />} label={metric.name} />
-                    ))}
-                  </RadioGroup>
+                <RadioGroup style={{ width: '50%', border: '1px solid red'}} >
+                  {metricNames && metricNames.map((metric, index) => (
+                    <FormControlLabel
+                      key={metric.id} 
+                      value={metric.id.toString()} 
+                      control={<Radio />} 
+                      label={metric.name} 
+                      onChange={handleMetricChange}
+                    />
+                  ))}
+                </RadioGroup>
+                <div>
+                  {selectedMetricIndicators.length > 0 && (
+                    <div>
+                      <h3>Selected Metric Indicators:</h3>
+                      <ul>
+                        {selectedMetricIndicators.map((indicator, index) => (
+                          <li key={index}>{indicator.indicator_name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
                   {/* {selectedMetric && (
                     <div style={{ marginTop: '20px' }}>
                       <h3>Indicators for {metricNames.find(metric => metric.id === selectedMetric + 1)?.name}</h3>
