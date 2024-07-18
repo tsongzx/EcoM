@@ -90,6 +90,7 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         });
         //Add Company to List
         // if (event.target.isChecked) {
+        console.log(`AFFECTING ${watchlist[index].id}`);
         if (hasChecked === true) {
             console.log('true');
             // addCompanyToList(watchlist[index].id, companyId);
@@ -119,15 +120,15 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         });
 
         console.log(`New list`);
-        console.log(watchlist);
+        console.log(watchlist[index].id);
         
         //This continues to use from the old watchlist
         if (!oldWatchList[index].isChecked) {
-            console.log(`${watchlist[index]} has a CHECKED state`);
-            addCompanyToList(watchlist[index].id, companyId);
+            console.log(`${oldWatchList[index].id} ${oldWatchList[index].name} has a CHECKED state`);
+            addCompanyToList(oldWatchList[index].id, companyId);
         } else {
-            console.log(`${watchlist[index]} has a UNCHECKED state`);
-            removeCompanyFromList(watchlist[index].id, companyId);
+            console.log(`${oldWatchList[index].id} ${oldWatchList[index].name} has a UNCHECKED state`);
+            removeCompanyFromList(oldWatchList[index].id, companyId);
         }
     }
 
