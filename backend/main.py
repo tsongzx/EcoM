@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm 
 from datetime import timedelta
 from auth import generate_token, is_authenticated, authenticate_user, hash_password
@@ -14,11 +14,11 @@ import models.framework_models as framework_models
 import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
-from sqlalchemy import delete
+from sqlalchemy import delete, and_, or_
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
-from typing import List
+from typing import List, Any
 
 def get_session():
   session = SessionLocal()
@@ -564,14 +564,15 @@ async def get_framework_metrics(
     
     return metrics
 
-@app.post("/framework/customise/", response_model=framework_schemas.Framework, tags=["Framework"])
-async def save_custom_framework(
+@app.post("/framework/create/", response_model=framework_schemas.Framework, tags=["Framework"])
+async def create_framework(
     details: framework_schemas.CustomFramework,
     metrics: List[framework_schemas.CustomFrameworkMetrics],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) -> framework_schemas.Framework:
-    """_summary_: saves user customised framework
+    """_summary_: creates user customised framework. Please remember to add
+      subcateories as metrics. 
 
     Args:
         details (framework_schemas.CustomFramework): _description_
@@ -606,6 +607,153 @@ async def save_custom_framework(
     session.add_all(objects_to_insert)
     session.commit()
     return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
+
+@app.put("/user_framework/modify/", tags=["Framework"])
+async def modify_user_framework(
+    framework_id: int,
+    request: framework_schemas.UpdateCustomFramework,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: Allows user to update custom made framework details
+
+    Args:
+        framework_id (int): _description_
+        request (framework_schemas.UpdateCustomFramework): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns: message on success
+    """    
+    framework = session.query(framework_models.UserFrameworks).filter_by(id=framework_id).first() 
+    framework.framework_name = request.framework_name 
+    framework.description = request.description
+    session.commit()
+    return {"message" : f"Successfully modified framework details {framework_id}"}
+
+@app.put("/framework/modify_metrics/", tags=["Framework"])
+async def modify_framework_metrics(
+    framework_details: framework_schemas.Framework,
+    metrics: List[framework_schemas.CustomFrameworkMetrics],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: modify a framework. 
+        Metrics and weightings can be modified for user defined frameworks.
+        Only metric weights can be modified for official frameworks. 
+
+    Args:
+        framework_details (framework_schemas.Framework): _description_
+        metrics (List[framework_schemas.ModifyFrameworkMetrics]): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns: message on success
+    """    
+    # delete all previous rows for tat framework 
+    statement = delete(framework_models.CustomMetrics).where(
+        and_(
+            framework_models.CustomMetrics.framework_id == framework_details.framework_id,
+            framework_models.CustomMetrics.is_official_framework == framework_details.is_official_framework,
+        )
+    )
+    session.execute(statement)
+    session.commit()
+
+    objects_to_insert = []
+
+    for metric in metrics:
+        new_metric = framework_models.CustomMetrics(
+            is_official_framework=framework_details.is_official_framework,
+            framework_id=framework_details.framework_id,
+            parent_id=metric.parent_id,
+            metric_id=metric.metric_id,
+            weighting=metric.weighting,
+        )
+        objects_to_insert.append(new_metric)
+
+    session.add_all(objects_to_insert)
+    session.commit()
+
+    return {"message" : f"Successfully modified framework metrics {framework_details.framework_id}"}
+
+# route to delete framework - can only delete custom frameworks
+@app.delete("/framework", tags=["Framework"])
+async def delete_framework(
+    framework_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    """_summary_: Delete a custom made framework only.
+
+    Args:
+        framework_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns: message on success
+    """    
+    statement = delete(framework_models.CustomMetrics).where(
+        and_(
+            framework_models.CustomMetrics.framework_id == framework_id,
+            framework_models.CustomMetrics.is_official_framework == False,
+        )
+    )
+    session.execute(statement)
+    statement = delete(framework_models.UserFrameworks).where(
+        framework_models.UserFrameworks.id == framework_id,
+    )
+    session.execute(statement)
+    session.commit()
+    return {"message" : f"Successfully deleted framework {framework_id}"}
+
+# calculate framework score
+# must modify - current very acky metod
+# @app.get("/framework/score", tags=["Framework"])
+# async def get_framework_score(
+#     is_official_framework: bool = Query(...), 
+#     framework_id: int = Query(...),
+#     # probs do smt wit tis Any: 
+#     metrics: Any = Depends(get_framework_metrics), 
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> int:
+#     if len(metrics) == 0:
+#         return 0
+#     # note to self: add subcateory metrics to officialframework metrics
+#     # set root (aka directly below framework) as  parentid as 0
+#     use_default = all(isinstance(item, framework_models.OfficialFrameworkMetrics) for item in metrics)
+#     score = 0
+#     for metric in metrics:
+#         metric_value = calculate_metric(metric.metric_id)
+#         if use_default:
+#             # calculate default 
+#             # get metrics wit te same parent
+#             # get metric scores (get_metric)
+#             # calculate score for subcateory
+#             score += metric_value
+#             # use default_weight
+#         else:
+#             # calculate usin custom metrics
+#             score += metric_value * metric.weighting
+#     return score
+
+    # # non acky
+    # # someow create a tree - discuss wit eoff 
+    # for metric in metrics:
+    #     metric_value = calculate_metric(metric.metric_id)
+    #     if use_default:
+    #         # calculate default 
+    #         # get metrics wit te same parent
+    #         # get metric scores (get_metric)
+    #         # calculate score for subcateory
+    #         score += metric_value
+    #         # use default_weight
+    #     else:
+    #         # calculate usin custom metrics
+    #         score += metric_value * metric.weighting
+    # return score
+# et  
 
 #***************************************************************
 #                        Metric Apis
