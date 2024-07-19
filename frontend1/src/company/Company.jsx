@@ -7,7 +7,7 @@ import './Company.css'
 import WatchlistModal from './WatchlistModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
-import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework, getMetricName } from '../helper.js';
+import { getRecentlyViewed, addToFavourites, deleteFromFavourites, getOfficialFrameworks, getIndicatorInfo, getMetricForFramework, getMetricName, getFavouritesList } from '../helper.js';
 import axios from "axios";
 import Cookies from "js-cookie";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -38,10 +38,14 @@ const Company = () => {
     console.log(companyId);
     await addToRecentlyViewed(companyId);
     // Check if in Favourites
-    const recentList = await getRecentlyViewed();
-    if (Array.isArray(recentList) && recentList.includes(companyId)) {
+    const favsList = await getFavouritesList();
+    console.log('FAVS LIST:');
+    console.log(favsList);
+    if (Array.isArray(favsList) && favsList.includes(companyId)) {
+      console.log('IN FAVS');
       setIsInFavs(true);
     } else {
+      console.log('NOT IN FAVS');
       setIsInFavs(false);
     }
 

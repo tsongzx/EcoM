@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import './CreateFramework.css'
 import { TextField } from "@mui/material";
-import { getUserId } from "../helper.js";
+import { getUserId, getMetricName } from "../helper.js";
 
 const CreateFramework = () => {
     const [metrics, setMetrics] = useState([]);
@@ -16,9 +16,8 @@ const CreateFramework = () => {
             try {
                 const apiMetrics = await getAllMetrics();
 
-                const metricPromises = apiMetrics.map(async (id) => {
-                    const name = await getMetricName(id);
-                    return { id, name, isIncluded: false };
+                const metricPromises = apiMetrics.map(async (metric) => {
+                    return { id: metric.id, name: metric.name, isIncluded: false };
                 });
 
                 const transformedMetrics = await Promise.all(metricPromises);
@@ -45,21 +44,6 @@ const CreateFramework = () => {
         } catch (error) {
             console.log(error);
             return [];
-        }
-    }
-
-    const getMetricName = async(item) => {
-        try {
-            const response = await axios.get(`http://127.0.0.1:8000/metric/${item.id}`,
-                {headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${Cookies.get('authToken')}`
-              }});
-              //if successful
-              console.log('SUCCESSFULLY FETCHED METRICS');
-              return response.data;
-        } catch (error) {
-            console.log(error);
         }
     }
 

@@ -112,8 +112,8 @@ export const addCompanyToList = async (listId, companyId ) => {
     console.log(`incoming addCompany ${listId}, ${companyId}`);
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
-            list_id: Number(listId),
-            company_id: Number(companyId),
+            list_id: listId,
+            company_id: companyId,
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -126,13 +126,15 @@ export const addCompanyToList = async (listId, companyId ) => {
 }
 
 export const removeCompanyFromList = async(listId, companyId) => {
-    console.log(companyId);
+    console.log('deleting CompanyId: ', companyId, 'from LIST: ', listId);
     console.log(Cookies.get('authToken'));
     try {
         const response = await axios.delete('http://127.0.0.1:8000/list/company', {
-            list_id: Number(listId),
-            company_id: Number(companyId)
-        }, {headers: {
+            params: {
+                list_id: listId,
+                company_id: companyId
+            },
+            headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
@@ -199,6 +201,7 @@ export const getFavouritesList = async() => {
 }
 
 export const addToFavourites = async(companyId) => {
+    console.log(`addin ${companyId} to favourites`);
     try {
         const response = await axios.post(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
           {},  
@@ -206,6 +209,7 @@ export const addToFavourites = async(companyId) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
+        console.log('SUCCESSFULLY added to favourites')
         return response.data;
     } catch (error) {
         console.log(`error adding to favourites: ${error}`);
@@ -213,12 +217,14 @@ export const addToFavourites = async(companyId) => {
 }
 
 export const deleteFromFavourites = async(companyId) => {
+    console.log('deleting from favourites');
     try {
         const response = await axios.delete(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
             {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
+        console.log('SUCCESSFULLY deleted from favourites');
         return response.data;
     } catch (error) {
         console.log(`error deleting from favourites: ${error}`);
@@ -290,8 +296,9 @@ export const getMetricForFramework = async(official, frameworkId) => {
 }
 
 export const getMetricName = async(metricId) => {
+    console.log('Getting Name for Metric Id: ', metricId);
     try {   
-        const response = await axios.get('http://127.0.0.1:8000/metric', 
+        const response = await axios.get(`http://127.0.0.1:8000/metric`, 
         {
             params: {
                 metric_id: metricId
