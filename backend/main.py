@@ -14,6 +14,7 @@ import models.framework_models as framework_models
 import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
+import json
 from sqlalchemy import delete, and_, or_
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
@@ -823,6 +824,8 @@ async def get_all_metrics(
       
     return metrics 
   
+
+
 @app.get("/calculate_metric", tags=["Metrics"])
 # need to modify this to the metric for a given year!!!
 async def calculate_metric(
@@ -843,8 +846,27 @@ async def calculate_metric(
             # indicator does not exist for that company for that year
             continue
         score += value.indicator_value
-    
-    return score / len(indicators)
+        
+    # Calculate the score
+    metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first
+    company_score = session.query() 
+    name = metric.name
+    file_name = 'metrics.json'
+    # Open and read the JSON file
+    with open(file_name, 'r') as file:
+        metric_data = json.load(file)
+        
+        
+    metric_properties = metric_data[name]
+    if metric_properties["indicator"] == "positive":
+        lower = metric_properties["lower"]
+        higher = metric_properties["higher"]
+        score = 100*(company_score - lower)/(higher - lower)
+    else:
+        lower = metric_properties["lower"]
+        higher = metric_properties["higher"]
+        score = 100*(higher - company_score)/(higher - lower)
+    return score
   
 #***************************************************************
 #                        Industry Apis
