@@ -34,7 +34,7 @@ import {
   getOfficialFrameworks,
   getMetricForFramework,
   getMetricName,
-  getIndicatorsForMetric
+  getIndicatorsForMetric,
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -55,23 +55,29 @@ const Company = () => {
   const [expanded1, setExpanded1] = useState(false);
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
-  const [metricIndicators, setMetricIndicators] = useState({});
-  const [selectedIndicators, setSelectedIndicators] = useState({});  // Updated to an object
+  const [allIndicators, setAllIndicators] = useState({});
+  const [selectedIndicators, setSelectedIndicators] = useState({});
+  const [expandedMetrics, setExpandedMetrics] = useState({});
+  const [tableCollapsed, setTableCollapsed] = useState(true);
   const token = Cookies.get('authToken');
 
-  useEffect(async () => {
-    console.log(companyId);
-    await addToRecentlyViewed(companyId);
-    const recentList = await getRecentlyViewed();
-    if (Array.isArray(recentList) && recentList.includes(companyId)) {
-      setIsInFavs(true);
-    } else {
-      setIsInFavs(false);
-    }
 
-    const availableOfficialFramework = await getOfficialFrameworks();
-    setOfficialFrameworks(availableOfficialFramework);
-  }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log(companyId);
+      await addToRecentlyViewed(companyId);
+      const recentList = await getRecentlyViewed();
+      if (Array.isArray(recentList) && recentList.includes(companyId)) {
+        setIsInFavs(true);
+      } else {
+        setIsInFavs(false);
+      }
+
+      const availableOfficialFramework = await getOfficialFrameworks();
+      setOfficialFrameworks(availableOfficialFramework);
+    };
+    fetchData();
+  }, [companyId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,16 +86,56 @@ const Company = () => {
         console.log(metrics);
         if (metrics) {
           const nameOfMetrics = [];
+          const metricIds = [];
           for (const item of Object.values(metrics)) {
             const name = await getMetricName(item.metric_id);
             nameOfMetrics.push({ id: item.metric_id, name: name });
+            metricIds.push(item.metric_id);
           }
           setMetricNames(nameOfMetrics);
+          
+          setSelectedMetrics(metricIds);
+          
+          const newAllIndicators = {};
+          for (const id of metricIds) {
+            try {
+              const indicators = await getIndicatorsForMetric(id);
+              newAllIndicators[id] = indicators;
+            } catch (error) {
+              console.log(error);
+            }
+          }
+          console.log(newAllIndicators);
+          setAllIndicators(newAllIndicators);
+          
+          const newSelectedIndicators = {};
+          for (const id of metricIds) {
+            newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
+          }
+          setSelectedIndicators(newSelectedIndicators);
         }
       }
     };
     fetchData();
   }, [selectedFramework]);
+
+  useEffect(() => {
+    const fetchIndicators = async () => {
+      const newAllIndicators = {};
+      for (const id of selectedMetrics) {
+        try {
+          const indicators = await getIndicatorsForMetric(id);
+          newAllIndicators[id] = indicators;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      setAllIndicators(newAllIndicators);
+    };
+    if (selectedMetrics.length > 0) {
+      fetchIndicators();
+    }
+  }, [selectedMetrics]);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -97,6 +143,13 @@ const Company = () => {
 
   const handleExpandClick1 = () => {
     setExpanded1(!expanded1);
+  };
+
+  const handleMetricExpandClick = (metricId) => {
+    setExpandedMetrics((prev) => ({
+      ...prev,
+      [metricId]: !prev[metricId]
+    }));
   };
 
   const addToRecentlyViewed = async (cId) => {
@@ -117,7 +170,6 @@ const Company = () => {
       console.log(response.data);
     } catch (error) {
       console.log(error);
-      return;
     }
   };
 
@@ -148,55 +200,97 @@ const Company = () => {
     }
   };
 
-  const handleFrameworkChange = (event) => {
-    setSelectedFramework(Number(event.target.value) + 1);
-  };
+  const handleFrameworkChange = async (event) => {
+    const frameworkId = Number(event.target.value) + 1;
+    setSelectedFramework(frameworkId);
 
-  const handleMetricChange = async (event) => {
-    const metricId = Number(event.target.value);
-    let newSelectedMetrics = [];
-    if (selectedMetrics.includes(metricId)) {
-      newSelectedMetrics = selectedMetrics.filter((id) => id !== metricId);
-    } else {
-      newSelectedMetrics = [...selectedMetrics, metricId];
-    }
-    setSelectedMetrics(newSelectedMetrics);
-
-    // Fetch indicators for all selected metrics
-    const newMetricIndicators = { ...metricIndicators };
-    for (const id of newSelectedMetrics) {
-      if (!newMetricIndicators[id]) {
+    const metrics = await getMetricForFramework(true, frameworkId);
+    if (metrics) {
+      const nameOfMetrics = [];
+      const metricIds = [];
+      for (const item of Object.values(metrics)) {
+        const name = await getMetricName(item.metric_id);
+        nameOfMetrics.push({ id: item.metric_id, name: name });
+        metricIds.push(item.metric_id);
+      }
+      setMetricNames(nameOfMetrics);
+      
+      setSelectedMetrics(metricIds);
+      
+      const newAllIndicators = {};
+      for (const id of metricIds) {
         try {
           const indicators = await getIndicatorsForMetric(id);
-          console.log(indicators);
-          newMetricIndicators[id] = indicators;
+          newAllIndicators[id] = indicators;
         } catch (error) {
           console.log(error);
         }
       }
+      setAllIndicators(newAllIndicators);
+      
+      const newSelectedIndicators = {};
+      for (const id of metricIds) {
+        console.log(id);
+        newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
+      }
+      console.log(newSelectedIndicators);
+      setSelectedIndicators(newSelectedIndicators);
     }
-    setMetricIndicators(newMetricIndicators);
   };
+
+  const handleMetricChange = async (event) => {
+    const metricId = Number(event.target.value);
+  
+    let newSelectedIndicators = { ...selectedIndicators };
+    let newSelectedMetrics = [...selectedMetrics];
+  
+    if (selectedMetrics.includes(metricId)) {
+      newSelectedMetrics = selectedMetrics.filter((id) => id !== metricId);
+      delete newSelectedIndicators[metricId];
+    } else {
+      newSelectedMetrics = [...selectedMetrics, metricId];
+      try {
+        const indicators = await getIndicatorsForMetric(metricId);
+        newSelectedIndicators[metricId] = indicators.map(indicator => indicator.indicator_id);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  
+    setSelectedMetrics(newSelectedMetrics);
+    setSelectedIndicators(newSelectedIndicators);
+  
+    const fetchIndicators = async () => {
+      const newAllIndicators = {};
+      for (const id of newSelectedMetrics) {
+        try {
+          const indicators = await getIndicatorsForMetric(id);
+          newAllIndicators[id] = indicators;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      setAllIndicators(newAllIndicators);
+    };
+    fetchIndicators();
+  };
+
   const handleIndicatorChange = (event, metricId) => {
     const indicatorId = Number(event.target.value);
     
     setSelectedIndicators((prevSelectedIndicators) => {
-      // Get the current indicators for the metric or initialize an empty array
       const metricIndicators = prevSelectedIndicators[metricId] || [];
       const isSelected = metricIndicators.includes(indicatorId);
       
-      // Update the indicators for the metric
       const updatedIndicators = isSelected
         ? metricIndicators.filter((id) => id !== indicatorId)
         : [...metricIndicators, indicatorId];
       
-      // Create a new state object, excluding entries with empty arrays
       const newIndicators = {
         ...prevSelectedIndicators,
         [metricId]: updatedIndicators.length > 0 ? updatedIndicators : undefined,
       };
       
-      // Remove the metricId entry if the array is empty
       const result = Object.fromEntries(
         Object.entries(newIndicators).filter(([_, indicators]) => indicators !== undefined)
       );
@@ -204,14 +298,17 @@ const Company = () => {
       return result;
     });
   };  
+  
 
   useEffect(() => {
     console.log(selectedIndicators);
   }, [selectedIndicators]);
 
   useEffect(() => {
-    console.log(metricNames);
-  }, [metricNames]);
+    console.log(allIndicators);
+  }, [allIndicators]);
+
+  
 
   return (
     <>
@@ -251,105 +348,158 @@ const Company = () => {
         </div>
         <p>recommendations placeholder</p>
       </div>
-      <Card>
-        <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
-          <FormLabel component="legend" onClick={handleExpandClick}>
-            Select Framework
-            <IconButton onClick={handleExpandClick} size="small">
-              {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </FormLabel>
-          <Collapse in={expanded}>
-            <RadioGroup
-              aria-labelledby="select-framework-radio-buttons-group"
-              name="select-framework-radio-buttons-group"
-              value={selectedFramework ? String(selectedFramework - 1) : ''}
-              onChange={handleFrameworkChange}
-            >
-              {officialFrameworks &&
-                Object.entries(officialFrameworks).map(([key, framework]) => (
-                  <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} />
-                ))}
-            </RadioGroup>
-          </Collapse>
-        </FormControl>
-      </Card>
-      <Card style={{ marginTop: '100px' }}>
-        <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
-          <FormLabel component="legend" onClick={handleExpandClick1}>
-            Metrics and Indicators
-            <IconButton onClick={handleExpandClick1} size="small">
-              {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-            </IconButton>
-          </FormLabel>
-          <Collapse in={expanded1}>
-            <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
+      <div style={{ display: 'flex', flexDirection: 'row'}}>
+        <div style={{ width: '30%', display: 'flex', flexDirection: 'column'}}>
+          <Card style={{ marginTop: '20px'}}>
+            <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
+              <FormLabel component="legend" onClick={handleExpandClick}>
+                Select Framework
+                <IconButton onClick={handleExpandClick} size="small">
+                  {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </FormLabel>
+              <Collapse in={expanded}>
+                <RadioGroup
+                  aria-labelledby="select-framework-radio-buttons-group"
+                  name="select-framework-radio-buttons-group"
+                  value={selectedFramework ? String(selectedFramework - 1) : ''}
+                  onChange={handleFrameworkChange}
+                >
+                  {officialFrameworks &&
+                    Object.entries(officialFrameworks).map(([key, framework]) => (
+                      <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} />
+                    ))}
+                </RadioGroup>
+              </Collapse>
+            </FormControl>
+          </Card>
+          <Card style={{ marginTop: '100px' }}>
+            <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
+              <FormLabel component="legend" onClick={handleExpandClick1} style={{ display: 'flex', alignItems: 'center' }}>
+                Metrics and Indicators
+                <IconButton onClick={handleExpandClick1} size="small">
+                  {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </IconButton>
+              </FormLabel>
+              <Collapse in={expanded1}>
                 <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
-                    <FormGroup style={{ border: '1px solid red' }}>
+                    <FormGroup>
                       {metricNames &&
                         metricNames.map((metric) => (
-                          <div key={metric.id}>
-                            <FormControlLabel
-                              value={metric.id.toString()}
-                              control={<Checkbox />}
-                              label={metric.name}
-                              onChange={handleMetricChange}
-                            />
-                            {selectedMetrics.includes(metric.id) &&
-                              metricIndicators[metric.id] &&
-                              metricIndicators[metric.id].length > 0 && (
-                                <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
-                                  <FormGroup
-                                    style={{ marginLeft: '30px' }}
-                                    name="indicators"
-                                    value={selectedIndicators[metric.id] || []}
-                                  >
-                                    {metricIndicators[metric.id].map((indicator) => (
-                                      <FormControlLabel
-                                        key={indicator.indicator_id}
-                                        value={indicator.indicator_id.toString()}
-                                        control={<Checkbox />}
-                                        label={indicator.indicator_name}
-                                        onChange={(event) => handleIndicatorChange(event, metric.id)}
-                                      />
-                                    ))}
-                                  </FormGroup>
-                                </div>
-                              )}
+                          <div key={metric.id} style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                              <FormControlLabel
+                                value={metric.id.toString()}
+                                control={<Checkbox checked={selectedMetrics.includes(metric.id)} />}
+                                label={metric.name}
+                                onChange={handleMetricChange}
+                              />
+                              <IconButton
+                                onClick={() => handleMetricExpandClick(metric.id)}
+                                style={{
+                                  width: '24px',
+                                  height: '24px',
+                                  borderRadius: '50%',
+                                  color: 'rgba(0, 0, 0, 0.54)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                                size="small"
+                              >
+                                {expandedMetrics[metric.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+                              </IconButton>
+                            </div>
+                            <Collapse in={expandedMetrics[metric.id]}>
+                              <FormGroup
+                                style={{ marginLeft: '30px' }}
+                                name="indicators"
+                                value={selectedIndicators[metric.id] || []}
+                              >
+                                {allIndicators[metric.id]?.map((indicator) => (
+                                  <FormControlLabel
+                                    key={indicator.indicator_id}
+                                    value={indicator.indicator_id.toString()}
+                                    control={<Checkbox checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false} />}
+                                    label={indicator.indicator_name}
+                                    onChange={(event) => handleIndicatorChange(event, metric.id)}
+                                  />
+                                ))}
+                              </FormGroup>
+                            </Collapse>
                           </div>
                         ))}
                     </FormGroup>
                   </div>
                 </div>
-              </div>
 
-              <Grid item xs={6} style={{ border: '1px solid red' }}>
-                <TableContainer component={Paper} style={{ marginTop: '20px' }}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
-                        <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {metricNames &&
-                        Object.values(metricNames).map((metric) => (
-                          <TableRow key={metric.id}>
-                            <TableCell style={{ borderRight: '1px solid #ddd' }}>{metric.name}</TableCell>
-                            <TableCell style={{ borderBottom: '1px solid #ddd' }}></TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </Grid>
-            </div>
-          </Collapse>
-        </FormControl>
-      </Card>
+                {/* Button - Only visible when section is expanded */}
+                {Object.keys(selectedIndicators).length > 0 && (
+                  <div style={{ marginLeft: '20px', marginTop: '20px' }}>
+                    <Button variant="contained" color="primary">
+                      Calculate Score
+                    </Button>
+                  </div>
+                )}
+              </Collapse>
+            </FormControl>
+          </Card>
+        </div>
+
+        <div style={{ width: '60%', marginTop: '20px', marginLeft: '10px'}}>
+          <Card>
+            <IconButton onClick={() => setTableCollapsed(!tableCollapsed)}>
+              {tableCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
+            </IconButton>
+            <Collapse in={!tableCollapsed}>
+              {selectedFramework && (
+                <Grid item xs={6}>
+                  <TableContainer component={Paper} style={{ marginLeft: '50px', border: '1px solid #ddd' }}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Metric</TableCell>
+                          <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Indicator</TableCell>
+                          <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {Object.entries(selectedIndicators).map(([metricId, indicatorIds]) => {
+                          const metricName = metricNames.find(m => m.id === Number(metricId))?.name || 'Unknown Metric';
+                          const indicators = allIndicators[metricId] || [];
+                          return (
+                            indicatorIds.map((indicatorId, index) => {
+                              const indicator = indicators.find(ind => ind.indicator_id === indicatorId);
+                              return (
+                                <TableRow key={`${metricId}-${indicatorId}`}>
+                                  {index === 0 && (
+                                    <TableCell
+                                      rowSpan={indicatorIds.length}
+                                      style={{ borderRight: '1px solid #ddd' }}
+                                    >
+                                      {metricName}
+                                    </TableCell>
+                                  )}
+                                  <TableCell style={{ borderRight: '1px solid #ddd' }}>
+                                    {indicator ? indicator.indicator_name : 'Unknown Indicator'}
+                                  </TableCell>
+                                  <TableCell style={{ borderBottom: '1px solid #ddd' }}>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Grid>
+              )}
+            </Collapse>
+          </Card>
+        </div>
+      </div>
       <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} />
     </>
   );
