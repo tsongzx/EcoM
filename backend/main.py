@@ -836,8 +836,13 @@ async def calculate_metric(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
+    file_name = 'metrics.json'
+    # Open and read the JSON file
+    with open(file_name, 'r') as file:
+        indicator_data = json.load(file)
+        
     # fix this later
-    company_score = 0
+    overall_score = 0
     for indicator in indicators:
         # get value for indicator
         value = session.query(company_models.CompanyData).filter_by(company_name=company_name,
@@ -845,27 +850,19 @@ async def calculate_metric(
         if value is None:
             # indicator does not exist for that company for that year
             continue
-        company_score += value.indicator_value
-        
-    # Calculate the score
-    metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first
-    name = metric.name
-    file_name = 'metrics.json'
-    # Open and read the JSON file
-    with open(file_name, 'r') as file:
-        metric_data = json.load(file)
-        
-        
-    metric_properties = metric_data[name]
-    if metric_properties["indicator"] == "positive":
-        lower = metric_properties["lower"]
-        higher = metric_properties["higher"]
-        score = 100*(company_score - lower)/(higher - lower)
-    else:
-        lower = metric_properties["lower"]
-        higher = metric_properties["higher"]
-        score = 100*(higher - company_score)/(higher - lower)
-    return score
+          
+        indicator_scaling = indicator_data[value.indicator_name]
+        if indicator_scaling["indicator"] == "positive":
+            lower = indicator_scaling["lower"]
+            higher = indicator_scaling["higher"]
+            scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
+        else:
+            lower = indicator_scaling["lower"]
+            higher = indicator_scaling["higher"]
+            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
+        overall_score += scaled_score
+  
+    return overall_score/len(indicator)
   
 #***************************************************************
 #                        Industry Apis
