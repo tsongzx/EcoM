@@ -312,7 +312,7 @@ export const getIndicatorsForMetric = async(metricId) => {
         const response = await axios.get('http://127.0.0.1:8000/indicators', 
         {
             params: {
-                metric_id: metricId
+                metric_id: Number(metricId)
             }, 
             headers: {
                 'Content-Type': 'application/json',
