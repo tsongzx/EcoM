@@ -24,6 +24,3 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
 EOF
   echo $f 'ran'
 done
-
-# Extract and display the summary from the output
-# grep -E 'Query OK|Records|Deleted|Skipped|Warnings' $MYSQL_OUTPUT
