@@ -837,7 +837,7 @@ async def calculate_metric(
     session: Session = Depends(get_session),
 ) :
     # fix this later
-    score = 0
+    company_score = 0
     for indicator in indicators:
         # get value for indicator
         value = session.query(company_models.CompanyData).filter_by(company_name=company_name,
@@ -845,11 +845,10 @@ async def calculate_metric(
         if value is None:
             # indicator does not exist for that company for that year
             continue
-        score += value.indicator_value
+        company_score += value.indicator_value
         
     # Calculate the score
     metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first
-    company_score = session.query() 
     name = metric.name
     file_name = 'metrics.json'
     # Open and read the JSON file
