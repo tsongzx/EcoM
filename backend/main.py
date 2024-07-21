@@ -908,16 +908,11 @@ async def get_industries(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
-    """_summary_: DONT RUN THIS IS FAR TOO SLOW - I WILL JUST SAVE THE INDUSTRIES
-
-    Args:
-        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
-        session (Session, optional): _description_. Defaults to Depends(get_session).
-
-    Returns:
-        _type_: _description_
-    """    
-    industries = session.query(company_models.Company).distinct(company_models.Company.industry).all()   
+    with open('db/industries.json') as fp:
+        data = json.load(fp)
+        industries = ["Unknown" if entry.get('industry') == None else entry.get('industry') for entry in data]
+    
+    print(industries)
     return industries
   
 @app.get("/industry/companies", tags=["Industry"])
