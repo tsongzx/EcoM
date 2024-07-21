@@ -8,7 +8,7 @@ export const DraggableElements = ({components}) => {
     return (
         <div className="column">
             <SortableContext items={components} strategy={verticalListSortingStrategy}>
-                {components.map((c, index) => (
+                {components.map((c) => (
                     <PageComponent id = {c.id} content={c.name} key={c.id}/>
                 ))}
             </SortableContext>
