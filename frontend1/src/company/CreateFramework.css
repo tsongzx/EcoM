@@ -1,0 +1,11 @@
+.button {
+    border-radius: 10px;
+}
+
+.button:hover {
+    border-color: blue;
+}
+
+.included {
+    border-color: green;
+}
