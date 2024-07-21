@@ -43,3 +43,14 @@ class MetricIndicators(Base):
     metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
     indicator_name: Mapped[str] = mapped_column(String(100), primary_key=False, unique=False, nullable=False)
     indicator_id: Mapped[int] = mapped_column(primary_key=False, unique=False)
+    weighting: Mapped[float] = mapped_column(primary_key=False, unique=False)
+
+class CustomMetricIndicators(Base):
+    __tablename__ = 'CustomMetricIndicators'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
+    metric_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    indicator_name: Mapped[str] = mapped_column(String(100), primary_key=False, unique=False, nullable=False)
+    indicator_id: Mapped[int] = mapped_column(primary_key=False, unique=False)
+    user_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
+    weighting: Mapped[float] = mapped_column(primary_key=False, unique=False, nullable=False)
