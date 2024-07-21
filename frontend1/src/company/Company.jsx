@@ -227,7 +227,7 @@ const Company = () => {
               </FormControl>
             </Card>
             <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen}/>
-
+            
             <CreateFramework/>
         </>
 	);

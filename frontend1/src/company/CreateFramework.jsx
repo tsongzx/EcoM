@@ -85,7 +85,7 @@ const CreateFramework = () => {
               }});
               //if successful
               handleClose();
-              console.log('SUCCESSFULLY CREATED FRAMEWORK METRICS');
+              console.log('SUCCESSFULLY CREATED FRAMEWORK');
               return response.data;
         } catch (error) {
             console.log(error);
@@ -107,7 +107,7 @@ const CreateFramework = () => {
                     {metric.name ? metric.name : '...'}
                 </button>
             ))}
-            <button onClick={() => setShowAddName(!showAddName)}>Create Framework</button>
+            {!showAddName && (<button onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
             {showAddName && (<div>
                 <button onClick={handleClose}>X</button>
                     <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
