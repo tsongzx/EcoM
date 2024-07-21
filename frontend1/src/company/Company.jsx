@@ -35,11 +35,14 @@ import {
   getMetricForFramework,
   getMetricName,
   getIndicatorsForMetric,
+  getFavouritesList,
+  getIndicatorInfo
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import CreateFramework from './CreateFramework.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -61,8 +64,7 @@ const Company = () => {
   const [tableCollapsed, setTableCollapsed] = useState(true);
   const token = Cookies.get('authToken');
 
-
-  useEffect(() => {
+  useEffect(async() => {
     const fetchData = async () => {
       console.log(companyId);
       await addToRecentlyViewed(companyId);
@@ -77,6 +79,17 @@ const Company = () => {
       setOfficialFrameworks(availableOfficialFramework);
     };
     fetchData();
+
+    const favsList = await getFavouritesList();
+    console.log('FAVS LIST:');
+    console.log(favsList);
+    if (Array.isArray(favsList) && favsList.includes(companyId)) {
+      console.log('IN FAVS');
+      setIsInFavs(true);
+    } else {
+      console.log('NOT IN FAVS');
+      setIsInFavs(false);
+    }
   }, [companyId]);
 
   useEffect(() => {
@@ -191,8 +204,8 @@ const Company = () => {
 
   const handleToggleFavourite = () => {
     setIsInFavs(!isInFavs);
-    const companyId_int = Number(companyId.split(' ')[1]);
-
+    //depending on isInFavs, either add or delete from favourites (called WatchList in backend)
+    const companyId_int = Number(companyId);
     if (isInFavs) {
       addToFavourites(companyId_int);
     } else {
@@ -501,6 +514,7 @@ const Company = () => {
         </div>
       </div>
       <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} />
+      <CreateFramework/>
     </>
   );
 };
