@@ -10,6 +10,7 @@ from route_tags import tags_metadata
 import schemas.user_schemas as user_schemas
 import schemas.list_schemas as list_schemas
 import schemas.framework_schemas as framework_schemas
+import schemas.metric_schemas as metric_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -734,17 +735,16 @@ async def get_framework_score(
     session: Session = Depends(get_session),
 ) -> int:
 
-  
     framework = session.query(framework_models.Frameworks).get(framework_id)
     total_score = 0
     categories = ["E", "S", "G"]
     
     for category in categories:
-        metrics = frameworks.get_framework_metrics_by_category(framework_id, category, session)
+        metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
         
         score = 0
         for metric in metrics:
-            metric_value = await calculate_metric(metric.metric_id, company_name, user, session)
+            metric_value = await calculate_metric(metric.metric_id, company_name, 2023, user, session)
             
             score += metric_value * metric.weighting
 
@@ -757,15 +757,14 @@ async def get_framework_score(
 #                        Indicator Apis
 #***************************************************************
 @app.get("/indicators", tags=["Indicators"])
-async def get_indicators(
+def get_indicators(
     metric_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
-    indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
-      
-    return indicators
-  
+    # fix to return custom indicators
+    return session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
+
 @app.get("/indicators/all", tags=["Indicators"])
 async def get_all_indicators(
     user: user_schemas.UserInDB = Depends(get_user),
@@ -806,6 +805,18 @@ async def get_all_metrics(
       
     return metrics 
 
+@app.post("/metric/modify", tags=["Metrics"])
+def modify_metric(
+    metric_id: int,
+    indicators: List[metric_schemas.ModifyMetric],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: TO DO
+    """    
+    return []
+
+# fix to get by year and apply weighting!
 @app.get("/calculate_metric", tags=["Metrics"])
 # need to modify this to the metric for a given year!!!
 async def calculate_metric(
@@ -813,7 +824,7 @@ async def calculate_metric(
     company_name: str,
     # year filter
     year: int,
-    indicators: Any = Depends(get_indicators),
+    # indicators: List[metrics_models.MetricIndicators] = Depends(get_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
@@ -824,29 +835,30 @@ async def calculate_metric(
         
     # fix this later
     overall_score = 0
-    
+    indicators = get_indicators(metric_id, user, session)
+    for indicator in indicators:
+        print(type(indicator))
+        print(indicator)
     indicator_names = [indicator.indicator_name for indicator in indicators]
     values = session.query(company_models.CompanyData).filter(
         company_models.CompanyData.company_name == company_name,
         company_models.CompanyData.indicator_name.in_(indicator_names),
     ).all()
 
-    values = {value.indicator_name: value for value in values}
-
-    for indicator_name, indicator_value in values:
-        if indicator_value is None:
+    for value in values:
+        if value.indicator_value is None:
             # indicator does not exist for that company for that year
             continue
           
-        indicator_scaling = indicator_data[indicator_name]
+        indicator_scaling = indicator_data[value.indicator_name]
         if indicator_scaling["indicator"] == "positive":
             lower = indicator_scaling["lower"]
             higher = indicator_scaling["higher"]
-            scaled_score = 100*(indicator_value - lower)/(higher - lower)
+            scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
         else:
             lower = indicator_scaling["lower"]
             higher = indicator_scaling["higher"]
-            scaled_score = 100*(higher - indicator_value)/(higher - lower)
+            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
         overall_score += scaled_score
   
     return overall_score / len(indicators)
@@ -857,7 +869,8 @@ async def get_metrics_by_category(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-   
+    """_summary_: TO DO
+    """   
     # TO DO: GET ALL METRICS IN A CATEGORY!!
     return []
 #***************************************************************
@@ -919,12 +932,6 @@ async def get_industry_average(
     session: Session = Depends(get_session),
 ) :
     """_summary_: ignore right now!
-
-    Args:
-        industry (str): _description_
-        framework_id (int): _description_
-        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
-        session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns:
         _type_: _description_
