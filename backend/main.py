@@ -15,7 +15,7 @@ import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
 import json
-from sqlalchemy import delete, and_, or_
+from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
@@ -801,6 +801,24 @@ async def get_indicators(
     indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
       
     return indicators
+  
+@app.get("/indicators/all", tags=["Indicators"])
+async def get_all_indicators(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    indicators = session.query(metrics_models.Indicators).all()
+    
+    return indicators
+
+@app.get("/indicator", tags=["Indicators"])
+async def get_indicator(
+    indicator_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    return session.query(metrics_models.Indicators).get(indicator_id)
+    
 #***************************************************************
 #                        Metric Apis
 #***************************************************************
@@ -823,8 +841,6 @@ async def get_all_metrics(
     metrics = session.query(metrics_models.Metrics).limit(54).all()
       
     return metrics 
-  
-
 
 @app.get("/calculate_metric", tags=["Metrics"])
 # need to modify this to the metric for a given year!!!
@@ -877,3 +893,63 @@ async def get_industry(
     company = session.query(company_models.Company).filter_by(id=company_id).first()
       
     return "Unknown" if company.industry is None else company.industry  
+  
+@app.get("/industry", tags=["Industry"])
+async def get_industry(
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    company = session.query(company_models.Company).filter_by(id=company_id).first()   
+    return "Unknown" if company.industry is None else company.industry  
+
+@app.get("/industries", tags=["Industry"])
+async def get_industries(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: DONT RUN THIS IS FAR TOO SLOW - I WILL JUST SAVE THE INDUSTRIES
+
+    Args:
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: _description_
+    """    
+    industries = session.query(company_models.Company).distinct(company_models.Company.industry).all()   
+    return industries
+  
+@app.get("/industry/companies", tags=["Industry"])
+async def get_companies_in_industry(
+    industry: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    companies = session.query(company_models.Company).filter_by(industry=industry).all()
+      
+    return companies
+  
+# ignore
+@app.get("/industry/average/", tags=["Industry"])
+async def get_industry_average(
+    industry: str,
+    framework_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: ignore right now!
+
+    Args:
+        industry (str): _description_
+        framework_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: _description_
+    """    
+    # fix - get average for an industry for a framework 
+    companies = session.query(company_models.Company).filter_by(industry=industry).all()
+    
+    return companies
