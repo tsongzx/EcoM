@@ -15,7 +15,7 @@ import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
 import json
-from sqlalchemy import delete, and_, or_
+from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
@@ -801,6 +801,24 @@ async def get_indicators(
     indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
       
     return indicators
+  
+@app.get("/indicators/all", tags=["Indicators"])
+async def get_all_indicators(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    indicators = session.query(metrics_models.Indicators).all()
+    
+    return indicators
+
+@app.get("/indicator", tags=["Indicators"])
+async def get_indicator(
+    indicator_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    return session.query(metrics_models.Indicators).get(indicator_id)
+    
 #***************************************************************
 #                        Metric Apis
 #***************************************************************
@@ -823,8 +841,6 @@ async def get_all_metrics(
     metrics = session.query(metrics_models.Metrics).limit(54).all()
       
     return metrics 
-  
-
 
 @app.get("/calculate_metric", tags=["Metrics"])
 # need to modify this to the metric for a given year!!!
@@ -836,8 +852,13 @@ async def calculate_metric(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
+    file_name = 'db/metrics.json'
+    # Open and read the JSON file
+    with open(file_name, 'r') as file:
+        indicator_data = json.load(file)
+        
     # fix this later
-    company_score = 0
+    overall_score = 0
     for indicator in indicators:
         # get value for indicator
         value = session.query(company_models.CompanyData).filter_by(company_name=company_name,
@@ -845,27 +866,19 @@ async def calculate_metric(
         if value is None:
             # indicator does not exist for that company for that year
             continue
-        company_score += value.indicator_value
-        
-    # Calculate the score
-    metric = session.query(metrics_models.Metrics).filter_by(id=metric_id).first
-    name = metric.name
-    file_name = 'metrics.json'
-    # Open and read the JSON file
-    with open(file_name, 'r') as file:
-        metric_data = json.load(file)
-        
-        
-    metric_properties = metric_data[name]
-    if metric_properties["indicator"] == "positive":
-        lower = metric_properties["lower"]
-        higher = metric_properties["higher"]
-        score = 100*(company_score - lower)/(higher - lower)
-    else:
-        lower = metric_properties["lower"]
-        higher = metric_properties["higher"]
-        score = 100*(higher - company_score)/(higher - lower)
-    return score
+          
+        indicator_scaling = indicator_data[value.indicator_name]
+        if indicator_scaling["indicator"] == "positive":
+            lower = indicator_scaling["lower"]
+            higher = indicator_scaling["higher"]
+            scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
+        else:
+            lower = indicator_scaling["lower"]
+            higher = indicator_scaling["higher"]
+            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
+        overall_score += scaled_score
+  
+    return overall_score / len(indicators)
   
 #***************************************************************
 #                        Industry Apis
@@ -880,3 +893,63 @@ async def get_industry(
     company = session.query(company_models.Company).filter_by(id=company_id).first()
       
     return "Unknown" if company.industry is None else company.industry  
+  
+@app.get("/industry", tags=["Industry"])
+async def get_industry(
+    company_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    company = session.query(company_models.Company).filter_by(id=company_id).first()   
+    return "Unknown" if company.industry is None else company.industry  
+
+@app.get("/industries", tags=["Industry"])
+async def get_industries(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: DONT RUN THIS IS FAR TOO SLOW - I WILL JUST SAVE THE INDUSTRIES
+
+    Args:
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: _description_
+    """    
+    industries = session.query(company_models.Company).distinct(company_models.Company.industry).all()   
+    return industries
+  
+@app.get("/industry/companies", tags=["Industry"])
+async def get_companies_in_industry(
+    industry: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    companies = session.query(company_models.Company).filter_by(industry=industry).all()
+      
+    return companies
+  
+# ignore
+@app.get("/industry/average/", tags=["Industry"])
+async def get_industry_average(
+    industry: str,
+    framework_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: ignore right now!
+
+    Args:
+        industry (str): _description_
+        framework_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: _description_
+    """    
+    # fix - get average for an industry for a framework 
+    companies = session.query(company_models.Company).filter_by(industry=industry).all()
+    
+    return companies
