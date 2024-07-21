@@ -35,8 +35,10 @@ import {
   getMetricForFramework,
   getMetricName,
   getIndicatorsForMetric,
-  getFavouritesList,
-  getIndicatorInfo
+  getIndicatorInfo,
+  getFrameworkScore,
+  getMetricScore,
+  getFavouritesList
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -62,7 +64,21 @@ const Company = () => {
   const [selectedIndicators, setSelectedIndicators] = useState({});
   const [expandedMetrics, setExpandedMetrics] = useState({});
   const [tableCollapsed, setTableCollapsed] = useState(true);
+  const [indicatorsCompany, setIndicatorsCompany] = useState(null);
+  const [frameworkScore, setFrameworkScore] = useState(null);
+  const [metricScore, setMetricScore] = useState(null);
   const token = Cookies.get('authToken');
+
+  useEffect(() => {
+    const fetchCompanyIndicators = async(companyName) => {
+      const companyIndicators = await getIndicatorInfo(companyName);
+      console.log(companyIndicators);
+      setIndicatorsCompany(companyIndicators);
+    };
+
+    fetchCompanyIndicators(companyName);
+  }, []);
+
 
   useEffect(async() => {
     const fetchData = async () => {
@@ -110,16 +126,24 @@ const Company = () => {
           setSelectedMetrics(metricIds);
           
           const newAllIndicators = {};
+          const allMetricScores = {};
           for (const id of metricIds) {
             try {
               const indicators = await getIndicatorsForMetric(id);
+              console.log(indicators);
               newAllIndicators[id] = indicators;
+
+              // const scoreMetric = await getMetricScore(id, companyName, indicators);
+              // console.log(scoreMetric);
+              // allMetricScores[id] = scoreMetric;
+              
             } catch (error) {
               console.log(error);
             }
           }
           console.log(newAllIndicators);
           setAllIndicators(newAllIndicators);
+          // setMetricScore(allMetricScores);
           
           const newSelectedIndicators = {};
           for (const id of metricIds) {
@@ -127,6 +151,9 @@ const Company = () => {
           }
           setSelectedIndicators(newSelectedIndicators);
         }
+        // const scoreFramework = await getFrameworkScore(selectedFramework, true, companyName);
+        // console.log(scoreFramework);
+        // setFrameworkScore(scoreFramework);
       }
     };
     fetchData();
@@ -508,6 +535,12 @@ const Company = () => {
                     </Table>
                   </TableContainer>
                 </Grid>
+              )}
+
+              {!selectedFramework && (
+                <div>
+                  hi
+                </div>
               )}
             </Collapse>
           </Card>

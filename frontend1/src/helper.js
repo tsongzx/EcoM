@@ -48,6 +48,24 @@ export const fetchCompanies = async(page) => {
     }
 }
 
+export const fetchIndustries = async() => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industries', 
+            {
+                params: {},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log('Error fetching the companies', error);
+        return [];
+    }
+}
+
 export const getCompanyFromRecentlyViewed = async (companyId) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
@@ -344,6 +362,66 @@ export const getIndicatorsForMetric = async(metricId) => {
             }
         });
 
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getFrameworkScore = async(frameworkId, useDefault, companyName) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/official_framework/score/', 
+        {
+            params: {
+                framework_id: frameworkId,
+                use_default: useDefault,
+                company_name: companyName
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getMetricScore = async(metricId, companyName, indicators) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/calculate_metric', 
+        {
+            params: {
+                metric_id: metricId,
+                company_name: companyName,
+                indicators: indicators
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getCompaniesOfIndustry = async(industryName) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
+        {
+            params: {
+                industry: industryName
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
