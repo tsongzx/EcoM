@@ -20,9 +20,19 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
       ENCLOSED BY '"'
     LINES TERMINATED BY '\r\n'
     IGNORE 1 ROWS 
-    (framework_id, parent_id, metric_id);
+    (framework_id, category, metric_id);
   SHOW WARNINGS;
- 
+  
+  CREATE TEMPORARY TABLE category_counts AS
+  SELECT framework_id, category, COUNT(*) AS num_metrics
+  FROM OfficialFrameworkMetrics
+  GROUP BY framework_id, category;
+
+  UPDATE OfficialFrameworkMetrics metrics
+  JOIN category_counts cc
+  ON metrics.framework_id = cc.framework_id AND metrics.category = cc.category
+  SET metrics.weighting = 1.0 / cc.num_metrics;
+  
 EOF
 echo $f 'ran'
 
