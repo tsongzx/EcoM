@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem } from '@mui/material';
+import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button } from '@mui/material';
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed } from './helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const industries = ['Industry 1', 'Industry 2', 'Industry 3', 'Industry 4', 'Industry 5'];
-
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [listOfIndustries, setListOfIndustries] = useState([]);
+  const [listOfFrameworks, setListOfFrameworks] = useState({});
   const [lists, setLists] = useState([]);
   const [recents, setRecents] = useState([]);
   const [listOfCompanies, setListOfCompanies] = useState([]);
@@ -20,24 +21,44 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [anchorElement, setanchorElement] = useState(null); // For dropdown menu
-  const [selectedList, setSelectedList] = useState(null); // Changed to null initially
+  const [selectedList, setSelectedList] = useState(null); 
+  const [selectedFramework, setSelectedFramework] = useState(null);
   const [companyNames, setCompanyNames] = useState([]);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
+  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    if (selectedCompany !== null) {
-      navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, { state: { companyId: selectedCompany.id, companyName: selectedCompany.company_name } });
+  useEffect(async() => {
+
+    if (selectedIndustry) {
+      console.log(selectedIndustry);
+      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
+      setListOfCompanies(companyOfIndustry);
     }
-  }, [selectedCompany, navigate]);
+  }, [selectedIndustry]);
+
+  // useEffect(() => {
+  //   if (selectedCompany !== null) {
+  //     navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, { state: { companyId: selectedCompany.id, companyName: selectedCompany.company_name } });
+  //   }
+  // }, [selectedCompany, navigate]);
 
   useEffect(() => {
     console.log(page);
     const fetchData = async () => {
       setLoading(true);
       try {
+
+        const industriesAvailable = await fetchIndustries();
+        console.log(industriesAvailable);
+        setListOfIndustries(industriesAvailable);
+
         const companiesAvailable = await fetchCompanies(page);
         setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
         setHasMore(companiesAvailable.length > 0);
+
+        const frameworksAvailable = await getOfficialFrameworks();
+        console.log(frameworksAvailable);
+        setListOfFrameworks(frameworksAvailable);
 
         const userLists = await fetchLists();
         console.log(userLists);
@@ -79,6 +100,13 @@ const Dashboard = () => {
     try {
       const companyInfo = await getCompanyFromRecentlyViewed(companyId);
       setSelectedCompany(companyInfo);
+      navigate(`/company/${encodeURIComponent(companyInfo.id)}`, 
+      { state: { 
+          companyId: companyInfo.id, 
+          companyName: companyInfo.company_name,
+          initialFramework: null
+        } 
+      });
     } catch (error) {
       console.error('Failed to open company', error);
     }
@@ -120,9 +148,29 @@ const Dashboard = () => {
   };
 
   const handleListClick = (list) => {
-    setSelectedList(list); // Set the selected list
-    setIsListModalOpen(true); // Open the modal
+    setSelectedList(list); 
+    setIsListModalOpen(true); 
   };
+
+  const handleClick = () => {
+    if (!selectedCompany) {
+      setError('Please select a company.')
+    } else {
+      console.log(selectedFramework);
+      navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, 
+      { state: { 
+          companyId: selectedCompany.id, 
+          companyName: selectedCompany.company_name,
+          initialFramework: selectedFramework,
+          selectedIndustry: selectedIndustry
+        } 
+      });
+    }
+  }
+
+  useEffect(() => {
+    console.log(selectedFramework);
+  }, [selectedFramework]);
 
 
   return (
@@ -133,20 +181,21 @@ const Dashboard = () => {
         <Grid container direction="row" spacing={2} style={{ width: '100%', maxWidth: '100%', height: '100%' }}>
           <Grid item xs={12} style={{ minHeight: '30%' }}>
             <Paper style={{ height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row', boxShadow: 'none' }}>
-              <Card style={{ width: '40%', boxShadow: 'none', minHeight: '30vh' }}>
+              <Card style={{ width: '30%', boxShadow: 'none', minHeight: '30vh' }}>
                 <CardContent style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'column' }}>
                   <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
-                    Select Industry
+                    Select Industry (Optional)
                   </Typography>
                   <Select
                     styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
-                    options={industries.map(industry => ({ value: industry, label: industry }))}
-                    placeholder="Select an option"
+                    options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
+                    placeholder="Industry"
                     maxMenuHeight={100}
+                    onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
                   />
                 </CardContent>
               </Card>
-              <Card style={{ width: '40%', boxShadow: 'none', minHeight: '30vh' }}>
+              <Card style={{ width: '30%', boxShadow: 'none', minHeight: '30vh' }}>
                 <CardContent style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'column' }}>
                   <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
                     Select Company
@@ -154,11 +203,43 @@ const Dashboard = () => {
                   <Select
                     styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
                     options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
-                    placeholder="Select an option"
+                    placeholder="Company"
                     onChange={(selectedOption) => setSelectedCompany(listOfCompanies.find(company => company.id === selectedOption.value))}
                     maxMenuHeight={100}
                     onMenuScrollToBottom={handleMenuScrollToBottom}
                   />
+                </CardContent>
+              </Card>
+              <Card style={{ width: '30%', boxShadow: 'none', minHeight: '30vh' }}>
+                <CardContent style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'column' }}>
+                  <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
+                    Select Framework (Optional)
+                  </Typography>
+                  <Select
+                    styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
+                    options={Object.entries(listOfFrameworks).map(([key, framework]) => ({
+                      value: framework.id,
+                      label: framework.framework_name,
+                    }))}
+                    placeholder="Framework"
+                    maxMenuHeight={100}
+                    onChange={(selectedOption) => setSelectedFramework(selectedOption.value)}
+                  />
+                </CardContent>
+              </Card>
+              <Card style={{ width: '10%', boxShadow: 'none', minHeight: '30vh' }}>
+                <CardContent style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', flexDirection: 'column' }}>
+                  <Typography variant="h6" gutterBottom style={{ color: 'transparent', alignSelf: 'flex-start' }}>
+                    Placeholder
+                  </Typography>
+                  <Button variant="contained" color="primary" onClick={handleClick}>
+                    Go
+                  </Button>
+                  {error && (
+                    <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
+                      {error}
+                    </Typography>
+                  )}
                 </CardContent>
               </Card>
             </Paper>

@@ -26,5 +26,6 @@ EOF
   echo $f 'ran'
 done
 
-# Extract and display the summary from the output
-# grep -E 'Query OK|Records|Deleted|Skipped|Warnings' $MYSQL_OUTPUT
+# after loop is done
+# ALTER TABLE CompanyData ADD column_name indicator_year_int;
+# UPDATE CompanyData SET indicator_year_int = EXTRACT(YEAR FROM indicator_year);
