@@ -25,6 +25,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
+import ReportModal from './ReportModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
@@ -48,6 +49,7 @@ const Company = () => {
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [reportModal, setOpenReportModal] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
   const [officialFrameworks, setOfficialFrameworks] = useState(null);
   const [selectedFramework, setSelectedFramework] = useState(null);
@@ -137,6 +139,14 @@ const Company = () => {
     setCompareModalOpen(true);
   };
 
+  const openReportModal = () => {
+    setOpenReportModal(true);
+  }
+
+  const handleCloseReportModal = () => {
+    setOpenReportModal(false);
+  }
+
   const handleToggleFavourite = () => {
     setIsInFavs(!isInFavs);
     const companyId_int = Number(companyId.split(' ')[1]);
@@ -220,6 +230,7 @@ const Company = () => {
         Return to Dashboard
       </Button>
       <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
+      <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} />
       <div className="companyHeading">
         <div className="metainfoContainer">
           <div className="companyName metainfo">
@@ -236,7 +247,7 @@ const Company = () => {
           </div>
         </div>
         <div className="quickControls">
-          <Button>Save Report</Button>
+          <Button onClick={openReportModal}>Save Report</Button>
           <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
         </div>
       </div>

@@ -69,6 +69,28 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
     }
 }
 
+export const getCompanyMetrics = async (companyName) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/indicators/${companyName}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_name: companyName
+                }
+            } 
+        );
+        const companyInfo = response.data;
+        return companyInfo;
+    } catch (error) {
+        console.log('Error fetching company', error);
+        return [];
+    }
+}
+
+
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
     try {
