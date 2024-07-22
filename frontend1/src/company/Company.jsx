@@ -557,9 +557,9 @@ const Company = () => {
                                   <TableCell style={{ borderRight: '1px solid #ddd' }}>
                                     {indicator ? indicator.indicator_name : 'Unknown Indicator'}
                                   </TableCell>
-                                  {/* <TableCell style={{ borderBottom: '1px solid #ddd' }}>
-                                    {indicator ? indicatorsCompany[Number(selectedYear)][indicator.indicator_name] : 'N/A'}                                  
-                                  </TableCell> */}
+                                  <TableCell style={{ borderBottom: '1px solid #ddd' }}>
+                                    {indicator ? findIndicatorValue(indicator.indicator_name) : 'N/A'}                                  
+                                  </TableCell>
 
                                 </TableRow>
                               );
