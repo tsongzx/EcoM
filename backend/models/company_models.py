@@ -43,4 +43,6 @@ class CompanyData(Base):
     nb_points_of_observations: Mapped[int] = mapped_column()
     indicator_period:  Mapped[str] = mapped_column(String(100))
     provider_name:  Mapped[str] = mapped_column(String(100), nullable=False) 
-    reported_date:  Mapped[DateTime] = mapped_column(DateTime)      
+    reported_date:  Mapped[DateTime] = mapped_column(DateTime, nullable=True) 
+    indicator_year_int: Mapped[int] = mapped_column(nullable=True)
+     
