@@ -48,6 +48,24 @@ export const fetchCompanies = async(page) => {
     }
 }
 
+export const fetchIndustries = async() => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industries', 
+            {
+                params: {},
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log('Error fetching the companies', error);
+        return [];
+    }
+}
+
 export const getCompanyFromRecentlyViewed = async (companyId) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
@@ -113,7 +131,7 @@ export const addCompanyToList = async (listId, companyId ) => {
     try {
         const response = await axios.post('http://127.0.0.1:8000/list/company', {
             list_id: listId,
-            company_id: parseInt(companyId),
+            company_id: companyId,
         }, {headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -126,12 +144,15 @@ export const addCompanyToList = async (listId, companyId ) => {
 }
 
 export const removeCompanyFromList = async(listId, companyId) => {
-    console.log(companyId);
+    console.log('deleting CompanyId: ', companyId, 'from LIST: ', listId);
+    console.log(Cookies.get('authToken'));
     try {
-        const response = axios.delete('http://127.0.0.1:8000/list/company', {
-            list_id: Number(listId),
-            company_id: Number(companyId.split(" ")[0])
-        }, {headers: {
+        const response = await axios.delete('http://127.0.0.1:8000/list/company', {
+            params: {
+                list_id: listId,
+                company_id: companyId
+            },
+            headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
         }});
@@ -198,6 +219,7 @@ export const getFavouritesList = async() => {
 }
 
 export const addToFavourites = async(companyId) => {
+    console.log(`addin ${companyId} to favourites`);
     try {
         const response = await axios.post(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
           {},  
@@ -205,6 +227,7 @@ export const addToFavourites = async(companyId) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
+        console.log('SUCCESSFULLY added to favourites')
         return response.data;
     } catch (error) {
         console.log(`error adding to favourites: ${error}`);
@@ -212,12 +235,14 @@ export const addToFavourites = async(companyId) => {
 }
 
 export const deleteFromFavourites = async(companyId) => {
+    console.log('deleting from favourites');
     try {
         const response = await axios.delete(`http://127.0.0.1:8000/watchlist?company_id=${companyId}`, 
             {headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
+        console.log('SUCCESSFULLY deleted from favourites');
         return response.data;
     } catch (error) {
         console.log(`error deleting from favourites: ${error}`);
@@ -289,8 +314,9 @@ export const getMetricForFramework = async(official, frameworkId) => {
 }
 
 export const getMetricName = async(metricId) => {
+    console.log('Getting Name for Metric Id: ', metricId);
     try {   
-        const response = await axios.get('http://127.0.0.1:8000/metric', 
+        const response = await axios.get(`http://127.0.0.1:8000/metric`, 
         {
             params: {
                 metric_id: metricId
@@ -307,6 +333,22 @@ export const getMetricName = async(metricId) => {
     }
 }
 
+export const getUserId = async() => {
+    try {   
+        const response = await axios.get('http://127.0.0.1:8000/user',
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting userID: ${error}`);
+    }
+}
+
 export const getIndicatorsForMetric = async(metricId) => {
     try {   
         const response = await axios.get('http://127.0.0.1:8000/indicators', 
@@ -320,6 +362,66 @@ export const getIndicatorsForMetric = async(metricId) => {
             }
         });
 
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getFrameworkScore = async(frameworkId, useDefault, companyName) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/official_framework/score/', 
+        {
+            params: {
+                framework_id: frameworkId,
+                use_default: useDefault,
+                company_name: companyName
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getMetricScore = async(metricId, companyName, indicators) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/calculate_metric', 
+        {
+            params: {
+                metric_id: metricId,
+                company_name: companyName,
+                indicators: indicators
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getCompaniesOfIndustry = async(industryName) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
+        {
+            params: {
+                industry: industryName
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);

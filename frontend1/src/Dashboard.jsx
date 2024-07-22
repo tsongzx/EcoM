@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem 
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed } from './helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 
@@ -13,6 +13,8 @@ const Dashboard = () => {
   const industries = ['Industry 1', 'Industry 2', 'Industry 3', 'Industry 4', 'Industry 5'];
 
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [listOfIndustries, setListOfIndustries] = useState(null);
   const [lists, setLists] = useState([]);
   const [recents, setRecents] = useState([]);
   const [listOfCompanies, setListOfCompanies] = useState([]);
@@ -23,6 +25,13 @@ const Dashboard = () => {
   const [selectedList, setSelectedList] = useState(null); // Changed to null initially
   const [companyNames, setCompanyNames] = useState([]);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
+
+  useEffect(async() => {
+    if (selectedIndustry) {
+      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
+      setListOfCompanies(companyOfIndustry);
+    }
+  }, [selectedIndustry]);
 
   useEffect(() => {
     if (selectedCompany !== null) {
@@ -35,6 +44,11 @@ const Dashboard = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
+
+        const industriesAvailable = await fetchIndustries();
+        console.log(industriesAvailable);
+        setListOfIndustries(industriesAvailable);
+
         const companiesAvailable = await fetchCompanies(page);
         setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
         setHasMore(companiesAvailable.length > 0);
@@ -138,12 +152,15 @@ const Dashboard = () => {
                   <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
                     Select Industry
                   </Typography>
-                  <Select
-                    styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
-                    options={industries.map(industry => ({ value: industry, label: industry }))}
-                    placeholder="Select an option"
-                    maxMenuHeight={100}
-                  />
+                  {listOfIndustries && (
+                    <Select
+                      styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
+                      options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
+                      placeholder="Select an option"
+                      maxMenuHeight={100}
+                      onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
+                    />
+                  )}
                 </CardContent>
               </Card>
               <Card style={{ width: '40%', boxShadow: 'none', minHeight: '30vh' }}>
