@@ -5,7 +5,7 @@ import Select from 'react-select';
 import { fetchCompanies, fetchIndustries, getCompaniesOfIndustry } from '../helper';
 import { useNavigate } from 'react-router-dom';
 
-const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCompareModalOpen, selectedIndicators }) => {
+const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCompareModalOpen, selectedFramework }) => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyId, label: companyName }]);
   const [allCompanies, setAllCompanies] = useState([]);
@@ -89,7 +89,7 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
       setError('Please select at least 2 companies to compare.');
     } else {
       console.log(selectedCompanies);
-      navigate('/compare', { state: { companies: selectedCompanies, selectedIndicators } });
+      navigate('/compare', { state: { companies: selectedCompanies, selectedFramework } });
     }
   };
 

@@ -3,11 +3,11 @@ import { useLocation } from 'react-router-dom';
 
 const Compare = () => {
   const location = useLocation();
-  const { companies, selectedIndicators } = location.state;
+  const { companies, selectedFramework } = location.state;
 
   useEffect(() => {
-    console.log(selectedIndicators);
-  }, []);
+    console.log(selectedFramework);
+  }, [selectedFramework]);
 
   return (
     <div>
