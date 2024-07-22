@@ -14,7 +14,7 @@ const Dashboard = () => {
 
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
-  const [listOfIndustries, setListOfIndustries] = useState(null);
+  const [listOfIndustries, setListOfIndustries] = useState([]);
   const [listOfFrameworks, setListOfFrameworks] = useState({});
   const [lists, setLists] = useState([]);
   const [recents, setRecents] = useState([]);
@@ -161,7 +161,8 @@ const Dashboard = () => {
       { state: { 
           companyId: selectedCompany.id, 
           companyName: selectedCompany.company_name,
-          initialFramework: selectedFramework
+          initialFramework: selectedFramework,
+          selectedIndustry: selectedIndustry
         } 
       });
     }
@@ -185,15 +186,13 @@ const Dashboard = () => {
                   <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
                     Select Industry (Optional)
                   </Typography>
-                  {listOfIndustries && (
-                    <Select
-                      styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
-                      options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
-                      placeholder="Industry"
-                      maxMenuHeight={100}
-                      onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
-                    />
-                  )}
+                  <Select
+                    styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
+                    options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
+                    placeholder="Industry"
+                    maxMenuHeight={100}
+                    onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
+                  />
                 </CardContent>
               </Card>
               <Card style={{ width: '30%', boxShadow: 'none', minHeight: '30vh' }}>

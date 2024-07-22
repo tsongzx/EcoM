@@ -38,7 +38,8 @@ import {
   getIndicatorInfo,
   getFrameworkScore,
   getMetricScore,
-  getFavouritesList
+  getFavouritesList,
+  getIndustryMean
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -48,7 +49,7 @@ import CreateFramework from './CreateFramework.jsx';
 
 const Company = () => {
   const location = useLocation();
-  const { companyId, companyName, initialFramework } = location.state || {};
+  const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
   const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
@@ -67,6 +68,8 @@ const Company = () => {
   const [indicatorsCompany, setIndicatorsCompany] = useState(null);
   const [frameworkScore, setFrameworkScore] = useState(null);
   const [metricScore, setMetricScore] = useState(null);
+
+  const [industryMean, setIndustryMean] = useState(null);
   const token = Cookies.get('authToken');
 
   useEffect(() => {
@@ -75,6 +78,12 @@ const Company = () => {
       const companyIndicators = await getIndicatorInfo(companyName);
       console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
+      
+      if(selectedIndustry && selectedFramework) {
+        const industryMean = await getIndustryMean(selectedFramework, selectedIndustry);
+        console.log(industryMean);
+        setIndustryMean(industryMean);
+      }
     };
 
     fetchCompanyIndicators(companyName);
@@ -363,7 +372,6 @@ const Company = () => {
         <div className="metainfoContainer">
           <div className="companyName metainfo">
             <h1>{companyName}</h1>
-            <h3>NASDAQ, inc. ETF - What is this for?</h3>
           </div>
           <div className="currentPrice metainfo">
             <h2>58.78</h2>
@@ -548,7 +556,7 @@ const Company = () => {
           </Card>
         </div>
       </div>
-      <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} />
+      <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedIndicators={selectedIndicators}/>
       <CreateFramework/>
     </>
   );

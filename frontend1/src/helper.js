@@ -427,3 +427,23 @@ export const getCompaniesOfIndustry = async(industryName) => {
         console.log(`Error getting metric: ${error}`);
     }
 }
+
+export const getIndustryMean = async(frameworkId, industryName) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industry/average/', 
+        {
+            params: {
+                industry: industryName,
+                framework_id: frameworkId
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
+}
