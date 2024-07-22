@@ -368,13 +368,13 @@ export const getIndicatorsForMetric = async(metricId) => {
     }
 }
 
-export const getFrameworkScore = async(frameworkId, useDefault, companyName) => {
+export const getFrameworkScore = async(industryName, frameworkId, useDefault, companyName) => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/framework/score/', 
+        const response = await axios.get('http://127.0.0.1:8000/industry/framework/average/', 
         {
             params: {
+                industry: industryName,
                 framework_id: frameworkId,
-                company_name: companyName,
                 year: 2023
             },
             headers: {
@@ -445,5 +445,24 @@ export const getIndustryMean = async(frameworkId, industryName) => {
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
+    }
+}
+
+export const getMetricCategory = async(category) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/metrics/category', 
+            {
+                params: {
+                    category: category
+                },             
+                
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting metrics for categorty: ${error}`)
     }
 }

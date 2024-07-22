@@ -10,8 +10,6 @@ import ListModal from './ListModal.jsx';
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const industries = ['Industry 1', 'Industry 2', 'Industry 3', 'Industry 4', 'Industry 5'];
-
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [listOfIndustries, setListOfIndustries] = useState([]);
@@ -30,7 +28,9 @@ const Dashboard = () => {
   const [error, setError] = useState(false);
 
   useEffect(async() => {
+
     if (selectedIndustry) {
+      console.log(selectedIndustry);
       const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
       setListOfCompanies(companyOfIndustry);
     }
