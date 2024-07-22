@@ -48,14 +48,14 @@ import CreateFramework from './CreateFramework.jsx';
 
 const Company = () => {
   const location = useLocation();
-  const { companyId, companyName } = location.state || {};
+  const { companyId, companyName, initialFramework } = location.state || {};
   const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
   const [officialFrameworks, setOfficialFrameworks] = useState(null);
-  const [selectedFramework, setSelectedFramework] = useState(null);
+  const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [expanded, setExpanded] = useState(false);
   const [expanded1, setExpanded1] = useState(false);
   const [metricNames, setMetricNames] = useState(null);
@@ -70,6 +70,7 @@ const Company = () => {
   const token = Cookies.get('authToken');
 
   useEffect(() => {
+    console.log(selectedFramework);
     const fetchCompanyIndicators = async(companyName) => {
       const companyIndicators = await getIndicatorInfo(companyName);
       console.log(companyIndicators);
@@ -111,6 +112,7 @@ const Company = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (selectedFramework) {
+        console.log(selectedFramework);
         const metrics = await getMetricForFramework(true, selectedFramework);
         console.log(metrics);
         if (metrics) {
@@ -151,8 +153,8 @@ const Company = () => {
           }
           setSelectedIndicators(newSelectedIndicators);
         }
-        // const scoreFramework = await getFrameworkScore(selectedFramework, true, companyName);
-        // console.log(scoreFramework);
+        const scoreFramework = await getFrameworkScore(selectedFramework, true, companyName);
+        console.log(scoreFramework);
         // setFrameworkScore(scoreFramework);
       }
     };
