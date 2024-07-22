@@ -556,7 +556,7 @@ const Company = () => {
           </Card>
         </div>
       </div>
-      <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedIndicators={selectedIndicators}/>
+      <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
       <CreateFramework/>
     </>
   );
