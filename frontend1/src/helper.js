@@ -2,6 +2,27 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const token = Cookies.get('authToken');
+let indicatorData = null;
+
+const fetchIndicatorData = async() => {
+    try {
+        const response = await fetch('../backend/db/metrics.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        indicatorData = await response.json();
+        return;
+    } catch (error) {
+        console.error("Unable to fetch data:", error);
+        return null;
+    }
+}
+
+const initialise = async() => {
+    await fetchIndicatorData();
+}
+
+initialise();
 
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
@@ -361,7 +382,8 @@ export const getIndicatorsForMetric = async(metricId) => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-
+        console.log('Indicators for metric ', metricId);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
@@ -427,3 +449,37 @@ export const getCompaniesOfIndustry = async(industryName) => {
         console.log(`Error getting metric: ${error}`);
     }
 }
+
+// Given a framework already, requires company Indicators by metric
+// indicators List of json objects {id, indicator_id, indicator_name (string), metric_id, weighting (float)}
+// used pre-stored data from the json file to avoid continuously accessing it
+// export const getMetricScore = async(indicators, companyValues) => {
+//         let overallScore = 0;
+//         console.log('Calculating Metric...');
+
+//         const weights = indicators.reduce((acc, indicator) => {
+//             acc[indicator.indicator_name] = indicator.weighting;
+//             return acc;
+//          },{});
+
+//          companyValues.forEach(value => {
+//             const indicatorScaling = indicatorData[value.indicator_name];
+//             if (!indicatorScaling) return;
+
+//             const {lower, higher} = indicatorScaling;
+//             if (higher === lower) return;
+
+//             let scaledScore;
+//             if (indicatorScaling.indicator === 'positive') {
+//                 scaledScore = 100 * (value.indicator_value - lower) / (higher - lower);
+//             } else {
+//                 scaledScore = 100 * (higher - value.indicator_value) / (higher - lower);
+//             }
+//             overallScore += scaledScore * (weights[value.indicator_name] || 0);
+//          });
+//     }
+
+// export const getFrameworkScore = async(frameworkId, useDefault, companyName) => {
+//     let totalScore = 0;
+
+// }
