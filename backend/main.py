@@ -529,7 +529,14 @@ async def get_company_indicators(
         company_models.CompanyData.company_name == company_name,
         # company_models.CompanyData.indicator_year_int == company_name,
     ).all()
-    return company_data
+    
+    by_year = {}
+    for entry in company_data:
+        if entry.indicator_year_int not in by_year:
+            by_year[entry.indicator_year_int] = []
+        
+        by_year[entry.indicator_year_int].append(entry)
+    return by_year
 
 # ***************************************************************
 #                        Framework Apis
