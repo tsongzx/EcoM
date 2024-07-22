@@ -266,7 +266,7 @@ export const getRecentlyViewed = async() => {
 
 export const getOfficialFrameworks = async() => {
     try {
-        const response  = await axios.get('http://127.0.0.1:8000/official_framework/all', 
+        const response  = await axios.get('http://127.0.0.1:8000/frameworks/all', 
             {headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -370,12 +370,12 @@ export const getIndicatorsForMetric = async(metricId) => {
 
 export const getFrameworkScore = async(frameworkId, useDefault, companyName) => {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/official_framework/score/', 
+        const response = await axios.get('http://127.0.0.1:8000/framework/score/', 
         {
             params: {
                 framework_id: frameworkId,
-                use_default: useDefault,
-                company_name: companyName
+                company_name: companyName,
+                year: 2023
             },
             headers: {
                 'Content-Type': 'application/json',
