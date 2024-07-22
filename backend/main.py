@@ -120,9 +120,6 @@ async def get_user(
     #     raise credentials_exception
     return user
 
-# update password
-
-
 @app.put("/user/password", tags=["User"])
 async def change_user_password(
     request: user_schemas.PasswordUpdate,
@@ -146,8 +143,6 @@ async def change_user_password(
 
     # alternatively just return empty {}
     return {"message": "Password changed successfully"}
-
-# update name
 
 
 @app.put("/user/full-name", response_model=user_schemas.UserInDB, tags=["User"])
@@ -176,7 +171,6 @@ async def get_lists(
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(session, authorization.credentials)
     lists = session.query(list_models.UserList).filter(
         list_models.UserList.user_id == user.id).all()
 
@@ -533,9 +527,9 @@ async def get_company_indicators(
     by_year = {}
     for entry in company_data:
         if entry.indicator_year_int not in by_year:
-            by_year[entry.indicator_year_int] = []
+            by_year[entry.indicator_year_int] = {}
         
-        by_year[entry.indicator_year_int].append(entry)
+        by_year[entry.indicator_year_int][entry.indicator_name] = entry
     return by_year
 
 # ***************************************************************
