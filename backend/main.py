@@ -120,9 +120,6 @@ async def get_user(
     #     raise credentials_exception
     return user
 
-# update password
-
-
 @app.put("/user/password", tags=["User"])
 async def change_user_password(
     request: user_schemas.PasswordUpdate,
@@ -146,8 +143,6 @@ async def change_user_password(
 
     # alternatively just return empty {}
     return {"message": "Password changed successfully"}
-
-# update name
 
 
 @app.put("/user/full-name", response_model=user_schemas.UserInDB, tags=["User"])
@@ -176,7 +171,6 @@ async def get_lists(
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(session, authorization.credentials)
     lists = session.query(list_models.UserList).filter(
         list_models.UserList.user_id == user.id).all()
 
@@ -533,9 +527,9 @@ async def get_company_indicators(
     by_year = {}
     for entry in company_data:
         if entry.indicator_year_int not in by_year:
-            by_year[entry.indicator_year_int] = []
+            by_year[entry.indicator_year_int] = {}
         
-        by_year[entry.indicator_year_int].append(entry)
+        by_year[entry.indicator_year_int][entry.indicator_name] = entry
     return by_year
 
 # ***************************************************************
@@ -833,13 +827,15 @@ async def get_framework_score(
 
 @app.get("/indicators", tags=["Indicators"])
 def get_indicators(
+    framework_id: int,
     metric_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
     # get custom weights
     indicators = session.query(metrics_models.CustomMetricIndicators).filter_by(metric_id=metric_id,
-                                                                   user_id=user.id).all()
+                                                                   user_id=user.id,
+                                                                   framework_id=framework_id).all()
     # if custom weights don't exist, use default
     if len(indicators) == 0:
         indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
@@ -888,17 +884,48 @@ async def get_all_metrics(
     # fix this later 
     metrics = session.query(metrics_models.Metrics).all()
       
-    return metrics 
+    metrics_dict = {}
+    for metric in metrics:
+        if metric.category not in metrics_dict:
+            metrics_dict[metric.category] = []
+        metrics_dict[metric.category].append(metric)
+    return metrics_dict 
 
 @app.post("/metric/modify", tags=["Metrics"])
 def modify_metric(
     metric_id: int,
-    indicators: List[metric_schemas.ModifyMetric],
+    framework_id: int,
+    indicators: List[metric_schemas.CustomMetricIndicators],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
-    """_summary_: TO DO
-    """    
+    # delete custom metric weightings if they exist
+    statement = delete(metrics_models.CustomMetricIndicators).where(
+        and_(
+            metrics_models.CustomMetricIndicators.framework_id == framework_id,
+            metrics_models.CustomMetricIndicators.metric_id == metric_id,
+            metrics_models.CustomMetricIndicators.user_id == user.id,
+        )
+    )
+    session.execute(statement)
+    session.commit()
+
+    objects_to_insert = []
+
+    for indicator in indicators:
+        new_indicator = metrics_models.CustomMetricIndicators(
+            framework_id=framework_id,
+            metric_id=metric_id,
+            weighting=indicator.weighting,
+            indicator_name=indicator.indicator_name,
+            indicator_id=indicator.indicator_id,  
+            user_id=user.id,
+        )
+        objects_to_insert.append(new_indicator)
+
+    session.add_all(objects_to_insert)
+    session.commit()
+    # indicator weights is unique for a framework
     return []
 
 @app.get("/company/metric/indicators", tags=["Company"])
@@ -965,17 +992,18 @@ async def calculate_metric(
   
     return overall_score
 
-@app.get("/metrics/category", tags=["Framework"])
-async def get_metrics_by_category(
-    category: Category,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-):
-    """_summary_: TO DO: currently not one to to one mapping between
-      metrics and categories so this is currently getting fixed
-    """   
-    # TO DO: GET ALL METRICS IN A CATEGORY!!
-    return []
+
+# @app.get("/metrics/category", tags=["Metrics"])
+# async def get_metrics_by_category(
+#     category: Category,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     """_summary_: TO DO: currently not one to to one mapping between
+#       metrics and categories so this is currently getting fixed
+#     """   
+#     # TO DO: GET ALL METRICS IN A CATEGORY!!
+#     return []
 #***************************************************************
 #                        Industry Apis
 # ***************************************************************

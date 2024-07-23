@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,
   FormControl,
@@ -39,7 +39,8 @@ import {
   getFrameworkScore,
   getMetricScore,
   getFavouritesList,
-  getIndustryMean
+  getIndustryMean,
+  getMetricCategory
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -49,6 +50,7 @@ import CreateFramework from './CreateFramework.jsx';
 
 const Company = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
   const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
@@ -68,6 +70,8 @@ const Company = () => {
   const [indicatorsCompany, setIndicatorsCompany] = useState(null);
   const [frameworkScore, setFrameworkScore] = useState(null);
   const [metricScore, setMetricScore] = useState(null);
+  const [selectedYear, setSelectedYear] = useState('');
+  const [availableYears, setAvailableYears] = useState([]);
 
   const [industryMean, setIndustryMean] = useState(null);
   const token = Cookies.get('authToken');
@@ -78,12 +82,13 @@ const Company = () => {
       const companyIndicators = await getIndicatorInfo(companyName);
       console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
-      
-      if(selectedIndustry && selectedFramework) {
-        const industryMean = await getIndustryMean(selectedFramework, selectedIndustry);
-        console.log(industryMean);
-        setIndustryMean(industryMean);
+      const years = Object.keys(companyIndicators);
+      setAvailableYears(years);
+      if (years.length > 0) {
+        console.log(typeof selectedYear);
+        setSelectedYear(years[years.length - 1]); 
       }
+      
     };
 
     fetchCompanyIndicators(companyName);
@@ -143,10 +148,6 @@ const Company = () => {
               const indicators = await getIndicatorsForMetric(id);
               console.log(indicators);
               newAllIndicators[id] = indicators;
-
-              // const scoreMetric = await getMetricScore(id, companyName, indicators);
-              // console.log(scoreMetric);
-              // allMetricScores[id] = scoreMetric;
               
             } catch (error) {
               console.log(error);
@@ -161,14 +162,18 @@ const Company = () => {
             newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
           }
           setSelectedIndicators(newSelectedIndicators);
+
+
         }
-        const scoreFramework = await getFrameworkScore(selectedFramework, true, companyName);
-        console.log(scoreFramework);
-        // setFrameworkScore(scoreFramework);
       }
     };
     fetchData();
   }, [selectedFramework]);
+
+  const handleYearChange = (year) => {
+    console.log(year);
+    setSelectedYear(year);
+  };
 
   useEffect(() => {
     const fetchIndicators = async () => {
@@ -225,7 +230,7 @@ const Company = () => {
   };
 
   const handleReturn = () => {
-    window.history.back();
+    navigate('/dashboard');
   };
 
   const openWatchlistModal = () => {
@@ -327,6 +332,7 @@ const Company = () => {
   };
 
   const handleIndicatorChange = (event, metricId) => {
+    console.log('here');
     const indicatorId = Number(event.target.value);
     
     setSelectedIndicators((prevSelectedIndicators) => {
@@ -359,7 +365,14 @@ const Company = () => {
     console.log(allIndicators);
   }, [allIndicators]);
 
-  
+  const findIndicatorValue = (indicatorName) => {
+    if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
+      console.log(Number(selectedYear));
+      return indicatorsCompany[Number(selectedYear)][indicatorName]['indicator_value'];
+    } else {
+      return 'N/A';
+    }
+  }
 
   return (
     <>
@@ -503,6 +516,16 @@ const Company = () => {
               {tableCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
             </IconButton>
             <Collapse in={!tableCollapsed}>
+              <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                <h2>{companyName}</h2>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                  {availableYears.map((year) => (
+                    <Button key={year} onClick={() => handleYearChange(year)}>
+                      {year}
+                    </Button>
+                  ))}
+                </div>
+              </div>
               {selectedFramework && (
                 <Grid item xs={6}>
                   <TableContainer component={Paper} style={{ marginLeft: '50px', border: '1px solid #ddd' }}>
@@ -535,7 +558,9 @@ const Company = () => {
                                     {indicator ? indicator.indicator_name : 'Unknown Indicator'}
                                   </TableCell>
                                   <TableCell style={{ borderBottom: '1px solid #ddd' }}>
+                                    {indicator ? findIndicatorValue(indicator.indicator_name) : 'N/A'}                                  
                                   </TableCell>
+
                                 </TableRow>
                               );
                             })
@@ -548,8 +573,28 @@ const Company = () => {
               )}
 
               {!selectedFramework && (
-                <div>
-                  hi
+                // <IndicatorsInfo companyName={companyName}/>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+                  {selectedYear && indicatorsCompany[selectedYear] && (
+                    <TableContainer component={Paper} style={{ marginTop: '40px' }}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Indicator Name</TableCell>
+                            <TableCell>Indicator Value</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {Object.values(indicatorsCompany[selectedYear]).map((indicator, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{indicator.indicator_name}</TableCell>
+                                <TableCell>{indicator.indicator_value}</TableCell>
+                              </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
                 </div>
               )}
             </Collapse>
@@ -557,7 +602,7 @@ const Company = () => {
         </div>
       </div>
       <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
-      <CreateFramework/>
+      {/* <CreateFramework/> */}
     </>
   );
 };
