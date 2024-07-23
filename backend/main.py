@@ -933,7 +933,7 @@ def get_company_indicators_by_metric(
     metric_id: int,
     company_name: str,
     year: int,
-    indicators: List[metrics_models.MetricIndicators] = Depends(get_indicators),
+    indicators: List[metrics_models.MetricIndicators | metrics_models.CustomMetricIndicators] = Depends(get_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
