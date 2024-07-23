@@ -22,10 +22,10 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
     IGNORE 1 ROWS 
     (company_name, perm_id, @dummy, disclosure, @dummy, indicator_name, @dummy, indicator_value, indicator_year, nb_points_of_observations, indicator_period, provider_name, reported_date, @dummy, @dummy);
   SHOW WARNINGS;
+  # UPDATE CompanyData SET indicator_year_int = EXTRACT(YEAR FROM indicator_year);
 EOF
   echo $f 'ran'
 done
 
 # after loop is done
 # ALTER TABLE CompanyData ADD column_name indicator_year_int;
-# UPDATE CompanyData SET indicator_year_int = EXTRACT(YEAR FROM indicator_year);
