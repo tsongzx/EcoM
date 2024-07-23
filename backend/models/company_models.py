@@ -21,7 +21,7 @@ class CompanyData(Base):
     __tablename__ = 'CompanyData'
    
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
-    company_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    company_name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
     perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
     # data_type: Mapped[Data_Type] = mapped_column(Enum(
     #   *get_args(Data_Type),
