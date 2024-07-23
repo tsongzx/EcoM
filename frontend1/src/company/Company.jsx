@@ -276,7 +276,7 @@ const Company = () => {
       const newAllIndicators = {};
       for (const id of metricIds) {
         try {
-          const indicators = await getIndicatorsForMetric(id);
+          const indicators = await getIndicatorsForMetric(selectedFramework, id);
           newAllIndicators[id] = indicators;
         } catch (error) {
           console.log(error);

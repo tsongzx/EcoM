@@ -17,6 +17,7 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
         setHasMore(companiesAvailable.length > 0);
     },[]);
 
+    //Maybe we have to load all of them in one go
     const handleMenuScrollToBottom = () => {
         if (!loading && hasMore) {
           setPage(prevPage => prevPage + 1);
@@ -28,7 +29,7 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
             styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
             options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
             placeholder="Select Company"
-            onChange={(selectedOption) => handleSelectedCompanyId(listOfCompanies.find(company => company.id === selectedOption.value))}
+            onChange={(selectedOption) => handleSelectedCompanyId(selectedOption.value, selectedOption.label)}
             maxMenuHeight={100}
             onMenuScrollToBottom={handleMenuScrollToBottom}
         />

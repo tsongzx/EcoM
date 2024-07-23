@@ -370,11 +370,12 @@ export const getUserId = async() => {
     }
 }
 
-export const getIndicatorsForMetric = async(metricId) => {
+export const getIndicatorsForMetric = async(frameworkId, metricId) => {
     try {   
         const response = await axios.get('http://127.0.0.1:8000/indicators', 
         {
             params: {
+                framework_id: frameworkId,
                 metric_id: Number(metricId)
             }, 
             headers: {
