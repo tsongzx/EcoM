@@ -979,11 +979,11 @@ async def calculate_metric(
 
         lower = indicator_scaling["lower"]
         higher = indicator_scaling["higher"]
+        scaled_score = 0
         if higher == lower:
-            print("skipped")
+            scaled_score = 100
             continue
-          
-        if indicator_scaling["indicator"] == "positive":
+        elif indicator_scaling["indicator"] == "positive":
             scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
         else:
             scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
