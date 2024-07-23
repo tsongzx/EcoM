@@ -21,5 +21,14 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
     IGNORE 1 ROWS 
     (id, name);
   SHOW WARNINGS;
+
+  CREATE temporary table mapping AS
+  SELECT category, metric_id
+  FROM OfficialFrameworkMetrics
+  GROUP BY metric_id;
+
+  UPDATE Metrics m 
+  JOIN mapping ON m.id = mapping.metric_id
+  SET m.category = mapping.category;
 EOF
   echo $f 'ran'
