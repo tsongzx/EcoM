@@ -29,6 +29,7 @@ const Compare = () => {
 
   const [companies, setCompanies] = useState([{id: 1, name: 'bozo'}]);
   const [metrics, setMetrics] = useState([]);
+  const [metricsList, setMetricsList] = useState([]);
   const [frameworks , setFrameworks] = useState([]);
 
   const [message, setMessage] = useState('');
@@ -66,6 +67,8 @@ const Compare = () => {
   //DEBUGGING
   useEffect(() => {
     console.log('companies changed:', companies);
+    //update Everytime Companies change
+    updateMetrics();
   }, [companies]);
   useEffect(() => {
     console.log('frameworks changed:', frameworks);
@@ -80,6 +83,39 @@ const Compare = () => {
     const newListOfCompanies = [...companies, {id: companyId, companyName, framework: 1, year: 2023, selected: false}];
     setCompanies(newListOfCompanies);
   }
+
+  //This function updates the metrics that are being used depending on the frameworks that are being selected
+  const updateMetrics = async () => {
+    const processedFrameworks = new Set();
+    const updatedMetrics = [];
+  
+    await Promise.all(companies.map(async (c) => {
+      if (c.framework && !processedFrameworks.has(c.framework)) {
+        processedFrameworks.add(c.framework);
+  
+        const frameworkMetrics = await getMetricForFramework(c.framework);
+        console.log(frameworkMetrics);
+        updatedMetrics.push(...frameworkMetrics);
+      }
+    }));
+  
+    const combinedList = updatedMetrics.filter(m => 
+      !metricsList.some(i => i.id === m.id)
+    );
+  
+    setMetricsList(prevMetricsList => [...prevMetricsList, ...combinedList]);
+  };
+  
+  //remove metric 
+  const addMetric = (metricId, metricName) => {
+
+  }
+
+  //add metric
+  const deleteMetric = (metricId) => {
+
+  }
+  
 
   const handleClickCompanyName = (companyId, companyName, framework) => {
     console.log('Clicked company Name at ', companyId);
@@ -108,24 +144,25 @@ const Compare = () => {
     );
     setCompanies(newListOfCompanies);
     
+    //MOST LIKELY TO GET DELETED FOR NEW IMPLEMENTATION
     //Change the metrics to match the selected Framework
-    if (!selectedFramework) {
-      const newListOfMetrics = metrics.map(metric => 
-        metric.companyId === companyId ?
-          {companyId, metrics: null}
-          : metric
-      );
-      setMetrics(newListOfMetrics);
-      return;
-    }
-    //get the metrics
-    const metricsForFramework = await getMetricForFramework(selectedFrameworkId);
-    const newListOfMetrics = metrics.map(metric => 
-      metric.companyId === companyId ?
-        {companyId, metrics: metricsForFramework}
-        : metric
-    );
-    setMetrics(newListOfMetrics);
+    // if (!selectedFramework) {
+    //   const newListOfMetrics = metrics.map(metric => 
+    //     metric.companyId === companyId ?
+    //       {companyId, metrics: null}
+    //       : metric
+    //   );
+    //   setMetrics(newListOfMetrics);
+    //   return;
+    // }
+    // //get the metrics
+    // const metricsForFramework = await getMetricForFramework(selectedFrameworkId);
+    // const newListOfMetrics = metrics.map(metric => 
+    //   metric.companyId === companyId ?
+    //     {companyId, metrics: metricsForFramework}
+    //     : metric
+    // );
+    // setMetrics(newListOfMetrics);
   }
 
   const handleDeleteFromTable = (companyId) => {
@@ -233,7 +270,7 @@ const Compare = () => {
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={index}>
                 <div>
                   <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
-                  <div>
+                  <div className='companyParamContainer'>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
@@ -242,6 +279,7 @@ const Compare = () => {
                       defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
                       onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
                     />
+                    {/* insert years filter here */}
                   </div>
                 </div>
               </TableCell>

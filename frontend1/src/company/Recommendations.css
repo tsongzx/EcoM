@@ -1,0 +1,15 @@
+.recommendations-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+}
+
+button {
+    border: 1px solid black;
+    width: 100%;
+}
+
+button:hover {
+    border: 1px solid blue;
+}

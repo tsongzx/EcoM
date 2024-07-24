@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { getCompaniesOfIndustry, getIndustry } from "../helper";
 import { useNavigate } from "react-router-dom";
+import './Recommendations.css';
 //given a Company Id return a mapped list of buttons of companies in that industry
 
 const Recommendations = ({companyId}) => {
     const [reccs, setReccs] = useState([]);
-    const [industryName, setIndustryName] = ('');
+    // const [industryName, setIndustryName] = ('');
     //const [companies, setCompanies] = useState([]);
     //get the industry of the company
     useEffect(() => {
         const initialiseRecommendations = async(cId) => {
             const indName = await getIndustry(cId);
-            setIndustryName(indName);
-
             const comp = await getCompaniesOfIndustry(indName);
             const newList = comp.filter(company => company.id !== companyId);
             const reccs = getRandom(newList);
