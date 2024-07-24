@@ -10,18 +10,25 @@ import schemas.user_schemas as user_schemas
 import schemas.list_schemas as list_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
+import schemas.chat_schemas as chat_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
-import json
+import json 
 from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
 from typing import List, Any
-
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+    
+load_dotenv()
+print(os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
 
 def get_session():
     session = SessionLocal()
@@ -933,7 +940,7 @@ def get_company_indicators_by_metric(
     metric_id: int,
     company_name: str,
     year: int,
-    indicators: List[metrics_models.MetricIndicators | metrics_models.CustomMetricIndicators] = Depends(get_indicators),
+    indicators: List[Any] = Depends(get_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
@@ -1127,3 +1134,29 @@ async def get_indicator_industry_averages(
     num_companies = len(companies)
     indicator_averages = {indicator_name: total / num_companies for indicator_name, total in indicator_values.items()}
     return indicator_averages
+
+#***************************************************************
+#                        Chatbot Apis
+# ***************************************************************
+
+@app.post("/chat", tags=["Chatbot"])
+async def chat(
+    user_query: chat_schemas.ChatQuery,
+    user: user_schemas.UserInDB = Depends(get_user)  
+):
+    # dont accept empty queries
+    # Using GPT-4 with the ChatCompletion endpoint
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        # require accuracy
+        temperature=0,
+        # dont want the messages to be too long
+        max_tokens=300,
+        messages=[*Config.chat_prompts, { "role": "user", "content": user_query.query}]
+    )
+    chatbot_response = response.choices[0].message['content']
+    # get records of chatbot responses
+    Config.chat_prompts.append({"role": "assistant", "content": chatbot_response})
+    # message = response.choices[0].message.content
+
+    return {'response': chatbot_response}

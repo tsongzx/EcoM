@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
+import ChatFeature from './chatbot/Chatbot.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -312,6 +313,7 @@ const Dashboard = () => {
         </Grid>
       </div>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} />} {/* Render ListModal conditionally */}
+      <ChatFeature/>
     </>
   );
 };
