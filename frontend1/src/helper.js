@@ -498,3 +498,21 @@ export const getMetricCategory = async(category) => {
         console.log(`Error getting metrics for categorty: ${error}`)
     }
 }
+
+export const getIndustry = async(companyId) => {
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industry', 
+            {
+                params: {
+                    category: companyId
+                },             
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
+}

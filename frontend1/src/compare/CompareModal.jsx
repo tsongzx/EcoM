@@ -93,7 +93,7 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
       const compareCompanies = selectedCompanies.map((company) => ({
         id: company.value,
         companyName: company.label,
-        framework: selectedFramework ?? 1,
+        framework: selectedFramework ?? null,
         year: null,
         selected: false
     }));

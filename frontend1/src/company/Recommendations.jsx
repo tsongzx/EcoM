@@ -1,15 +1,48 @@
-import React, { useState } from "react";
-import { getCompaniesOfIndustry } from "../helper";
+import React, { useEffect, useState } from "react";
+import { getCompaniesOfIndustry, getIndustry } from "../helper";
+import { useNavigate } from "react-router-dom";
 //given a Company Id return a mapped list of buttons of companies in that industry
 
 const Recommendations = ({companyId}) => {
     const [reccs, setReccs] = useState([]);
     const [industryName, setIndustryName] = ('');
+    //const [companies, setCompanies] = useState([]);
     //get the industry of the company
-    
-    //filter out the companies that are in the industry and do not have the id of the current company
+    useEffect(() => {
+        const initialiseRecommendations = async(cId) => {
+            const indName = await getIndustry(cId);
+            setIndustryName(indName);
 
-    //return 3 random companies
+            const comp = await getCompaniesOfIndustry(indName);
+            const newList = comp.filter(company => company.id !== companyId);
+            const reccs = getRandom(newList);
+
+            setReccs(reccs);
+        }
+
+        initialiseRecommendations(companyId);
+    },[]);
+
+    const navigate = useNavigate();
+
+    const getRandom = (array) => {
+        const shuffled = array.sort(() => 0.5 - Math.random());
+        return shuffled.slice(0, 5);
+    }
+    
+    return (
+        <div className="recommendations-container">
+            {reccs.map((r) => {
+                <button onClick={() => navigate(`/company/${encodeURIComponent(r.id)}`, 
+                { state: { 
+                    companyId: r.id, 
+                    companyName: r.company_name,
+                    initialFramework: null
+                  } 
+                })}>{r.company_name}</button>
+            })}
+        </div>
+    );
 }
 
 export default Recommendations;

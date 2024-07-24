@@ -25,14 +25,15 @@ import ContextMenu from './ContextMenu';
 const Compare = () => {
   const location = useLocation();
   const { companiesList, selectedFramework } = location.state;
-  console.log('Comparing companies with framework: ', selectedFramework);
-  console.log(companiesList);
-
   const navigate = useNavigate();
 
   const [companies, setCompanies] = useState([{id: 1, name: 'bozo'}]);
   const [metrics, setMetrics] = useState([]);
   const [frameworks , setFrameworks] = useState([]);
+
+  const [message, setMessage] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [defaultFramework, setDefaultFramework] = useState(null);
 
   const contextMenuRef = useRef(null);
   const [contextMenu, setContextMenu] = useState({
@@ -51,6 +52,11 @@ const Compare = () => {
       id: framework.id,
       name: framework.framework_name
     }));
+    const fwname = modifiedfws.find(f => f.id === selectedFramework);
+    console.log('FW NAME::::', selectedFramework);
+    console.log(fwname);
+    setDefaultFramework(fwname ? fwname.name : null);
+
     //set the frameworks
     console.log(modifiedfws);
     setFrameworks(modifiedfws);
@@ -75,13 +81,19 @@ const Compare = () => {
     setCompanies(newListOfCompanies);
   }
 
-  const handleClickCompanyName = (companyId) => {
+  const handleClickCompanyName = (companyId, companyName, framework) => {
     console.log('Clicked company Name at ', companyId);
-    //navigate(`/company/${companyId}`);
+    navigate(`/company/${encodeURIComponent(companyId)}`, 
+      { state: { 
+          companyId, 
+          companyName,
+          initialFramework: framework
+        } 
+      });
   }
 
   const handleSelectedFramework = async (companyId, selectedOption) =>  {
-    const foundC = companies.find(company => company.id === searchId);
+    const foundC = companies.find(company => company.id === companyId);
     if (foundC.framework == selectedOption) {
       console.log(`Already has company ${companyId} with that framework: `, selectedOption);
       return;
@@ -119,8 +131,10 @@ const Compare = () => {
   const handleDeleteFromTable = (companyId) => {
     console.log('deleting from table ', companyId);
     const newListOfCompanies = companies.filter(company => company.id !== companyId);
+    console.log('DELETED COMPANIES');
+    console.log(newListOfCompanies);
     setCompanies(newListOfCompanies);
-    resetContextMenu();
+    setIsDeleting(true);
   }
 
   const handleContextMenu = (e, companyId) => {
@@ -196,6 +210,14 @@ const Compare = () => {
     }
   },[contextMenu]);
 
+  //because there has been problems with resetContextMenu using old company data
+  useEffect(() => {
+    if (isDeleting) {
+      resetContextMenu();
+      setIsDeleting(false); // Reset the flag
+    }
+  }, [companies, isDeleting]);
+
   //render table cell if company is not null
   return (
     <div>
@@ -207,16 +229,17 @@ const Compare = () => {
           <TableRow>
             <TableCell>Metrics / Indicators</TableCell>
             {/* Where the companies are rendered */}
-            {companies.map((company) => (
-              <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={company.id}>
+            {companies.map((company, index) => (
+              <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={index}>
                 <div>
-                  <a onClick={() => handleClickCompanyName(company.id)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
+                  <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
                   <div>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
                       label="Framework"
                       maxMenuHeight={100}
+                      defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
                       onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
                     />
                   </div>
@@ -232,7 +255,6 @@ const Compare = () => {
             )}
           </TableRow>
         </TableHead>
-
       </Table>
     </TableContainer>
     
