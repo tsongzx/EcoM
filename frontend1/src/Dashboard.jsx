@@ -6,6 +6,7 @@ import Select from 'react-select';
 import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
+import ChatFeature from './chatbot/Chatbot.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -157,6 +158,7 @@ const Dashboard = () => {
       setError('Please select a company.')
     } else {
       console.log(selectedFramework);
+      console.log(selectedCompany.id);
       navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, 
       { state: { 
           companyId: selectedCompany.id, 
@@ -177,7 +179,7 @@ const Dashboard = () => {
     <>
       <Navbar />
 
-      <div style={{ maxWidth: '100vw', height: '100vh', paddingTop: '50px' }}>
+      <div style={{ maxWidth: '100vw', height: '100vh', paddingTop: '100px' }}>
         <Grid container direction="row" spacing={2} style={{ width: '100%', maxWidth: '100%', height: '100%' }}>
           <Grid item xs={12} style={{ minHeight: '30%' }}>
             <Paper style={{ height: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row', boxShadow: 'none' }}>
@@ -311,6 +313,7 @@ const Dashboard = () => {
         </Grid>
       </div>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} />} {/* Render ListModal conditionally */}
+      <ChatFeature/>
     </>
   );
 };
