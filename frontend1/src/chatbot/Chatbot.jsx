@@ -2,7 +2,8 @@ import { useState } from 'react'
 import ChatBot from "react-chatbotify"
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
+import { Box } from '@mui/material';
+import './Chatbot.css';
 const ChatFeature = () => {
   const [restart, setRestart] = useState(false)
   const makeChatBotQuery = async (params) => {
@@ -47,23 +48,30 @@ const ChatFeature = () => {
 		}
 	}
 	return (
-		<ChatBot options={{
-        theme: {}, 
-        chatHistory: {storageKey: 'chatHistory'},
-        header: {
-          title: 'Chatbot'
-        },
-        footer: {
-          text: 'Crumpets'
-        },
-        chatWindowStyle: {
-          height: 'auto',
-          width: 'auto',
-          inset: 'auto',
-          borderRadius: 'auto'
+    // <Box className='chatbot-container'>
+      <ChatBot options={{
+          theme: {}, 
+          chatHistory: {storageKey: 'chatHistory'},
+          header: {
+            title: 'Chatbot'
+          },
+          footer: {
+            text: 'Crumpets'
+          },
+          chatWindowStyle: {
+            // height: '20vh',
+            // width: '10vw',
+            // // inset: 'auto',
+            // borderRadius: '10px',
+            // position: 'fixed',
+            // // bottom: '20px',
+            // // right: 20,
+            // display: 'flex',
+            // flexDirection: 'column'
+          }
         }
-      }
     } flow={flow}/>
+    // </Box>
 	);
 }
 
