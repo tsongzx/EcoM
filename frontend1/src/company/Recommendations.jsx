@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCompaniesOfIndustry, getIndustry } from "../helper";
+import { getCompaniesOfIndustry, getIndustry, getFavouritesList } from "../helper";
 import { useNavigate } from "react-router-dom";
 import './Recommendations.css';
 //given a Company Id return a mapped list of buttons of companies in that industry
@@ -12,11 +12,19 @@ const Recommendations = ({companyId}) => {
     useEffect(() => {
         const initialiseRecommendations = async(cId) => {
             const indName = await getIndustry(cId);
-            const comp = await getCompaniesOfIndustry(indName);
-            const newList = comp.filter(company => company.id !== companyId);
-            const reccs = getRandom(newList);
+            if (indName) {
+                const comp = await getCompaniesOfIndustry(indName);
+                const newList = comp.filter(company => company.id !== companyId);
+                const newReccs = getRandom(newList);
+                setReccs(newReccs);
+            } else {
+                console.log('no industry :( so imma get ur favs');
+                const favs = getFavouritesList();
+                const newReccs = getRandom(favs);
+                setReccs(newReccs);
+            }
 
-            setReccs(reccs);
+            
         }
 
         initialiseRecommendations(companyId);

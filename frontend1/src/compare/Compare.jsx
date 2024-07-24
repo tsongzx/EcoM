@@ -36,6 +36,8 @@ const Compare = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [defaultFramework, setDefaultFramework] = useState(null);
 
+  const [open, setOpen] = useState(false);
+
   const contextMenuRef = useRef(null);
   const [contextMenu, setContextMenu] = useState({
     position: {
@@ -85,6 +87,7 @@ const Compare = () => {
   }
 
   //This function updates the metrics that are being used depending on the frameworks that are being selected
+  //This returns a list of JSON objects [{metric_id: }]
   const updateMetrics = async () => {
     const processedFrameworks = new Set();
     const updatedMetrics = [];
@@ -99,15 +102,15 @@ const Compare = () => {
       }
     }));
   
-    const combinedList = updatedMetrics.filter(m => 
-      !metricsList.some(i => i.id === m.id)
-    );
+    const newMetricIds = updatedMetrics
+      .map(m => m.metric_id)
+      .filter(metricId => !metricsList.some(i => i.metric_id === metricId));
   
-    setMetricsList(prevMetricsList => [...prevMetricsList, ...combinedList]);
+    setMetricsList(prevMetricsList => [...prevMetricsList, ...newMetricIds]);
   };
   
   //remove metric 
-  const addMetric = (metricId, metricName) => {
+  const addMetrics = (metrics, metricName) => {
 
   }
 
@@ -255,6 +258,15 @@ const Compare = () => {
     }
   }, [companies, isDeleting]);
 
+  const handleCloseModal = (newMetricsList) => {
+    setMetricsList(newMetricsList);
+    setOpen(false);
+  }
+
+  const handleOpenModal = () => {
+    setOpen(true);
+  }
+
   //render table cell if company is not null
   return (
     <div>
@@ -293,6 +305,18 @@ const Compare = () => {
             )}
           </TableRow>
         </TableHead>
+
+        {metrics.map((metric, index) => (
+          <TableRow>
+            <TableCell>{metric.metricName}</TableCell>
+            {metric.companies.map((company, index) => (
+              <TableCell>
+                {company.score}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+
       </Table>
     </TableContainer>
     

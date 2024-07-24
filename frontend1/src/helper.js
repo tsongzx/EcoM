@@ -517,10 +517,18 @@ export const getIndustry = async(companyId) => {
     }
 }
 
+export const getMetricByCategory = (category) => {
+    try {
+        
+    } catch (error) {
+        console.log('problem getting metrics by category ', category, error);
+    }
+}
+
 // given a company Id, return all the information for that company
 // This function is used in the compare Industry
 // return {companyId, metrics: [{metricId, metricName, metricScore}], FrameworkScore, IndustryRanking}
-// OR ACTUALLY {metricId, companyResults:[{companyId, score}]}
+// OR ACTUALLY {metricId, metricName, companyResults:[{companyId, score}]}
 export const calculateMetricScore = async(metricId, companyList) => {
     const metrics = await Promise.all(metricsList.map(async (m) => {
         const indicators = await getIndicatorsForMetric(frameworkId);
