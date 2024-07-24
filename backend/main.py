@@ -933,7 +933,7 @@ def get_company_indicators_by_metric(
     metric_id: int,
     company_name: str,
     year: int,
-    indicators: List[metrics_models.MetricIndicators] = Depends(get_indicators),
+    indicators: List[metrics_models.MetricIndicators | metrics_models.CustomMetricIndicators] = Depends(get_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
@@ -979,11 +979,11 @@ async def calculate_metric(
 
         lower = indicator_scaling["lower"]
         higher = indicator_scaling["higher"]
+        scaled_score = 0
         if higher == lower:
-            print("skipped")
+            scaled_score = 100
             continue
-          
-        if indicator_scaling["indicator"] == "positive":
+        elif indicator_scaling["indicator"] == "positive":
             scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
         else:
             scaled_score = 100*(higher - value.indicator_value)/(higher - lower)

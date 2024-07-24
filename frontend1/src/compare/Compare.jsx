@@ -15,10 +15,11 @@ import {
   TableCell,
   TableBody,
   Tab,
-  Select,
   Typography
 } from '@mui/material';
-import { getOfficialFrameworks } from '../helper';
+import Select from 'react-select';
+import Navbar from '../Navbar';
+import { getOfficialFrameworks, getMetricForFramework } from '../helper';
 import ContextMenu from './ContextMenu';
 
 const Compare = () => {
@@ -29,8 +30,8 @@ const Compare = () => {
 
   const navigate = useNavigate();
 
-  const [companies, setCompanies] = useState([]);
-  const [indicators, setIndicators] = useState([]);
+  const [companies, setCompanies] = useState([{id: 1, name: 'bozo'}]);
+  const [metrics, setMetrics] = useState([]);
   const [frameworks , setFrameworks] = useState([]);
 
   const contextMenuRef = useRef(null);
@@ -43,6 +44,7 @@ const Compare = () => {
   const [selectedCompany, setSelectedCompany] = useState();
 
   useEffect(async() => {
+    console.log('INSIDE INIT USE EFFECT');
     //get all the frameworks
     const fws = await getOfficialFrameworks();
     const modifiedfws = fws.map((framework) => ({
@@ -62,20 +64,29 @@ const Compare = () => {
   useEffect(() => {
     console.log('frameworks changed:', frameworks);
   }, [frameworks]);
+  useEffect(() => {
+    console.log('ContextMENU changed:', contextMenu, ' company selected at ', selectedCompany);
+  }, [contextMenu, selectedCompany]);
 
   //given the index that it was selected switch out the company ID at that index to become the new company ID
   const handleSelectedCompanyId = (companyId, companyName) => {
     console.log(`Adding company ${companyId} ${companyName}`);
-    const newListOfCompanies = [...companiesList, {id: companyId, companyName, framework: 1, year: 2023, selected: false}];
+    const newListOfCompanies = [...companies, {id: companyId, companyName, framework: 1, year: 2023, selected: false}];
     setCompanies(newListOfCompanies);
   }
 
   const handleClickCompanyName = (companyId) => {
-    console.log('CLicked company Name at ', companyId);
+    console.log('Clicked company Name at ', companyId);
     //navigate(`/company/${companyId}`);
   }
 
-  const handleSelectedFramework = (companyId) => (selectedOption) =>  {
+  const handleSelectedFramework = async (companyId, selectedOption) =>  {
+    const foundC = companies.find(company => company.id === searchId);
+    if (foundC.framework == selectedOption) {
+      console.log(`Already has company ${companyId} with that framework: `, selectedOption);
+      return;
+    }
+
     const selectedFrameworkId = selectedOption ? selectedOption.value : null;
     console.log('Handing selected Framework: ', selectedFrameworkId, ' for company, ', companyId);
     const newListOfCompanies = companies.map(company => 
@@ -84,16 +95,36 @@ const Compare = () => {
           : company // Keep the object unchanged
     );
     setCompanies(newListOfCompanies);
+    
+    //Change the metrics to match the selected Framework
+    if (!selectedFramework) {
+      const newListOfMetrics = metrics.map(metric => 
+        metric.companyId === companyId ?
+          {companyId, metrics: null}
+          : metric
+      );
+      setMetrics(newListOfMetrics);
+      return;
+    }
+    //get the metrics
+    const metricsForFramework = await getMetricForFramework(selectedFrameworkId);
+    const newListOfMetrics = metrics.map(metric => 
+      metric.companyId === companyId ?
+        {companyId, metrics: metricsForFramework}
+        : metric
+    );
+    setMetrics(newListOfMetrics);
   }
 
   const handleDeleteFromTable = (companyId) => {
     console.log('deleting from table ', companyId);
-    const newListOfCompanies = companies.filter(company => company.companyID !== companyId);
+    const newListOfCompanies = companies.filter(company => company.id !== companyId);
     setCompanies(newListOfCompanies);
+    resetContextMenu();
   }
 
   const handleContextMenu = (e, companyId) => {
-    console.log('handing opening context menu...', companyId);
+    console.log('handling opening context menu...', companyId);
     e.preventDefault();
     setSelectedCompany(companyId);
     const contextMenuAttr = contextMenuRef.current.getBoundingClientRect();
@@ -125,14 +156,15 @@ const Compare = () => {
 
   const resetContextMenu = () => {
     console.log('Resetting context Menu...');
+
     setSelectedCompany(null);
     //reset everything back to false
-    setCompanies(companies.map(c => {
-      return {
-        ...c,
-        selected: false
-      }
-    }));
+    console.log(companies);
+    const newListOfCompanies = companies.map(company => 
+      ({ ...company, selected: false })
+    );
+    console.log(newListOfCompanies);
+    setCompanies(newListOfCompanies);
 
     setContextMenu(
       {
@@ -147,24 +179,28 @@ const Compare = () => {
   //detect clicking off context menu
   useEffect(() => {
     function handler(e) {
-      if (contextMenuRef.current) {
-        if (!contextMenuRef.current.contains(e.target)) {
-          resetContextMenu();
-        }
+      if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+          console.log('just before reset', contextMenu);
+          if (contextMenu.toggled){
+            //only do reset if context menu is toggled
+            resetContextMenu();
+          } 
       }
     }
+    console.log('Adding event Listener');
     document.addEventListener('click', handler);
 
     return () => {
       console.log('Removing Click Event Handler');
       document.removeEventListener('click', handler);
     }
-  },[]);
+  },[contextMenu]);
 
   //render table cell if company is not null
   return (
     <div>
-    <TableContainer>
+    <Navbar/>
+    <TableContainer className='table'>
       <Table>
         {/* Header where Company controls are obtained */}
         <TableHead>
@@ -174,14 +210,14 @@ const Compare = () => {
             {companies.map((company) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={company.id}>
                 <div>
-                  <a onClick={handleClickCompanyName(company.id)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
+                  <a onClick={() => handleClickCompanyName(company.id)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
                   <div>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
                       label="Framework"
                       maxMenuHeight={100}
-                      onChange={handleSelectedFramework(company.id)}
+                      onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
                     />
                   </div>
                 </div>

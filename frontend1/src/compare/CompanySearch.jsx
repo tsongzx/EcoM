@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import { fetchCompanies } from "../helper";
-import { Select } from "@mui/material";
-
+import {MenuItem } from "@mui/material";
+import Select from 'react-select';
 
 //takes in a function that retuns which company id was send
 const CompanySearch = ({handleSelectedCompanyId}) => {
@@ -9,13 +9,20 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-
+    const [selected, setSelected] = useState(null);
     //on mount collect all the companies there are
-    useEffect(async() => {
-        const companiesAvailable = await fetchCompanies(page);
-        setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
-        setHasMore(companiesAvailable.length > 0);
-    },[]);
+    useEffect(() => {
+        const fetchAndSetCompanies = async () => {
+          setLoading(true);
+          const companiesAvailable = await fetchCompanies(page);
+          console.log('Companies available:', companiesAvailable);
+          setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
+          setHasMore(companiesAvailable.length > 0);
+          setLoading(false);
+        };
+    
+        fetchAndSetCompanies();
+      }, [page]);
 
     //Maybe we have to load all of them in one go
     const handleMenuScrollToBottom = () => {
@@ -24,15 +31,34 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
         }
       };
 
+    const handleOnSubmit = (selectedOption) => {
+        setSelected(null);
+        handleSelectedCompanyId(selectedOption.value, selectedOption.label);
+    }
+
     return (
         <Select
-            styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
+            styles={{ 
+              container: (provided) => ({ ...provided, width: '50%' }),
+              menu: (provided) => ({ ...provided, zIndex: 1300 }),
+            }}
             options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
             placeholder="Select Company"
-            onChange={(selectedOption) => handleSelectedCompanyId(selectedOption.value, selectedOption.label)}
+            value={selected}
+            onChange={(selectedOption) => handleOnSubmit(selectedOption)}
             maxMenuHeight={100}
             onMenuScrollToBottom={handleMenuScrollToBottom}
+            label="Company"
         />
+        // listOfCompanies.map((company) => (
+        //     <Option
+        //       key={company.id}
+        //       value={company.id}
+        //     >
+        //       {company.company_name}
+        //     </Option>
+        //   ))}
+        // </Select>
     );
 }
 
