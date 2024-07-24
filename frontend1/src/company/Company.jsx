@@ -13,6 +13,7 @@ import {
   Collapse,
   Card,
   Grid,
+  Slider,
   TableContainer,
   Table,
   Paper,
@@ -46,6 +47,9 @@ import Cookies from 'js-cookie';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CreateFramework from './CreateFramework.jsx';
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
+
 
 const Company = () => {
   const location = useLocation();
@@ -67,24 +71,25 @@ const Company = () => {
   const [expandedMetrics, setExpandedMetrics] = useState({});
   const [tableCollapsed, setTableCollapsed] = useState(true);
   const [indicatorsCompany, setIndicatorsCompany] = useState(null);
-  const [frameworkScore, setFrameworkScore] = useState(null);
-  const [metricScore, setMetricScore] = useState(null);
   const [selectedYear, setSelectedYear] = useState('');
   const [availableYears, setAvailableYears] = useState([]);
-
-  const [industryMean, setIndustryMean] = useState(null);
   const token = Cookies.get('authToken');
 
+  const [sliderValues, setSliderValues] = useState({});
+  const [lockedSliders, setLockedSliders] = useState({});
+
+
   useEffect(() => {
-    console.log(companyName);
+    console.log(lockedSliders);
+  }, [lockedSliders]);
+
+  useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
       const companyIndicators = await getIndicatorInfo(companyName);
-      console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
       setAvailableYears(years);
       if (years.length > 0) {
-        console.log(typeof selectedYear);
         setSelectedYear(years[years.length - 1]); 
       }
       
@@ -93,10 +98,13 @@ const Company = () => {
     fetchCompanyIndicators(companyName);
   }, []);
 
+  useEffect(() => {
+    console.log(metricNames);
+  }, [metricNames]);
+
 
   useEffect(async() => {
     const fetchData = async () => {
-      console.log(companyId);
       await addToRecentlyViewed(companyId);
       const recentList = await getRecentlyViewed();
       if (Array.isArray(recentList) && recentList.includes(companyId)) {
@@ -111,51 +119,38 @@ const Company = () => {
     fetchData();
 
     const favsList = await getFavouritesList();
-    console.log('FAVS LIST:');
-    console.log(favsList);
     if (Array.isArray(favsList) && favsList.includes(companyId)) {
-      console.log('IN FAVS');
       setIsInFavs(true);
     } else {
-      console.log('NOT IN FAVS');
       setIsInFavs(false);
     }
   }, [companyId]);
 
+  
+
   useEffect(() => {
     const fetchData = async () => {
       if (selectedFramework) {
-        console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
-        console.log(metrics);
         if (metrics) {
           const nameOfMetrics = [];
           const metricIds = [];
           for (const item of Object.values(metrics)) {
-            console.log(item);
             const name = await getMetricName(item.metric_id);
             nameOfMetrics.push({ id: item.metric_id, name: name, category: item.category, weighting: item.weighting });
             metricIds.push(item.metric_id);
 
 
           }
-          console.log(nameOfMetrics);
           setMetricNames(nameOfMetrics);
-          
           setSelectedMetrics(metricIds);
           
           const newAllIndicators = {};
-          const allMetricScores = {};
-          console.log(metricIds);
           for (let id of metricIds) {
-            console.log(id);
-            console.log(selectedFramework);
             const indicators = await getIndicatorsForMetric(parseInt(selectedFramework), parseInt(id));
-            console.log(indicators);
             newAllIndicators[id] = indicators;
           }
 
-          console.log(newAllIndicators);
           setAllIndicators(newAllIndicators);
           
           const newSelectedIndicators = {};
@@ -163,6 +158,12 @@ const Company = () => {
             newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
           }
           setSelectedIndicators(newSelectedIndicators);
+
+          const initialSliderValues = {};
+          for (let id of metricIds) {
+            initialSliderValues[id] = metrics.find(item => item.metric_id === id).weighting;
+          }
+          setSliderValues(initialSliderValues);
         }
       }
     };
@@ -170,7 +171,6 @@ const Company = () => {
   }, [selectedFramework]);
 
   const handleYearChange = (year) => {
-    console.log(year);
     setSelectedYear(year);
   };
 
@@ -204,7 +204,6 @@ const Company = () => {
           }
         }
       );
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
@@ -238,12 +237,10 @@ const Company = () => {
 
   const handleFrameworkChange = (event) => {
     const frameworkId = Number(event.target.value) + 1;
-    console.log(frameworkId);
     setSelectedFramework(frameworkId);
   };
 
   useEffect(() => {
-    console.log(allIndicators);
   }, [allIndicators]);
 
   const handleMetricChange = async (event) => {
@@ -256,11 +253,9 @@ const Company = () => {
       newSelectedMetrics = selectedMetrics.filter((id) => id !== metricId);
       delete newSelectedIndicators[metricId];
     } else {
-      console.log('here1');
       newSelectedMetrics = [...selectedMetrics, metricId];
       newSelectedIndicators[metricId] = allIndicators[metricId].map(indicator => indicator.indicator_id);
     }
-    console.log(newSelectedIndicators);
     setSelectedMetrics(newSelectedMetrics);
     setSelectedIndicators(newSelectedIndicators);
   };
@@ -289,23 +284,234 @@ const Company = () => {
     });
   };  
   
+  useEffect(() => {
+    console.log(sliderValues);
+  }, [sliderValues]);
 
   useEffect(() => {
-    console.log(selectedIndicators);
-  }, [selectedIndicators]);
-
-  // useEffect(() => {
-  //   console.log(allIndicators);
-  // }, [allIndicators]);
+    console.log(selectedMetrics);
+  }, [selectedMetrics]);
 
   const findIndicatorValue = (indicatorName) => {
     if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
-      console.log(Number(selectedYear));
       return indicatorsCompany[Number(selectedYear)][indicatorName]['indicator_value'];
     } else {
       return ' ';
     }
   }
+  
+  const handleSliderChange = (metricId, newValue) => {
+
+    const changedMetric = metricNames.find(metric => metric.id === metricId);
+    changedMetric.weighting = newValue;
+    const category = changedMetric.category;
+    const filteredMetrics = metricNames
+      .filter(metric => metric.category === category)
+      .filter(metric => metric.id !== metricId)
+      .filter(metric => selectedMetrics.includes(metric.id))
+      .filter(metric => !lockedSliders.hasOwnProperty(metric.id));
+    
+    console.log(filteredMetrics);
+      
+    const lockedMetrics = metricNames
+      .filter(metric => metric.category === category)
+      .filter(metric => metric.id !== metricId)
+      .filter(metric => selectedMetrics.includes(metric.id))
+      .filter(metric => lockedSliders.hasOwnProperty(metric.id));
+
+    const additional = lockedMetrics.reduce((sum, metric) => sum + metric.weighting, 0);
+
+    const remainingWeight = 1 - newValue - additional;
+    
+    const newWeight = remainingWeight / filteredMetrics.length;
+    filteredMetrics.forEach(item => item.weighting = newWeight);
+
+    setSliderValues(prevValues => {
+      const updatedValues = { ...prevValues };
+      filteredMetrics.forEach(item => {
+        updatedValues[item.id] = item.weighting;
+      });
+  
+      updatedValues[metricId] = newValue;
+      return updatedValues;
+    });
+
+  };
+
+  // useEffect(() => {
+  //   console.log('here111');
+  //   let newLockedSliders = {};
+  //   let newSliderValues = {};
+
+  //   // 1. Update Locked sliders
+  //   const keys = Object.keys(lockedSliders).map(key => Number(key));
+  //   console.log(keys);
+  //   console.log(selectedMetrics);
+
+  //   for (let key of keys) {
+  //     if (selectedMetrics.includes(key)) {
+  //       newLockedSliders[key] = lockedSliders[key];
+  //     }
+  //   }
+  //   console.log(newLockedSliders);
+
+  //   setLockedSliders(newLockedSliders);
+
+  //   // 2. Get length of each pillar
+  //   let numE = 0;
+  //   let numS = 0;
+  //   let numG = 0;
+
+  //   let maxE = 1;
+  //   let maxS = 1;
+  //   let maxG = 1;
+
+  //   for (let entry of selectedMetrics) {
+  //     let category = metricNames.find(metric => metric.id === entry).category;
+
+  //     if (!lockedSliders.hasOwnProperty(entry)) {
+  //       if (category === 'E') {
+  //         numE += 1;
+  //       } else if (category === 'S') {
+  //         numS += 1;
+  //       } else {
+  //         numG += 1;
+  //       }
+  //     } else {
+  //       if (category === 'E') {
+  //         maxE -= sliderValues[entry];
+  //       } else if (category === 'S') {
+  //         maxS -= sliderValues[entry];
+  //       } else {
+  //         maxG -= sliderValues[entry];
+  //       }
+  //     }
+  //   }
+
+  //   let averageE = maxE / numE;
+  //   let averageS = maxS / numS;
+  //   let averageG = maxG / numG;
+
+  //   for (let entry of selectedMetrics) {
+  //     let category = metricNames.find(metric => metric.id === entry).category;
+  //     if (!lockedSliders.hasOwnProperty(entry)) {
+  //       if (category === 'E') {
+  //         newSliderValues[entry] = averageE;
+  //       } else if (category === 'S') {
+  //         newSliderValues[entry] = averageS;
+  //       } else {
+  //         newSliderValues[entry] = averageG;
+  //       }
+  //     } else {
+  //       newSliderValues[entry] = sliderValues[entry];
+  //     }
+  //   }
+
+  //   setSliderValues(newSliderValues);
+
+  // }, [selectedMetrics]);
+
+  const handleLockClick = (id) => {
+    setLockedSliders((prevLockedSliders) => {
+      const newLockedSliders = { ...prevLockedSliders };
+      if (newLockedSliders[id]) {
+        delete newLockedSliders[id];
+      } else {
+        newLockedSliders[id] = true;
+      }
+      return newLockedSliders;
+    });
+  };
+
+  const findMaxWeight = (metricId) => {
+
+    const categoryOfInterest = metricNames.find(metric => metric.id === metricId)['category'];
+    const lockedMetrics = metricNames
+      .filter(metric => metric.category === categoryOfInterest)
+      .filter(metric => !selectedMetrics.includes(metric.id))
+      .filter(metric => lockedSliders.hasOwnProperty(metric.id));
+    
+    if (lockedMetrics.length === 0) {
+      return 1;
+    } else {
+      console.log('here');
+      const totalWeighting = lockedMetrics.reduce((sum, metric) => sum + metric.weighting, 0);
+      return 1 - totalWeighting;
+    }
+  }
+
+  const getClampedValue = (value, max) => {
+    console.log(value);
+    console.log(max);
+    return Math.min(value, max);
+  }
+
+  const renderMetricsByCategory = (category) => {
+    if (!metricNames) return null;
+  
+    const filteredMetrics = metricNames.filter(metric => metric.category === category);
+  
+    return (
+      <FormGroup style={{ marginTop: '10px' }}>
+        {filteredMetrics.map((metric) => (
+          <div key={metric.id} style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px', width: '100%' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <FormControlLabel
+                style={{ flexGrow: '1' }}
+                value={metric.id.toString()}
+                control={<Checkbox checked={selectedMetrics.includes(metric.id)} />}
+                label={<span style={{ fontSize: '17px' }}>{metric.name}</span>}
+                onChange={handleMetricChange}
+              />
+              <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <IconButton
+                  onClick={() => handleMetricExpandClick(metric.id)}
+                  size="small"
+                >
+                  {expandedMetrics[metric.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
+                </IconButton>
+              </div>
+              {selectedMetrics.includes(metric.id) && (
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', width: '40%' }}>
+                  <Slider
+                    sx={{ display: 'flex', marginLeft: '25px', marginRight: '25px' }}
+                    value={getClampedValue(sliderValues[metric.id] || 0, lockedSliders.hasOwnProperty(metric.id) ? 1 : findMaxWeight(metric.id))}
+                    onChange={(event, newValue) => handleSliderChange(metric.id, newValue)}
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    valueLabelDisplay="auto"
+                    valueLabelFormat={(value) => value.toFixed(6)}
+                    disabled={lockedSliders[metric.id]} 
+                  />
+                  <IconButton onClick={() => handleLockClick(metric.id)} size="small">
+                    {lockedSliders[metric.id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                  </IconButton>
+                </div>
+              )}
+            </div>
+            <Collapse in={expandedMetrics[metric.id]}>
+              <FormGroup
+                style={{ marginLeft: '30px' }}
+                name="indicators"
+                value={selectedIndicators[metric.id] || []}
+              >
+                {allIndicators[metric.id]?.map((indicator) => (
+                  <FormControlLabel
+                    key={indicator.indicator_id}
+                    value={indicator.indicator_id.toString()}
+                    control={<Checkbox checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false} />}
+                    label={indicator.indicator_name}
+                    onChange={(event) => handleIndicatorChange(event, metric.id)}
+                  />
+                ))}
+              </FormGroup>
+            </Collapse>
+          </div>
+        ))}
+      </FormGroup>
+    );
+  };
 
   return (
     <>
@@ -345,9 +551,9 @@ const Company = () => {
           </div>
           <p>recommendations placeholder</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'row'}}>
-          <div style={{ width: '30%', display: 'flex', flexDirection: 'column'}}>
-            <Card style={{ marginTop: '20px'}}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+          <div style={{ width: '40%', display: 'flex', flexDirection: 'column'}}>
+            <Card style={{ marginTop: '20px', marginLeft: '40px'}}>
               <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
                 <FormLabel component="legend" onClick={handleExpandClick}>
                   Select Framework
@@ -364,72 +570,30 @@ const Company = () => {
                   >
                     {officialFrameworks &&
                       Object.entries(officialFrameworks).map(([key, framework]) => (
-                        <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} />
+                        <FormControlLabel key={key} value={key} control={<Radio />} label={<span style={{ fontSize: '17px' }}>{framework.framework_name}</span>} />
                       ))}
                   </RadioGroup>
                 </Collapse>
               </FormControl>
             </Card>
-            <Card style={{ marginTop: '100px' }}>
-              <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
-                <FormLabel component="legend" onClick={handleExpandClick1} style={{ display: 'flex', alignItems: 'center' }}>
+            <Card style={{ marginTop: '100px', marginLeft: '40px' }}>
+              <FormControl style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column', flex: '1' }} component="fieldset">
+                <FormLabel component="legend" onClick={handleExpandClick1} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
                   Metrics and Indicators
                   <IconButton onClick={handleExpandClick1} size="small">
                     {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                   </IconButton>
                 </FormLabel>
                 <Collapse in={expanded1}>
-                  <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
-                      <FormGroup>
-                        {metricNames &&
-                          metricNames.map((metric) => (
-                            <div key={metric.id} style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
-                              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                                <FormControlLabel
-                                  value={metric.id.toString()}
-                                  control={<Checkbox checked={selectedMetrics.includes(metric.id)} />}
-                                  label={metric.name}
-                                  onChange={handleMetricChange}
-                                />
-                                <IconButton
-                                  onClick={() => handleMetricExpandClick(metric.id)}
-                                  style={{
-                                    width: '24px',
-                                    height: '24px',
-                                    borderRadius: '50%',
-                                    color: 'rgba(0, 0, 0, 0.54)',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                  }}
-                                  size="small"
-                                >
-                                  {expandedMetrics[metric.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-                                </IconButton>
-                              </div>
-                              <Collapse in={expandedMetrics[metric.id]}>
-                                <FormGroup
-                                  style={{ marginLeft: '30px' }}
-                                  name="indicators"
-                                  value={selectedIndicators[metric.id] || []}
-                                >
-                                  {allIndicators[metric.id]?.map((indicator) => (
-                                    <FormControlLabel
-                                      key={indicator.indicator_id}
-                                      value={indicator.indicator_id.toString()}
-                                      control={<Checkbox checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false} />}
-                                      label={indicator.indicator_name}
-                                      onChange={(event) => handleIndicatorChange(event, metric.id)}
-                                    />
-                                  ))}
-                                </FormGroup>
-                              </Collapse>
-                            </div>
-                          ))}
-                      </FormGroup>
-                    </div>
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <h3 style={{ fontSize: '17px', marginTop: '20px', fontFamily: 'Roboto' }}>Environmental</h3>
+                    {renderMetricsByCategory('E')}
+                    <h3 style={{ fontSize: '17px', marginTop: '20px', fontFamily: 'Roboto' }}>Social</h3>
+                    {renderMetricsByCategory('S')}
+                    <h3 style={{ fontSize: '17px', marginTop: '20px', fontFamily: 'Roboto' }}>Governance</h3>
+                    {renderMetricsByCategory('G')}
                   </div>
+
                   {Object.keys(selectedIndicators).length > 0 && (
                     <div style={{ marginLeft: '20px', marginTop: '20px' }}>
                       <Button variant="contained" color="primary">
@@ -442,9 +606,10 @@ const Company = () => {
             </Card>
           </div>
 
-          <div style={{ width: '60%', marginTop: '20px', marginLeft: '10px'}}>
-            <Card>
-              <IconButton onClick={() => setTableCollapsed(!tableCollapsed)}>
+          <div style={{ width: '50%', marginTop: '20px', marginRight: '40px'}}>
+            <Card style={{ width: '100%', display: 'flex', flexDirection: 'column'}}>
+              <IconButton onClick={() => setTableCollapsed(!tableCollapsed)} size="large">
+                See table
                 {tableCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
               </IconButton>
               <Collapse in={!tableCollapsed}>
@@ -459,22 +624,20 @@ const Company = () => {
                   </div>
                 </div>
                 {selectedFramework && (
-                  <Grid item xs={6}>
-                    <TableContainer component={Paper} style={{ marginLeft: '50px', border: '1px solid #ddd' }}>
+                  <Grid container justifyContent="center">
+                    <TableContainer component={Paper} style={{ border: '1px solid #ddd', width: '90%' }}>
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Metric</TableCell>
-                            <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Indicator</TableCell>
+                            <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
+                            <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator</TableCell>
                             <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
                           {Object.entries(selectedIndicators).map(([metricId, indicatorIds]) => {
-                            console.log(selectedIndicators);
                             const metricName = metricNames.find(m => m.id === Number(metricId))?.name || 'Unknown Metric';
                             const indicators = allIndicators[metricId] || [];
-                            console.log(metricId);
                             return (
                               indicatorIds.map((indicatorId, index) => {
                                 const indicator = indicators.find(ind => ind.indicator_id === indicatorId);
@@ -492,7 +655,7 @@ const Company = () => {
                                       {indicator ? indicator.indicator_name : ' '}
                                     </TableCell>
                                     <TableCell style={{ borderBottom: '1px solid #ddd' }}>
-                                      <div style={{ display: 'flex', flexDirection: 'row', width: '80%', justifyContent: 'flex-end' }}>
+                                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                         {indicator ? findIndicatorValue(indicator.indicator_name) : ' '}
                                       </div>
                                     </TableCell>
