@@ -525,10 +525,17 @@ export const getMetricByCategory = (category) => {
     }
 }
 
+// This function is used in our Compare.jsx
 // given a company Id, return all the information for that company
 // This function is used in the compare Industry
-// return {companyId, metrics: [{metricId, metricName, metricScore}], FrameworkScore, IndustryRanking}
+// gets passed in metricList's objects
+// 
 // OR ACTUALLY {metricId, metricName, companyResults:[{companyId, score}]}
-export const calculateMetricScore = async(metricId, companyList, year) => {
+export const calculateGeneralMetricScore = async(metricId, metricName, companyList, year) => {
+  // get industries for metric
+
+  // Calculate metric using those industries for each company in companyList (which is companies in Compare.jsx)
+
+  // return collected information, (in future maybe ESG score if framework and industry ranking)
 
 }
