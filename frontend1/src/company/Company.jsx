@@ -338,78 +338,78 @@ const Company = () => {
 
   };
 
-  // useEffect(() => {
-  //   console.log('here111');
-  //   let newLockedSliders = {};
-  //   let newSliderValues = {};
+  useEffect(() => {
+    console.log('here111');
+    let newLockedSliders = {};
+    let newSliderValues = {};
 
-  //   // 1. Update Locked sliders
-  //   const keys = Object.keys(lockedSliders).map(key => Number(key));
-  //   console.log(keys);
-  //   console.log(selectedMetrics);
+    // 1. Update Locked sliders
+    const keys = Object.keys(lockedSliders).map(key => Number(key));
+    console.log(keys);
+    console.log(selectedMetrics);
 
-  //   for (let key of keys) {
-  //     if (selectedMetrics.includes(key)) {
-  //       newLockedSliders[key] = lockedSliders[key];
-  //     }
-  //   }
-  //   console.log(newLockedSliders);
+    for (let key of keys) {
+      if (selectedMetrics.includes(key)) {
+        newLockedSliders[key] = lockedSliders[key];
+      }
+    }
+    console.log(newLockedSliders);
 
-  //   setLockedSliders(newLockedSliders);
+    setLockedSliders(newLockedSliders);
 
-  //   // 2. Get length of each pillar
-  //   let numE = 0;
-  //   let numS = 0;
-  //   let numG = 0;
+    // 2. Get length of each pillar
+    let numE = 0;
+    let numS = 0;
+    let numG = 0;
 
-  //   let maxE = 1;
-  //   let maxS = 1;
-  //   let maxG = 1;
+    let maxE = 1;
+    let maxS = 1;
+    let maxG = 1;
 
-  //   for (let entry of selectedMetrics) {
-  //     let category = metricNames.find(metric => metric.id === entry).category;
+    for (let entry of selectedMetrics) {
+      let category = metricNames.find(metric => metric.id === entry).category;
 
-  //     if (!lockedSliders.hasOwnProperty(entry)) {
-  //       if (category === 'E') {
-  //         numE += 1;
-  //       } else if (category === 'S') {
-  //         numS += 1;
-  //       } else {
-  //         numG += 1;
-  //       }
-  //     } else {
-  //       if (category === 'E') {
-  //         maxE -= sliderValues[entry];
-  //       } else if (category === 'S') {
-  //         maxS -= sliderValues[entry];
-  //       } else {
-  //         maxG -= sliderValues[entry];
-  //       }
-  //     }
-  //   }
+      if (!lockedSliders.hasOwnProperty(entry)) {
+        if (category === 'E') {
+          numE += 1;
+        } else if (category === 'S') {
+          numS += 1;
+        } else {
+          numG += 1;
+        }
+      } else {
+        if (category === 'E') {
+          maxE -= sliderValues[entry];
+        } else if (category === 'S') {
+          maxS -= sliderValues[entry];
+        } else {
+          maxG -= sliderValues[entry];
+        }
+      }
+    }
 
-  //   let averageE = maxE / numE;
-  //   let averageS = maxS / numS;
-  //   let averageG = maxG / numG;
+    let averageE = maxE / numE;
+    let averageS = maxS / numS;
+    let averageG = maxG / numG;
 
-  //   for (let entry of selectedMetrics) {
-  //     let category = metricNames.find(metric => metric.id === entry).category;
-  //     if (!lockedSliders.hasOwnProperty(entry)) {
-  //       if (category === 'E') {
-  //         newSliderValues[entry] = averageE;
-  //       } else if (category === 'S') {
-  //         newSliderValues[entry] = averageS;
-  //       } else {
-  //         newSliderValues[entry] = averageG;
-  //       }
-  //     } else {
-  //       newSliderValues[entry] = sliderValues[entry];
-  //     }
-  //   }
+    for (let entry of selectedMetrics) {
+      let category = metricNames.find(metric => metric.id === entry).category;
+      if (!lockedSliders.hasOwnProperty(entry)) {
+        if (category === 'E') {
+          newSliderValues[entry] = averageE;
+        } else if (category === 'S') {
+          newSliderValues[entry] = averageS;
+        } else {
+          newSliderValues[entry] = averageG;
+        }
+      } else {
+        newSliderValues[entry] = sliderValues[entry];
+      }
+    }
 
-  //   setSliderValues(newSliderValues);
+    setSliderValues(newSliderValues);
 
-  // }, [selectedMetrics]);
+  }, [selectedMetrics]);
 
   const handleLockClick = (id) => {
     setLockedSliders((prevLockedSliders) => {
