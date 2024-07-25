@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import Select from 'react-select';
 import Navbar from '../Navbar';
-import { getOfficialFrameworks, getMetricForFramework } from '../helper';
+import { getOfficialFrameworks, getMetricForFramework, getMetricName } from '../helper';
 import ContextMenu from './ContextMenu';
 
 const Compare = () => {
@@ -32,10 +32,10 @@ const Compare = () => {
   const [metricsList, setMetricsList] = useState([]);
   const [frameworks , setFrameworks] = useState([]);
 
-  const [message, setMessage] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [defaultFramework, setDefaultFramework] = useState(null);
-
+  const [year, setYear] = useState(null);
+  const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
   const [open, setOpen] = useState(false);
 
   const contextMenuRef = useRef(null);
@@ -71,9 +71,12 @@ const Compare = () => {
     console.log('companies changed:', companies);
     //update Everytime Companies change
     updateMetrics();
+    ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
   }, [companies]);
   useEffect(() => {
     console.log('frameworks changed:', frameworks);
+    updateMetrics();
+    //IF YEAR IS NONE CREATE DISAPPEARING MESSAGE
   }, [frameworks]);
   useEffect(() => {
     console.log('ContextMENU changed:', contextMenu, ' company selected at ', selectedCompany);
@@ -88,6 +91,8 @@ const Compare = () => {
 
   //This function updates the metrics that are being used depending on the frameworks that are being selected
   //This returns a list of JSON objects [{metric_id: }]
+  //This is called everytime a framework or company changes and only adds onto the exisitng list without repalcing the old one
+
   const updateMetrics = async () => {
     const processedFrameworks = new Set();
     const updatedMetrics = [];
@@ -101,16 +106,22 @@ const Compare = () => {
         updatedMetrics.push(...frameworkMetrics);
       }
     }));
-  
-    const newMetricIds = updatedMetrics
-      .map(m => m.metric_id)
-      .filter(metricId => !metricsList.some(i => i.metric_id === metricId));
-  
-    setMetricsList(prevMetricsList => [...prevMetricsList, ...newMetricIds]);
+    
+    //gets a list of {metric_id, metric_name}
+    const newMetrics = await Promise.all(
+      updatedMetrics
+        .filter(m => !metricsList.some(i => i.metric_id === m.metric_id))
+        .map(async m => ({
+          metric_id: m.metric_id,
+          metric_name: await getMetricName(m.metric_id)
+        }))
+    );
+
+    setMetricsList(prevMetricsList => [...prevMetricsList, ...newMetrics]);
   };
   
-  //remove metric 
-  const addMetrics = (metrics, metricName) => {
+  // This is from the Adding tool (the modal)
+  const changeMetrics = (metrics, metricName) => {
 
   }
 
@@ -135,6 +146,8 @@ const Compare = () => {
     const foundC = companies.find(company => company.id === companyId);
     if (foundC.framework == selectedOption) {
       console.log(`Already has company ${companyId} with that framework: `, selectedOption);
+      //CREATE DISAPPEARING MESSAGE FOR THIS
+      //IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSAGE
       return;
     }
 
@@ -263,8 +276,8 @@ const Compare = () => {
     setOpen(false);
   }
 
-  const handleOpenModal = () => {
-    setOpen(true);
+  const handleToggleOpenModal = () => {
+    setOpen(!open);
   }
 
   //render table cell if company is not null
@@ -276,7 +289,17 @@ const Compare = () => {
         {/* Header where Company controls are obtained */}
         <TableHead>
           <TableRow>
-            <TableCell>Metrics / Indicators</TableCell>
+            <TableCell>
+              <Typography>Metrics</Typography>
+              {/* Put button for Metrics change here */}
+              <Select
+                      styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                      options={years.map((year) => ({ value: year, label: year }))}
+                      label="Year"
+                      maxMenuHeight={100}
+                      onChange={(selectedOption) => setYear(selectedOption)}
+                    />
+            </TableCell>
             {/* Where the companies are rendered */}
             {companies.map((company, index) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={index}>

@@ -110,18 +110,18 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
         <TabPanel value="1">
           <FormGroup>
             {Emetrics.map((e) => (
-                <FormControlLabel control={<Checkbox checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
+                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
             ))}
           </FormGroup>
         </TabPanel>
         <TabPanel value="2">
             {Smetrics.map((e) => (
-                <FormControlLabel control={<Checkbox checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
+                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
             ))}
         </TabPanel>
         <TabPanel value="3">
             {Gmetrics.map((e) => (
-                <FormControlLabel control={<Checkbox checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
+                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
             ))}
         </TabPanel>
       </Modal>

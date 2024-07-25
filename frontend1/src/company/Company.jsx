@@ -340,6 +340,10 @@ const Company = () => {
     }
   }
 
+  const handleClickReport = () => {
+    navigate(`/report/${companyId}`);
+  }
+
   return (
     <>
       <Navbar />
@@ -363,7 +367,7 @@ const Company = () => {
             </div>
           </div>
           <div className="quickControls">
-            <Button>Save Report</Button>
+            <Button onClick={handleClickReport}>Save Report</Button>
             <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
           </div>
         </div>

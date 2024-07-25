@@ -530,21 +530,5 @@ export const getMetricByCategory = (category) => {
 // return {companyId, metrics: [{metricId, metricName, metricScore}], FrameworkScore, IndustryRanking}
 // OR ACTUALLY {metricId, metricName, companyResults:[{companyId, score}]}
 export const calculateMetricScore = async(metricId, companyList, year) => {
-    //get Metric Score
-    const metrics = await Promise.all(metricsList.map(async (m) => {
-        const indicators = await getIndicatorsForMetric(frameworkId);
-        const score = await getMetricScore(m.id, companyName, indicators);
-        return {
-            metricId: m.id,
-            metricName: m.name,
-            score: score
-        };
-    }));
 
-    return {
-        companyId,
-        metrics,
-        frameworkScore: 69.42,
-        industryRanking: 2
-    };
 }
