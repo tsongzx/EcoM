@@ -533,7 +533,10 @@ export const getMetricByCategory = (category) => {
 // OR ACTUALLY {metricId, metricName, companyResults:[{companyId, score}]}
 export const calculateGeneralMetricScore = async(metricId, metricName, companyList, year) => {
   // get industries for metric
-
+  const companyScores = companyList.map(async(c) => ({
+    companyId: c.id,
+    score: await getMetricScore(metricId, c.companyName, await getIndicatorsForMetric()),
+  }));
   // Calculate metric using those industries for each company in companyList (which is companies in Compare.jsx)
 
   // return collected information, (in future maybe ESG score if framework and industry ranking)

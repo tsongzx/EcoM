@@ -21,6 +21,7 @@ import Select from 'react-select';
 import Navbar from '../Navbar';
 import { getOfficialFrameworks, getMetricForFramework, getMetricName } from '../helper';
 import ContextMenu from './ContextMenu';
+import SearchMetricsModal from './SearchMetricsModal';
 
 const Compare = () => {
   const location = useLocation();
@@ -66,10 +67,10 @@ const Compare = () => {
     setCompanies(companiesList);
   }, []);
 
-  //DEBUGGING
+  //THE ONLY TIME WE UPDATE METRICS IS ON COMPANY CHANGE, FRAMEWORK CHANGE and MODAL CLOSE, and METRIC DELTE
   useEffect(() => {
     console.log('companies changed:', companies);
-    //update Everytime Companies change
+    //update Everytime Companies change, then update metrics
     updateMetrics();
     ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
   }, [companies]);
@@ -127,7 +128,10 @@ const Compare = () => {
 
   //add metric
   const deleteMetric = (metricId) => {
-
+    const newMetrics = metrics.filter((m) => m.id !== metricId);
+    const newMetricList = metricsList.filter((m) => m.id !== metricId);
+    setMetrics(newMetrics);
+    setMetrics(newMetricList);
   }
   
 
@@ -355,6 +359,9 @@ const Compare = () => {
         },
       ]}
     />
+
+    <button onClick={handleToggleOpenModal}>Customise Metrics List</button>
+    <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
     </div>
   );
 };

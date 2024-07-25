@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import './Report.css'
 import Switch from '@mui/material/Switch';
 import {closestCorners, DndContext} from '@dnd-kit/core';
@@ -8,6 +8,8 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Navbar from "../Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed } from "../helper";
+import Pdf from 'react-to-pdf';
+
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
@@ -19,6 +21,8 @@ const Report = () => {
     const [ components , setComponents ] = useState([]);
     const [ showAddText, setShowAddText] = useState(false);
     const ref = useRef();
+    const location = useLocation();
+    const { id, companyName, framework, year } = location.state || {};
     // set Components to be a list of JSON objects {id: int, type: '', name: ''}, 
     useEffect(() => {
         console.log('Inside Reporing for company: ', parseInt(companyId));
@@ -95,7 +99,7 @@ const getCompanyMetaInformation = async () => {
         <Navbar/>
         <div className="reportContainer">
             <div className="reportContent" ref={ref}>
-                {/* components.map goes here */}
+                {/* components.map goes here, currently just some placeholder code*/}
             </div>
             <div className="reportControl">
                 <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
@@ -104,7 +108,13 @@ const getCompanyMetaInformation = async () => {
                 <div>
                   <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
                   {showAddText && <CustomTextarea handleClose={handleClose}/>}
-                  <button>Save PDF</button>
+                  <Pdf targetRef={ref} filename={`${companyName}.pdf`}>
+                    {({ toPdf }) => (
+					  <button onClick={toPdf} className="button">
+						Download PDF
+					  </button>
+				    )}
+                  </Pdf>
                 </div>
             </div>
         </div>

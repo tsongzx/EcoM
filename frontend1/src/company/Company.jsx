@@ -341,7 +341,14 @@ const Company = () => {
   }
 
   const handleClickReport = () => {
-    navigate(`/report/${companyId}`);
+    navigate(`/report/${companyId}`, 
+      { state: { 
+          id: companyId, 
+          companyName,
+          framework: selectedFramework,
+          year: selectedYear,
+        } 
+      });
   }
 
   return (
