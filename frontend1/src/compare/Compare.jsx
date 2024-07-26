@@ -85,8 +85,14 @@ const Compare = () => {
   }, [contextMenu, selectedCompany]);
   useEffect(() => {
     //everytime the metricsList changes, update the metrics to match
-    changeMetrics()
+    console.log('metricsList changed so Imma change metrics!!!!');
+    changeMetrics();
   },[metricsList]);
+
+  useEffect(() => {
+    console.log('METRICS CHANGED:');
+    console.log(metrics);
+  },[metrics]);
 
   //given the index that it was selected switch out the company ID at that index to become the new company ID
   const handleSelectedCompanyId = (companyId, companyName) => {
@@ -127,20 +133,29 @@ const Compare = () => {
   };
   
   // This is from the Adding tool (the modal)
-  const changeMetrics = () => {
-    const newMetrics = metricsList.map((m) => {
-      calculateGeneralMetricScore(m.metric_id, m.metricName, companies, year);
+  const changeMetrics = async () => {
+    const metricsPromises = metricsList.map((m) => {
+      console.log('mapping metric: ',m.metric_id, '/', metricsList.length);
+      return calculateGeneralMetricScore(m.metric_id, m.metric_name, companies, year);
     });
+
+    const newMetrics = await Promise.all(metricsPromises);
+    console.log('inside change metrics...');
+    console.log(metricsList);
+    console.log(newMetrics);
     setMetrics(newMetrics);
   }
 
   //add metric
   const deleteMetric = (metricId) => {
-    const newMetrics = metrics.filter((m) => m.id !== metricId);
-    const newMetricList = metricsList.filter((m) => m.id !== metricId);
+    //const newMetrics = metrics.filter((m) => m.metric_id !== metricId);
+    const newMetricList = metricsList.filter((m) => m.metric_id !== metricId);
     //THis line may become redundnat due to the useEffect
-    setMetrics(newMetrics);
-    setMetrics(newMetricList);
+    //setMetrics(newMetrics);
+    console.log('DELETING A METRIC');
+    console.log(newMetricList);
+    setMetricsList(newMetricList);
+    resetContextMenu();
   }
   
 
@@ -241,11 +256,13 @@ const Compare = () => {
     setSelectedCompany(null);
     //reset everything back to false
     console.log(companies);
-    const newListOfCompanies = companies.map(company => 
-      ({ ...company, selected: false })
-    );
-    console.log(newListOfCompanies);
-    setCompanies(newListOfCompanies);
+    if (isSelectedCompany) {
+      const newListOfCompanies = companies.map(company => 
+        ({ ...company, selected: false })
+      );
+      console.log(newListOfCompanies);
+      setCompanies(newListOfCompanies);
+    }
 
     setContextMenu(
       {

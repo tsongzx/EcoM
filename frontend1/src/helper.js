@@ -625,7 +625,10 @@ export const getAllMetrics = async() => {
 // OR ACTUALLY {metricId, metricName, companies:[{companyId, score}]}
 export const calculateGeneralMetricScore = async(metricId, metricName, companyList, year) => {
   // get industries for metric
-
+  const companies = companyList.map(c => ({
+    companyId : c.id,
+    score: 1,
+  }));
   // return collected information, (in future maybe ESG score if framework and industry ranking)
-  return {}
+  return {metricId, metricName, companies};
 }
