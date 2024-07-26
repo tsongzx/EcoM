@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import './CreateFramework.css'
 import { TextField } from "@mui/material";
-import { getUserId } from "../helper.js";
+import { getUserId, getAllMetrics } from "../helper.js";
 import Textarea from '@mui/joy/Textarea';
 
 const CreateFramework = () => {
@@ -17,7 +17,7 @@ const CreateFramework = () => {
         const fetchMetrics = async () => {
             try {
                 const apiMetrics = await getAllMetrics();
-
+                
                 const metricPromises = apiMetrics.map(async (metric) => {
                     return { id: metric.id, name: metric.name, isIncluded: false };
                 });
@@ -31,23 +31,6 @@ const CreateFramework = () => {
         console.log('DOING STUFF FOR CREATEFRAMEWORK...');
         fetchMetrics();
     }, []);
-
-    const getAllMetrics = async() => {
-        try {
-            const response = await axios.get(`http://127.0.0.1:8000/metrics`,
-                {headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${Cookies.get('authToken')}`
-              }});
-              //if successful
-              console.log('SUCCESSFULLY FETCHED METRICS');
-              console.log(response.data);
-              return response.data;
-        } catch (error) {
-            console.log(error);
-            return [];
-        }
-    }
 
     //toggle the state of a button to be checked
     const handleButtonClick = (index) => {

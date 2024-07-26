@@ -46,6 +46,7 @@ import Cookies from 'js-cookie';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CreateFramework from './CreateFramework.jsx';
+import Recommendations from './Recommendations.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -387,7 +388,7 @@ const Company = () => {
               <Button onClick={openCompareModal}>Compare</Button>
             </div>
           </div>
-          <p>recommendations placeholder</p>
+          <Recommendations companyId={companyId} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'row'}}>
           <div style={{ width: '30%', display: 'flex', flexDirection: 'column'}}>

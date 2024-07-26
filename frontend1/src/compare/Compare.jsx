@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import Select from 'react-select';
 import Navbar from '../Navbar';
-import { getOfficialFrameworks, getMetricForFramework, getMetricName } from '../helper';
+import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateGeneralMetricScore } from '../helper';
 import ContextMenu from './ContextMenu';
 import SearchMetricsModal from './SearchMetricsModal';
 
@@ -46,6 +46,7 @@ const Compare = () => {
       y: 0
     }, toggled: false
   });
+  const [isSelectedCompany, setIsSelectedCompany] = useState();
   const [selectedCompany, setSelectedCompany] = useState();
 
   useEffect(async() => {
@@ -82,6 +83,10 @@ const Compare = () => {
   useEffect(() => {
     console.log('ContextMENU changed:', contextMenu, ' company selected at ', selectedCompany);
   }, [contextMenu, selectedCompany]);
+  useEffect(() => {
+    //everytime the metricsList changes, update the metrics to match
+    changeMetrics()
+  },[metricsList]);
 
   //given the index that it was selected switch out the company ID at that index to become the new company ID
   const handleSelectedCompanyId = (companyId, companyName) => {
@@ -91,7 +96,7 @@ const Compare = () => {
   }
 
   //This function updates the metrics that are being used depending on the frameworks that are being selected
-  //This returns a list of JSON objects [{metric_id: }]
+  //This returns a list of JSON objects [{metric_id: , metricName}]
   //This is called everytime a framework or company changes and only adds onto the exisitng list without repalcing the old one
 
   const updateMetrics = async () => {
@@ -122,14 +127,18 @@ const Compare = () => {
   };
   
   // This is from the Adding tool (the modal)
-  const changeMetrics = (metrics, metricName) => {
-
+  const changeMetrics = () => {
+    const newMetrics = metricsList.map((m) => {
+      calculateGeneralMetricScore(m.metric_id, m.metricName, companies, year);
+    });
+    setMetrics(newMetrics);
   }
 
   //add metric
   const deleteMetric = (metricId) => {
     const newMetrics = metrics.filter((m) => m.id !== metricId);
     const newMetricList = metricsList.filter((m) => m.id !== metricId);
+    //THis line may become redundnat due to the useEffect
     setMetrics(newMetrics);
     setMetrics(newMetricList);
   }
@@ -194,7 +203,7 @@ const Compare = () => {
     setIsDeleting(true);
   }
 
-  const handleContextMenu = (e, companyId) => {
+  const handleContextMenu = (e, companyId, isCompany) => {
     console.log('handling opening context menu...', companyId);
     e.preventDefault();
     setSelectedCompany(companyId);
@@ -223,6 +232,7 @@ const Compare = () => {
         selected: c.id === companyId
       }
     }));
+    setIsSelectedCompany(isCompany);
   }
 
   const resetContextMenu = () => {
@@ -258,14 +268,16 @@ const Compare = () => {
           } 
       }
     }
-    console.log('Adding event Listener');
-    document.addEventListener('click', handler);
+    if (!open) {
+      console.log('Adding event Listener');
+      document.addEventListener('click', handler);
+    }
 
     return () => {
       console.log('Removing Click Event Handler');
       document.removeEventListener('click', handler);
     }
-  },[contextMenu]);
+  },[contextMenu, open]);
 
   //because there has been problems with resetContextMenu using old company data
   useEffect(() => {
@@ -276,6 +288,8 @@ const Compare = () => {
   }, [companies, isDeleting]);
 
   const handleCloseModal = (newMetricsList) => {
+    console.log('Closing Modal...');
+    console.log(newMetricsList);
     setMetricsList(newMetricsList);
     setOpen(false);
   }
@@ -306,7 +320,7 @@ const Compare = () => {
             </TableCell>
             {/* Where the companies are rendered */}
             {companies.map((company, index) => (
-              <TableCell onContextMenu={(e) => handleContextMenu(e, company.id)} key={index}>
+              <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                 <div>
                   <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
                   <div className='companyParamContainer'>
@@ -332,10 +346,11 @@ const Compare = () => {
             )}
           </TableRow>
         </TableHead>
-
+        
+        {/* This is the part that renders all the table components */}
         {metrics.map((metric, index) => (
           <TableRow>
-            <TableCell>{metric.metricName}</TableCell>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
             {metric.companies.map((company, index) => (
               <TableCell>
                 {company.score}
@@ -352,12 +367,19 @@ const Compare = () => {
       isToggled={contextMenu.toggled}
       positionX={contextMenu.position.x}
       positionY={contextMenu.position.y}
-      buttons={[
+      buttons={isSelectedCompany ? [
         {
           text: "delete",
           onClick: () => handleDeleteFromTable(selectedCompany),
         },
-      ]}
+      ] :
+      [
+        {
+          text: "delete metric",
+          onClick: () => deleteMetric(selectedCompany), // This is abit dodgy because its actually getting passed in a metricId
+        },
+      ]
+    }
     />
 
     <button onClick={handleToggleOpenModal}>Customise Metrics List</button>

@@ -8,7 +8,9 @@ import { arrayMove } from "@dnd-kit/sortable";
 import Navbar from "../Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed } from "../helper";
-import Pdf from 'react-to-pdf';
+import SimpleLineChart from "../SimpleLineChart";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { NeinDocument } from "./Document";
 
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
@@ -96,28 +98,33 @@ const getCompanyMetaInformation = async () => {
 
     return (
         <div>
-        <Navbar/>
-        <div className="reportContainer">
-            <div className="reportContent" ref={ref}>
-                {/* components.map goes here, currently just some placeholder code*/}
-            </div>
-            <div className="reportControl">
-                <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-                        <DraggableElements components={components} toggleDisplay={toggleDisplay}/>
-                </DndContext>
-                <div>
-                  <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
-                  {showAddText && <CustomTextarea handleClose={handleClose}/>}
-                  <Pdf targetRef={ref} filename={`${companyName}.pdf`}>
-                    {({ toPdf }) => (
-					  <button onClick={toPdf} className="button">
-						Download PDF
-					  </button>
-				    )}
-                  </Pdf>
+            <Navbar/>
+            <div className="reportContainer">
+                <div className="reportContent">
+                    {/* components.map goes here, currently just some placeholder code*/}
+                    
                 </div>
+
+
+                <div className="reportControl">
+                    <p>click and drag to reorder your content</p>
+                    <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+                            <DraggableElements components={components} toggleDisplay={toggleDisplay}/>
+                    </DndContext>
+                    <div>
+                    <div>
+                        <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
+                        {showAddText && <CustomTextarea handleClose={handleClose}/>}
+                    </div>
+                    <PDFDownloadLink document={<NeinDocument />} fileName="example.pdf">
+                        {({ blob, url, loading, error }) =>
+                        loading ? 'Loading document...' : 'Download PDF'
+                        }
+                    </PDFDownloadLink>
+                    </div>
+                </div>
+                
             </div>
-        </div>
         </div>
     );
 }

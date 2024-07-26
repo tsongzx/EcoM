@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Modal from '@mui/joy/Modal';
+import {ModalDialog, ModalClose} from '@mui/joy';
 import { styled } from '@mui/material/styles';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import TabPanel from '@mui/lab/TabPanel';
-import { Checkbox, FormGroup } from "@mui/material";
+import TabContext from '@mui/lab/TabContext';
+import { Checkbox, FormGroup, FormControlLabel, Typography } from "@mui/material";
+import { getAllMetrics } from "../helper";
 
 //metricsList gets passed in as [{metric_id, metricName}] ideally but we just have metricName rn
 const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
@@ -12,6 +15,7 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
     const [Emetrics, setE] = useState([]);
     const [Smetrics, setS] = useState([]);
     const [Gmetrics, setG] = useState([]);
+    const [value, setValue] = useState("1");
 
     useEffect(async() => {
         //fetch all the metrics available and sort them into their categories
@@ -22,32 +26,23 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
         setG(allMetrics.G);
     },[]);
 
-
-    //returns list of JsOn of form {category, id, name}
-    const getAllMetrics = async() => {
-        try {
-            const response = await axios.get(`http://127.0.0.1:8000/metrics`,
-                {headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${Cookies.get('authToken')}`
-              }});
-              //if successful
-              return response.data;
-        } catch (error) {
-            console.log(error);
-            return [];
-        }
-    }
-
     const handleOnClose = () => {
+        console.log(Emetrics);
+        // console.log(Emetrics);
+        // console.log(Emetrics);
         //submit metrics when closing the modal
         closeModal(metrics);
+
     }
 
-    const handleChange = (event, metricId) => {
+    const handleChange = (event, newValue) => {
+      setValue(newValue);
+    };
+
+    const handleCheckboxChange = (event, metricId, metricName) => {
         //add to list metrics
         if (event.target.checked) {
-            const updatedList = [...metrics, metricId];
+            const updatedList = [...metrics, {metric_id: metricId, metricName}];
             setMetrics(updatedList);
         } else {
             //remove from metrics
@@ -97,33 +92,47 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
         },
       }));
 
+      const ModalContent = styled('div')({
+        height: '400px',
+        overflowY: 'auto', 
+        padding: '16px',
+        width: '300px'
+      });
+
     return (
       <Modal
         open={isOpen}
         onClose={handleOnClose}
       >
-        <AntTabs value={value} onChange={handleChange} aria-label="ant example">
-          <AntTab label="Environmental" value="1"/>
-          <AntTab label="Social" value="2"/>
-          <AntTab label="Governance" value="3"/>
-        </AntTabs>
-        <TabPanel value="1">
-          <FormGroup>
-            {Emetrics.map((e) => (
-                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
-            ))}
-          </FormGroup>
-        </TabPanel>
-        <TabPanel value="2">
-            {Smetrics.map((e) => (
-                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
-            ))}
-        </TabPanel>
-        <TabPanel value="3">
-            {Gmetrics.map((e) => (
-                <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleChange(event, e.id)}/>} label={e.name} />
-            ))}
-        </TabPanel>
+        <ModalDialog>
+          <ModalClose />
+            <TabContext layout="center" value={value}>
+            <AntTabs value={value} onChange={handleChange} aria-label="ant example">
+              <AntTab label="Environmental" value="1"/>
+              <AntTab label="Social" value="2"/>
+              <AntTab label="Governance" value="3"/>
+            </AntTabs>
+            <ModalContent>
+            <TabPanel value="1">
+              <FormGroup>
+                {Emetrics.map((e) => (
+                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                ))}
+              </FormGroup>
+            </TabPanel>
+            <TabPanel value="2">
+                {Smetrics.map((e) => (
+                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                ))}
+            </TabPanel>
+            <TabPanel value="3">
+                {Gmetrics.map((e) => (
+                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                ))}
+            </TabPanel>
+            </ModalContent>
+            </TabContext>
+          </ModalDialog>
       </Modal>
     )
 }
