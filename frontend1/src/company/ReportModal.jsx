@@ -22,6 +22,8 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
         const company_info = await getCompanyFromRecentlyViewed(companyId);
         setHeadCountry(company_info.headquarter_country);
         setIndustry(company_info.industry);
+        const company_metrics = await getCompanyMetricInfo(companyName);
+        setMetrics(company_metrics);
     }, [])
 
     const closeReportModal = () => {
