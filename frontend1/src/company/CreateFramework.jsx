@@ -5,10 +5,19 @@ import './CreateFramework.css'
 import { TextField } from "@mui/material";
 import { getUserId, getAllMetrics } from "../helper.js";
 import Textarea from '@mui/joy/Textarea';
+import AccordionGroup from '@mui/joy/AccordionGroup';
+import Accordion from '@mui/joy/Accordion';
+import AccordionDetails from '@mui/joy/AccordionDetails';
+import AccordionSummary from '@mui/joy/AccordionSummary';
+import Slider from '@mui/material/Slider';
 
 const CreateFramework = () => {
-    const [metrics, setMetrics] = useState([]);
-    const [activeMetrics, setActiveMetrics] = useState([]);
+    const [Emetrics, setEMetrics] = useState([]);
+    const [Smetrics, setSMetrics] = useState([]);
+    const [Gmetrics, setGMetrics] = useState([]);
+    const [value, setValue] = useState([100/3, 200/3]);
+    const [isOpen, setIsOpen] = useState(false);
+
     const [showAddName, setShowAddName] = useState(false);
     const [newFrameworkName, setNewFrameworkName] = useState('');
     const [description, setDescription] = useState('');
@@ -17,13 +26,23 @@ const CreateFramework = () => {
         const fetchMetrics = async () => {
             try {
                 const apiMetrics = await getAllMetrics();
-                
-                const metricPromises = apiMetrics.map(async (metric) => {
-                    return { id: metric.id, name: metric.name, isIncluded: false };
+
+                const metricEPromises = apiMetrics.E.map(async (metric) => {
+                    return { id: metric.id, name: metric.name, category: metric.category, isIncluded: false };
+                });
+                const metricSPromises = apiMetrics.S.map(async (metric) => {
+                    return { id: metric.id, name: metric.name, category: metric.category, isIncluded: false };
+                });
+                const metricGPromises = apiMetrics.G.map(async (metric) => {
+                    return { id: metric.id, name: metric.name, category: metric.category, isIncluded: false };
                 });
 
-                const transformedMetrics = await Promise.all(metricPromises);
-                setMetrics(transformedMetrics);
+                const transformedEMetrics = await Promise.all(metricEPromises);
+                const transformedSMetrics = await Promise.all(metricSPromises);
+                const transformedGMetrics = await Promise.all(metricGPromises);
+                setEMetrics(transformedEMetrics);
+                setSMetrics(transformedSMetrics);
+                setGMetrics(transformedGMetrics);
             } catch (error) {
                 console.error('Failed to fetch metrics:', error);
             }
@@ -33,32 +52,55 @@ const CreateFramework = () => {
     }, []);
 
     //toggle the state of a button to be checked
-    const handleButtonClick = (index) => {
-        console.log('OLD METRICS:', metrics[index]);
-        const newMetrics = [...metrics];
+    const handleEButtonClick = (index) => {
+        const newMetrics = [...Emetrics];
         newMetrics[index].isIncluded = !newMetrics[index].isIncluded;
-        setMetrics(newMetrics);
+        setEMetrics(newMetrics);
+    }
+    const handleSButtonClick = (index) => {
+        const newMetrics = [...Smetrics];
+        newMetrics[index].isIncluded = !newMetrics[index].isIncluded;
+        setSMetrics(newMetrics);
+    }
+    const handleGButtonClick = (index) => {
+        const newMetrics = [...Gmetrics];
+        newMetrics[index].isIncluded = !newMetrics[index].isIncluded;
+        setGMetrics(newMetrics);
+    }
+
+    const processMetrics = (metrics) => {
+      const filteredMetrics = metrics.filter(metric => metric.isIncluded);
+      // const weighting = 100 / filteredMetrics.length
+      return filteredMetrics.map(metric => ({
+        category: metric.category,
+        metric_id: metric.id,
+        weighting: 1/filteredMetrics.length
+      }));
     }
 
     const handleSubmitNewFramework = async () => {
-    const filteredMetrics = metrics.filter(metric => metric.isIncluded)
-    // const weighting = 100 / filteredMetrics.length
-    const chosenMetrics = filteredMetrics.map(metric => ({
-        parent_id: 1,
-        metric_id: metric.id,
-        weighting: 0.0
-    }));
-    const userInfo = await getUserId();
-    console.log(userInfo);
+    // do one for each E, S and G
+    const chosenEMetrics = processMetrics(Emetrics);
+    const chosenSMetrics = processMetrics(Smetrics);
+    const chosenGMetrics = processMetrics(Gmetrics);
+
+    // Combine all chosen metrics
+    const chosenMetrics = [...chosenEMetrics, ...chosenSMetrics, ...chosenGMetrics];
+
     console.log(`Submitting Framework: ${newFrameworkName} with metrics:`);
     console.log(chosenMetrics);
+
         try {
             const response = await axios.post(`http://127.0.0.1:8000/framework/create/`,
                 {
                     details: {
                         framework_name: newFrameworkName,
                         description: description,
-                        user_id: userInfo.id
+                    },
+                    category_weightings: {
+                        E: (Math.min(...value) / 100),
+                        S: (value[1] - value[0]) / 100,
+                        G: (100 - value[1]) / 100,
                     },
                     metrics: chosenMetrics,
                 },
@@ -81,15 +123,60 @@ const CreateFramework = () => {
         setDescription('');
     }
 
+    const handleChangeSlider = (event, newValue) => {
+        setValue(newValue);
+    };
+
     return (
-        <div>
-            {metrics.map((metric, index) => (
+      <div>
+        <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
+        {isOpen && <div>
+          <Slider 
+            value = {value}
+            onChange={handleChangeSlider}
+            valueLabelDisplay="auto"
+          />
+          <AccordionGroup size={"md"}>
+
+            <Accordion>
+            <AccordionSummary>Environmental</AccordionSummary>
+            <AccordionDetails>
+              {Emetrics.map((metric, index) => (
                 <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
-                    key={index} 
-                    onClick={() => handleButtonClick(index)}>
-                    {metric.name ? metric.name : '...'}
+                  key={index} 
+                  onClick={() => handleEButtonClick(index)}>
+                  {metric.name ? metric.name : '...'}
                 </button>
-            ))}
+              ))}
+            </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+            <AccordionSummary>Social</AccordionSummary>
+            <AccordionDetails>
+              {Smetrics.map((metric, index) => (
+                <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
+                  key={index} 
+                  onClick={() => handleSButtonClick(index)}>
+                  {metric.name ? metric.name : '...'}
+                </button>
+              ))}
+            </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+            <AccordionSummary>Governance</AccordionSummary>
+            <AccordionDetails>
+              {Gmetrics.map((metric, index) => (
+                <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
+                  key={index} 
+                  onClick={() => handleGButtonClick(index)}>
+                  {metric.name ? metric.name : '...'}
+                </button>
+              ))}
+            </AccordionDetails>
+            </Accordion>
+          </AccordionGroup>
             {!showAddName && (<button onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
             {showAddName && (<div>
                 <button onClick={handleClose}>X</button>
@@ -97,7 +184,8 @@ const CreateFramework = () => {
                     <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
                 <button onClick={() => handleSubmitNewFramework()}>save</button>
             </div>)}
-        </div>
+        </div>}
+      </div>
     )
 }
 

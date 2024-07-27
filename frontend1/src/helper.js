@@ -430,49 +430,49 @@ export const getMetricScore = async(metricId, companyName, indicators) => {
 }
 
 export const getCompaniesOfIndustry = async(industryName) => {
-    const cacheURL = `http://127.0.0.1:8000/industry/companies?industry=${industryName}`;
+    // const cacheURL = `http://127.0.0.1:8000/industry/companies?industry=${industryName}`;
     
-    try {
-        const cache = await caches.open('companiesInIndustry');
-        const cachedResponse = await cache.match(cacheURL);
-        if (cachedResponse) {
-            console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-            console.log(cachedResponse.json());
-            return await cachedResponse.json();
-        }
-        const response = await axios.get('http://127.0.0.1:8000/industry/companies', {
-            params: { industry: industryName },
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Cookies.get('authToken')}`
-            }
-        });
-        const responseClone = new Response(JSON.stringify(response.data));
-        cache.put(cacheURL, responseClone);
-        console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-        console.log(response.data);
-        return response.data;
-    } catch (error) {
-        console.error(`Error getting companies: ${error}`);
-        return [];
-    }
-
     // try {
-    //     const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
-    //     {
-    //         params: {
-    //             industry: industryName
-    //         },             
-            
+    //     const cache = await caches.open('companiesInIndustry');
+    //     const cachedResponse = await cache.match(cacheURL);
+    //     if (cachedResponse) {
+    //         console.log('GOT CACHE FOR INDUSTRY COMPANIES');
+    //         console.log(cachedResponse.json());
+    //         return await cachedResponse.json();
+    //     }
+    //     const response = await axios.get('http://127.0.0.1:8000/industry/companies', {
+    //         params: { industry: industryName },
     //         headers: {
     //             'Content-Type': 'application/json',
     //             'Authorization': `Bearer ${Cookies.get('authToken')}`
     //         }
     //     });
+    //     const responseClone = new Response(JSON.stringify(response.data));
+    //     cache.put(cacheURL, responseClone);
+    //     console.log('GOT CACHE FOR INDUSTRY COMPANIES');
+    //     console.log(response.data);
     //     return response.data;
     // } catch (error) {
-    //     console.log(`Error getting metric: ${error}`);
+    //     console.error(`Error getting companies: ${error}`);
+    //     return [];
     // }
+
+    try {
+        const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
+        {
+            params: {
+                industry: industryName
+            },             
+            
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting metric: ${error}`);
+    }
 }
 
 // Given a framework already, requires company Indicators by metric
@@ -622,7 +622,15 @@ export const getAllMetrics = async() => {
 // This function is used in the compare Industry
 // gets passed in metricList's objects
 // 
-// OR ACTUALLY {metricId, metricName, companies:[{companyId, score}]}
+// RETURNS {metricId, metricName, companies:[{companyId, score}]}
+// companyList consists of:
+// {
+//     id: company.value,
+//     companyName: company.label,
+//     framework: selectedFramework ?? null,
+//     year: null,
+//     selected: false
+// }
 export const calculateGeneralMetricScore = async(metricId, metricName, companyList, year) => {
   // get industries for metric
   const companies = companyList.map(c => ({

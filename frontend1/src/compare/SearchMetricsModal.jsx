@@ -11,13 +11,14 @@ import { getAllMetrics } from "../helper";
 
 //metricsList gets passed in as [{metric_id, metricName}] ideally but we just have metricName rn
 const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
-    const [metrics, setMetrics] = useState(metricsList);
+    const [metrics, setMetrics] = useState([]);
     const [Emetrics, setE] = useState([]);
     const [Smetrics, setS] = useState([]);
     const [Gmetrics, setG] = useState([]);
     const [value, setValue] = useState("1");
 
     useEffect(async() => {
+      console.log('INSIDE THE METRICS MODAL');
         //fetch all the metrics available and sort them into their categories
         const allMetrics = await getAllMetrics();
         //this stuff could be cached HIGHKEY!!!
@@ -26,13 +27,17 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
         setG(allMetrics.G);
     },[]);
 
-    const handleOnClose = () => {
-        console.log(Emetrics);
-        // console.log(Emetrics);
-        // console.log(Emetrics);
-        //submit metrics when closing the modal
-        closeModal(metrics);
+    useEffect(() => {
+      setMetrics(metricsList);
+    }, [metricsList]);
 
+    const handleOnClose = () => {
+      console.log('CLOSING MODAL');
+      console.log(Emetrics);
+      // console.log(Emetrics);
+      // console.log(Emetrics);
+      //submit metrics when closing the modal
+      closeModal(metrics);
     }
 
     const handleChange = (event, newValue) => {
@@ -42,7 +47,7 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
     const handleCheckboxChange = (event, metricId, metricName) => {
         //add to list metrics
         if (event.target.checked) {
-            const updatedList = [...metrics, {metric_id: metricId, metricName}];
+            const updatedList = [...metrics, {metric_id: metricId, metric_name: metricName}];
             setMetrics(updatedList);
         } else {
             //remove from metrics
