@@ -99,7 +99,7 @@ const CreateFramework = () => {
     }
 
     return (
-        <div>
+        <div style={{ marginTop: '100px'}}>
             {metrics.map((metric, index) => (
                 <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
                     key={index} 

@@ -7,6 +7,7 @@ import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyVi
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
+import ChatFeature from './chatbot/Chatbot.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -158,6 +159,7 @@ const Dashboard = () => {
       setError('Please select a company.')
     } else {
       console.log(selectedFramework);
+      console.log(selectedCompany.id);
       navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, 
       { state: { 
           companyId: selectedCompany.id, 
@@ -266,6 +268,7 @@ const Dashboard = () => {
         </div>
       </div>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} />}
+      <ChatFeature/>
     </>
   );
 };
