@@ -1,7 +1,11 @@
+from statistics import LinearRegression
 from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
+
+import numpy as np
 from auth import generate_token, is_authenticated, authenticate_user, hash_password
+from schemas.predictive_schemas import PredictiveIndicators
 from db import Base, engine, SessionLocal
 from user import get_user_using_id, get_user_object_using_id
 from sqlalchemy.orm import Session
@@ -21,7 +25,7 @@ from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
-from typing import List, Any
+from typing import List, Any, Dict
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
@@ -1160,3 +1164,38 @@ async def chat(
     # message = response.choices[0].message.content
 
     return {'response': chatbot_response}
+
+
+#***************************************************************
+#                   Predictive Analysis Apis
+# ***************************************************************
+
+def linear_regression(data: List[Dict[str, Any]]) -> float:
+
+    years = np.array([point['indicator_year_int'] for point in data]).reshape(-1, 1)
+    values = np.array([point['indicator_value'] for point in data]).reshape(-1, 1)
+
+    prediction = LinearRegression().fit(years, values).predict(np.array([[2025]]))
+    return prediction[0][0]
+
+@app.get("/predictive", tags=["Predictive"])
+async def get_predictive(
+    indicator: str,
+    metric_unit = str,
+    session: Session = Depends(get_session),
+    user: user_schemas.UserInDB = Depends(get_user)
+) -> PredictiveIndicators:
+    data = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.indicator_name == indicator
+    ).all()
+
+    if metric_unit == "%":
+        prediction = linear_regression(data)
+    elif metric_unit.lower() == "yes/no":
+        values = [point['indicator_value'] for point in data]
+        prediction = max(set(values), key=values.count)
+    else: 
+        #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
+        prediction = linear_regression(data)
+
+    return PredictiveIndicators( indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
