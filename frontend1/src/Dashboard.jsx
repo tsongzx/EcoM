@@ -287,7 +287,7 @@ const Dashboard = () => {
                   >
                     <Card>
                       <CardContent>
-                        <Typography variant="h6">{companyNames[index]}</Typography>
+                        <Typography variant="h6">{companyNames[index]}</Typography>z
                       </CardContent>
                     </Card>
                   </Grid>
