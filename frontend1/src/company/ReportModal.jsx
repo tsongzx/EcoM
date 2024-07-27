@@ -46,7 +46,6 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
         const title = textTitleInput;
         const intro = textIntroInput;
         const conclusion = textConcInput;
-        alert(JSON.stringify(metrics));
         
         return <Document>
               <Page size="A4">
@@ -62,7 +61,19 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
                   <Text>Conclusion: {conclusion}</Text>
                 </View>
                 <View>
-                    
+                <Table tdStyle={{padding: '2px'}}>
+                <TH style={{fontSize: 14}}>
+                    <TD>Indicator Name</TD>
+                    <TD>Indicator Value</TD>
+                    <TD>Disclosure</TD>
+                </TH>
+
+                {metrics?.map((metric, index) => <TR key={index}>
+                        <TD>{metric.indicator_name}</TD>
+                        <TD>{metric.indicator_value}</TD>
+                        <TD>{metric.disclosure}</TD>
+                    </TR>)}
+                </Table>
                 </View>
               </Page>
             </Document>
