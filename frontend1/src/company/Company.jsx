@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Button,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
   FormControl,
   FormLabel,
   FormGroup,
@@ -10,6 +14,8 @@ import {
   Radio,
   RadioGroup,
   IconButton,
+  Input,
+  Typography,
   Collapse,
   Card,
   Grid,
@@ -20,7 +26,8 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
+  TableBody,
+  TextField
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
@@ -82,14 +89,63 @@ const Company = () => {
   const [errorE, setErrorE] = useState('');
   const [errorS, setErrorS] = useState('');
   const [errorG, setErrorG] = useState('');
-  const [errorMetrics, setErrorMetrics] = useState({});
-  const [pillarWeighting, setPillarWeighting] = useState({'E': 0.333333, 'S': 0.333333, 'G': 0.333333});
 
+
+  const [isLockedE, setIsLockedE] = useState(false);
+  const [isLockedS, setIsLockedS] = useState(false);
+  const [isLockedG, setIsLockedG] = useState(false);
+
+  const [errorMetrics, setErrorMetrics] = useState({});
+  const [errorPillarModal, setErrorPillarModal] = useState('');
+
+  const [pillarWeighting, setPillarWeighting] = useState({ E: 0.333333, S: 0.333333, G: 0.333333 });
+  const [editMode, setEditMode] = useState({ E: false, S: false, G: false });
+
+  const [modalE, setModalE] = useState(pillarWeighting['E']);
+  const [modalS, setModalS] = useState(pillarWeighting['S']);
+  const [modalG, setModalG] = useState(pillarWeighting['G']);
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const checkPillarWeighting = () => {
+    const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
+    if ((!decimalRegex.test(modalE) || !decimalRegex.test(modalS) || !decimalRegex.test(modalG))) {
+      setErrorPillarModal('Please ensure all fields contain a value from 0 to 1.')
+    } else if (isNaN(parseFloat(modalE)) || isNaN(parseFloat(modalS)) || isNaN(parseFloat(modalG))) {
+      setErrorPillarModal('Please ensure all fields contain a value from 0 to 1.')
+    } else {
+      let cumSum = parseFloat(modalE) + parseFloat(modalS) + parseFloat(modalG);
+      if (cumSum <= 0.999999 || cumSum >= 1.000001) {
+        setErrorPillarModal('Please ensure that all weightings add up to 1.');
+      } else {
+        let newPillarWeighting = {};
+        newPillarWeighting['E'] = modalE;
+        newPillarWeighting['S'] = modalS;
+        newPillarWeighting['G'] = modalG;
+
+        setPillarWeighting(newPillarWeighting);
+        setModalOpen(false);
+        setErrorPillarModal('');
+      }
+    }
+  }
 
 
   useEffect(() => {
     console.log(lockedSliders);
   }, [lockedSliders]);
+
+  const toggleLockE = () => {
+    setIsLockedE(true);
+  };
+
+  const toggleLockS = () => {
+    setIsLockedS(true);
+  };
+
+  const toggleLockG = () => {
+    setIsLockedG(true);
+  };
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
@@ -594,6 +650,11 @@ const Company = () => {
     const allMetrics = metricNames
     .filter(metric => metric.category === category)
     .filter(metric => selectedMetrics.includes(metric.id));
+
+    if (allMetrics.length === 0) {
+      return;
+    }
+
     console.log(allMetrics);
 
     let cumWeighting = 0;
@@ -672,6 +733,8 @@ const Company = () => {
   }
 
   const checkMetric = (metricId) => {
+
+
     let cumSum = 0;
     let errors = {};
 
@@ -696,6 +759,29 @@ const Company = () => {
       ...errors,  
     }));
   }
+
+  const handleCancel = () => {
+    setModalOpen(false);
+    setModalE(pillarWeighting['E']);
+    setModalS(pillarWeighting['S']);
+    setModalG(pillarWeighting['G']);
+    setErrorPillarModal('');
+  };
+
+  const handleWeightingChange = (pillar, value) => {
+    const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
+    const numericValue = parseFloat(value);
+    if (!isNaN(numericValue) && numericValue >= 0 && numericValue <= 1 && decimalRegex.test(value)) {
+      if (pillar === 'E') {
+        setModalE(value);
+      } else if (pillar === 'S') {
+        setModalS(value);
+      } else {
+        setModalG(value);
+      }
+    }
+  };
+
 
   const renderMetricsByCategory = (category) => {
     if (!metricNames) return null;
@@ -899,32 +985,143 @@ const Company = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
                       <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                         <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Environmental</h3>
-                        <Button variant="outlined"   style={{
-                          borderRadius: '30%', 
-                          aspectRatio: '2 / 1',
-                          borderWidth: '3px'
-                        }}>{pillarWeighting['E']}</Button>
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          <Button variant="outlined" style={{
+                            borderRadius: '30%', 
+                            aspectRatio: '2 / 1',
+                            borderWidth: '3px',
+                            marginRight: '20px',
+                          }} onClick={() => setModalOpen(true)} disabled={isLockedE}>{pillarWeighting['E']}</Button>
+                          <IconButton 
+                            onClick={() => setIsLockedE(prevState => !prevState)} 
+                            size="small"
+                          >
+                            {isLockedE ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                          </IconButton>
+                        </div>
                       </div>
                       {renderMetricsByCategory('E')}
                       {`${errorE}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorE}</div>}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
-                      <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Social</h3>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Social</h3>
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          <Button variant="outlined" style={{
+                            borderRadius: '30%', 
+                            aspectRatio: '2 / 1',
+                            borderWidth: '3px',
+                            marginRight: '20px'
+                          }} onClick={() => setModalOpen(true)} disabled={isLockedS}>{pillarWeighting['S']}</Button>
+                          <IconButton 
+                            onClick={() => setIsLockedS(prevState => !prevState)} 
+                            size="small"
+                          >
+                            {isLockedS ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                          </IconButton>
+                        </div>
+                      </div>
                       {renderMetricsByCategory('S')}
-                      {/* <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                        <Button variant="contained" color="primary" onClick={() => checkPillar('S')}>Check</Button>
-                      </div> */}
                       {`${errorS}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorS}</div>}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
-                      <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Governance</h3>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Governance</h3>
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
+                          <Button variant="outlined" style={{
+                            borderRadius: '30%', 
+                            aspectRatio: '2 / 1',
+                            borderWidth: '3px',
+                            marginRight: '20px'
+                          }} onClick={() => setModalOpen(true)} disabled={isLockedG}>{pillarWeighting['G']}</Button>
+                          <IconButton 
+                            onClick={() => setIsLockedG(prevState => !prevState)} 
+                            size="small"
+                          >
+                            {isLockedG ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                          </IconButton>
+                        </div>
+                      </div>
                       {renderMetricsByCategory('G')}
-                      {/* <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
-                        <Button variant="contained" color="primary" onClick={() => checkPillar('G')}>Check</Button>
-                      </div> */}
                       {`${errorG}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorG}</div>}
                     </div>
                   </div>
+                  <Dialog maxWidth="xs" fullWidth open={modalOpen} onClose={() => setModalOpen(false)}>
+                    <DialogTitle style={{ display: 'flex', justifyContent: 'center' }}>
+                      Edit Pillar Weighting
+                    </DialogTitle>
+                    <DialogContent style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Typography style={{ flexShrink: 0 }}>Environmental</Typography>
+                        <TextField
+                          value={isLockedE ? `${modalE} (locked)` : modalE}
+                          onChange={(e) => handleWeightingChange('E', e.target.value)}
+                          autoFocus
+                          style={{ 
+                            backgroundColor: isLockedE ? '#f0f0f0' : 'white',
+                            cursor: isLockedE ? 'not-allowed' : 'text',
+                            border: isLockedE ? '1px solid #ccc' : '1px solid #000',
+                            width: '200px',
+                          }}
+                          inputProps={{
+                            pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
+                            min: 0,                       // Minimum value allowed
+                            max: 1,                       // Maximum value allowed
+                            step: 0.01,                   // Step interval
+                            inputMode: 'decimal'          // Input mode for decimal numbers
+                          }}
+                          disabled={isLockedE}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Typography style={{ flexShrink: 0 }}>Social</Typography>
+                        <TextField
+                          value={isLockedS ? `${modalS} (locked)` : modalS}
+                          onChange={(e) => handleWeightingChange('S', e.target.value)}
+                          style={{ 
+                            backgroundColor: isLockedS ? '#f0f0f0' : 'white',
+                            cursor: isLockedS ? 'not-allowed' : 'text',
+                            border: isLockedS ? '1px solid #ccc' : '1px solid #000',
+                            width: '200px',
+                          }}
+                          inputProps={{
+                            pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
+                            min: 0,                       // Minimum value allowed
+                            max: 1,                       // Maximum value allowed
+                            step: 0.01,                   // Step interval
+                            inputMode: 'decimal'          // Input mode for decimal numbers
+                          }}
+                          disabled={isLockedS}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' }}>
+                        <Typography style={{ flexShrink: 0 }}>Governance</Typography>
+                        <TextField
+                          value={isLockedG ? `${modalG} (locked)` : modalG}
+                          onChange={(e) => handleWeightingChange('G', e.target.value)}
+                          style={{ 
+                            backgroundColor: isLockedG ? '#f0f0f0' : 'white',
+                            cursor: isLockedG ? 'not-allowed' : 'text',
+                            border: isLockedG ? '1px solid #ccc' : '1px solid #000',
+                            width: '200px',
+                          }}
+                          inputProps={{
+                            pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
+                            min: 0,                       // Minimum value allowed
+                            max: 1,                       // Maximum value allowed
+                            step: 0.01,                   // Step interval
+                            inputMode: 'decimal'          // Input mode for decimal numbers
+                          }}
+                          disabled={isLockedG}
+                        />
+                      </div>
+                      {`${errorPillarModal}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorPillarModal}</div>}
+                      <DialogActions style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginTop: '20px'}}>
+                        <Button variant="outlined" onClick={() => handleCancel()} color="primary">Cancel</Button>
+                        <Button variant="outlined" onClick={() => checkPillarWeighting()} color="primary">Save</Button>
+                      </DialogActions>
+                    </DialogContent>
+                  </Dialog>
 
                   {Object.keys(selectedIndicators).length > 0 && (
                     <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px' }}>
