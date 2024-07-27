@@ -47,6 +47,7 @@ import Cookies from 'js-cookie';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CreateFramework from './CreateFramework.jsx';
+import Recommendations from './Recommendations.jsx';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 
@@ -106,12 +107,12 @@ const Company = () => {
   useEffect(async() => {
     const fetchData = async () => {
       await addToRecentlyViewed(companyId);
-      const recentList = await getRecentlyViewed();
-      if (Array.isArray(recentList) && recentList.includes(companyId)) {
-        setIsInFavs(true);
-      } else {
-        setIsInFavs(false);
-      }
+      // const recentList = await ();
+      // if (Array.isArray(recentList) && recentList.includes(companyId)) {
+      //   console.log('company is in Favourites/ watchlist');
+      // } else {
+      //   console.log('company is NOT IN Favourites/ watchlist');
+      // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
       setOfficialFrameworks(availableOfficialFramework);
@@ -119,7 +120,11 @@ const Company = () => {
     fetchData();
 
     const favsList = await getFavouritesList();
-    if (Array.isArray(favsList) && favsList.includes(companyId)) {
+    console.log('FAVS LIST:');
+    console.log(favsList);
+    const listSearch = favsList.find(item => item.company_id === companyId);
+    if (listSearch) {
+      console.log('IN FAVS');
       setIsInFavs(true);
     } else {
       setIsInFavs(false);
@@ -226,18 +231,51 @@ const Company = () => {
   };
 
   const handleToggleFavourite = () => {
-    setIsInFavs(!isInFavs);
     const companyId_int = Number(companyId);
-    if (isInFavs) {
+    if (!isInFavs) {
       addToFavourites(companyId_int);
     } else {
       deleteFromFavourites(companyId_int);
     }
+    setIsInFavs(!isInFavs);
   };
 
-  const handleFrameworkChange = (event) => {
+  const handleFrameworkChange = async (event) => {
     const frameworkId = Number(event.target.value) + 1;
     setSelectedFramework(frameworkId);
+
+    const metrics = await getMetricForFramework(true, frameworkId);
+    if (metrics) {
+      const nameOfMetrics = [];
+      const metricIds = [];
+      for (const item of Object.values(metrics)) {
+        const name = await getMetricName(item.metric_id);
+        nameOfMetrics.push({ id: item.metric_id, name: name });
+        metricIds.push(item.metric_id);
+      }
+      setMetricNames(nameOfMetrics);
+      
+      setSelectedMetrics(metricIds);
+      
+      const newAllIndicators = {};
+      for (const id of metricIds) {
+        try {
+          const indicators = await getIndicatorsForMetric(selectedFramework, id);
+          newAllIndicators[id] = indicators;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      setAllIndicators(newAllIndicators);
+      
+      const newSelectedIndicators = {};
+      for (const id of metricIds) {
+        console.log(id);
+        newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
+      }
+      console.log(newSelectedIndicators);
+      setSelectedIndicators(newSelectedIndicators);
+    }
   };
 
   useEffect(() => {
@@ -513,6 +551,17 @@ const Company = () => {
     );
   };
 
+  const handleClickReport = () => {
+    navigate(`/report/${companyId}`, 
+      { state: { 
+          id: companyId, 
+          companyName,
+          framework: selectedFramework,
+          year: selectedYear,
+        } 
+      });
+  }
+
   return (
     <>
       <Navbar />
@@ -536,7 +585,7 @@ const Company = () => {
             </div>
           </div>
           <div className="quickControls">
-            <Button>Save Report</Button>
+            <Button onClick={handleClickReport}>Save Report</Button>
             <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
           </div>
         </div>
@@ -549,7 +598,7 @@ const Company = () => {
               <Button onClick={openCompareModal}>Compare</Button>
             </div>
           </div>
-          <p>recommendations placeholder</p>
+          <Recommendations companyId={companyId} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
           <div style={{ width: '40%', display: 'flex', flexDirection: 'column'}}>
@@ -699,7 +748,7 @@ const Company = () => {
           </div>
         </div>
         <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
-        {/* <CreateFramework/> */}
+        <CreateFramework/>
 
       </div>
     </>

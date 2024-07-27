@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem,
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks } from './helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
@@ -28,6 +28,7 @@ const Dashboard = () => {
   const [companyNames, setCompanyNames] = useState([]);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [error, setError] = useState(false);
+  const [favsList, setFavsList] = useState([]);
 
   useEffect(async() => {
 
@@ -67,6 +68,9 @@ const Dashboard = () => {
         setLists(userLists);
 
         const recentlyViewed = await getRecentlyViewed();
+
+        const fetchFavsList = await getFavouritesList();
+        setFavsList(fetchFavsList);
 
         const uniqueRecents = recentlyViewed.reduce((acc, current) => {
           const x = acc.find(item => item.company_id === current.company_id);
@@ -233,6 +237,27 @@ const Dashboard = () => {
                       </Card>
                     </Grid>
                   ))}
+          </Grid>
+        </div>
+        <div className='favouritescontainer'>
+          <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
+            Favourites {favsList.length}
+          </Typography>
+          <Grid container spacing={2}>
+            {favsList.map((f, index) => (
+              <Grid 
+                style={{ cursor: 'pointer' }} 
+                item xs={12} 
+                // key={}
+                onClick={() => dashboardToCompany(f.company_id)}
+              >
+            <Card>
+              <CardContent>
+                <Typography variant="h6">{companyNames[index]}</Typography>z
+              </CardContent>
+            </Card>
+          </Grid>
+          ))}
           </Grid>
         </div>
         <div id='listcontainer'>

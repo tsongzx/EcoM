@@ -1,0 +1,38 @@
+/* Define the base style for the message container */
+.msg-container {
+    transition: display 0.5s ease-in-out; /* Smooth transition for fading */
+    position: absolute;
+    z-index: 900;
+  }
+  
+  /* Visible state */
+  .msg-container.visible {
+    display: block; /* Fully visible */
+    top: 100px; /* 50px from the top */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Optional: Add other styles for the visible state */
+  }
+  
+  /* Hidden state */
+  .msg-container.hidden {
+    display: none; /* Fully hidden */
+    /* Optional: Add other styles for the hidden state */
+  }
+  
+  .progress-bar-container {
+    position: relative;
+    height: 5px;
+    background-color: #e0e0e0;
+    margin-top: 10px;
+  }
+  
+  .progress-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #76c7c0;
+    transition: width linear;
+  }

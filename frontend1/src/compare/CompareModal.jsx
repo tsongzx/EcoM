@@ -84,12 +84,21 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
     }
   };
 
+  //set default framework if Framework is NULL
   const handleCompare = () => {
     if (selectedCompanies.length < 2) {
       setError('Please select at least 2 companies to compare.');
     } else {
-      console.log(selectedCompanies);
-      navigate('/compare', { state: { companies: selectedCompanies, selectedFramework } });
+      console.log('handling compare with...');
+      const compareCompanies = selectedCompanies.map((company) => ({
+        id: company.value,
+        companyName: company.label,
+        framework: selectedFramework ?? null,
+        year: null,
+        selected: false
+    }));
+    console.log(compareCompanies);
+      navigate('/compare', { state: { companiesList: compareCompanies, selectedFramework } });
     }
   };
 
