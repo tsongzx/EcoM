@@ -5,14 +5,16 @@ import Cookies from "js-cookie";
 import { Page, Text, View, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import {
     getCompanyFromRecentlyViewed,
+    getCompanyMetrics,
     getIndicatorInfo,
   } from '../helper.js';
+import {Table, TR, TH, TD} from '@ag-media/react-pdf-table';
 
 const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
     const [name, setName] = useState(companyName);
-    const [desc, setDesc] = useState('');
-    const [headCountry, setHeadCountry] = useState('');
-    const [industry, setIndustry] = useState('');
+    const [desc, setDesc] = useState('This is a basic description');
+    const [headCountry, setHeadCountry] = useState('Australia');
+    const [industry, setIndustry] = useState('Manufacturing');
     const [metrics, setMetrics] = useState();
     const [textTitleInput, setTextTitleInput] = useState('');
     const [textIntroInput, setTextIntroInput] = useState('');
@@ -20,9 +22,7 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
 
     useEffect( async () => {
         const company_info = await getCompanyFromRecentlyViewed(companyId);
-        setHeadCountry(company_info.headquarter_country);
-        setIndustry(company_info.industry);
-        const company_metrics = await getCompanyMetricInfo(companyName);
+        const company_metrics = await getCompanyMetrics(companyName);
         setMetrics(company_metrics);
     }, [])
 
@@ -46,30 +46,26 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
         const title = textTitleInput;
         const intro = textIntroInput;
         const conclusion = textConcInput;
-
+        alert(JSON.stringify(metrics));
         
         return <Document>
               <Page size="A4">
-                <View>
-                  <Text>{title}</Text>
-                  <Text>{name}</Text>
-                  <Text>{headCountry}</Text>
-                  <Text>{industry}</Text>
-                  <Text>{intro}</Text>
-                  <Text>{conclusion}</Text>
+                <View style={{margin: 30}}> 
+                    <View style={{textAlign: 'center'}}>
+                        <Text>{title}</Text>
+                    </View>
+                  <Text>Company Name: {name}</Text>
+                  <Text>Company Description: {desc}</Text>
+                  <Text>Headquarter Country: {headCountry}</Text>
+                  <Text>Industry: {industry}</Text>
+                  <Text>Introduction: {intro}</Text>
+                  <Text>Conclusion: {conclusion}</Text>
                 </View>
                 <View>
+                    
                 </View>
               </Page>
             </Document>
-    }
-
-    const getCompanyInfo = async (companyId) => {
-        setHeadCountry(getCompanyFromRecentlyViewed(companyId).headquarter_country);
-    }
-
-    const getCompanyMetricInfo = (companyName) => {
-        return getCompanyMetricInfo(companyName);
     }
 
     return (<Modal
