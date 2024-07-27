@@ -225,7 +225,6 @@ const Dashboard = () => {
                       item xs={2} 
                       key={recent.id}
                       onClick={() => dashboardToCompany(recent.company_id)}
-                      wrap='nowrap'
                     >
                       <Card style={{ cursor: 'pointer', height: '120px'}}>
                         <CardContent>
