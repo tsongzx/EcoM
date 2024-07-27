@@ -99,12 +99,12 @@ const Company = () => {
     const fetchData = async () => {
       console.log(companyId);
       await addToRecentlyViewed(companyId);
-      const recentList = await getRecentlyViewed();
-      if (Array.isArray(recentList) && recentList.includes(companyId)) {
-        setIsInFavs(true);
-      } else {
-        setIsInFavs(false);
-      }
+      // const recentList = await ();
+      // if (Array.isArray(recentList) && recentList.includes(companyId)) {
+      //   console.log('company is in Favourites/ watchlist');
+      // } else {
+      //   console.log('company is NOT IN Favourites/ watchlist');
+      // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
       setOfficialFrameworks(availableOfficialFramework);
@@ -114,7 +114,8 @@ const Company = () => {
     const favsList = await getFavouritesList();
     console.log('FAVS LIST:');
     console.log(favsList);
-    if (Array.isArray(favsList) && favsList.includes(companyId)) {
+    const listSearch = favsList.find(item => item.company_id === companyId);
+    if (listSearch) {
       console.log('IN FAVS');
       setIsInFavs(true);
     } else {
@@ -228,13 +229,13 @@ const Company = () => {
   };
 
   const handleToggleFavourite = () => {
-    setIsInFavs(!isInFavs);
     const companyId_int = Number(companyId);
-    if (isInFavs) {
+    if (!isInFavs) {
       addToFavourites(companyId_int);
     } else {
       deleteFromFavourites(companyId_int);
     }
+    setIsInFavs(!isInFavs);
   };
 
   const handleFrameworkChange = async (event) => {

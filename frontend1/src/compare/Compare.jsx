@@ -339,7 +339,7 @@ const Compare = () => {
             {companies.map((company, index) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                 <div>
-                  <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected' : ''} >{company.companyName}</a>
+                  <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected compare-anchor' : 'compare-anchor'} >{company.companyName}</a>
                   <div className='companyParamContainer'>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
