@@ -18,17 +18,15 @@ const Navbar = () => {
         navigate('/dashboard');
     }
 
-    
-
     return (
         <div>
             <div className='nav'>
                 <ul>
                     {/* <li><Link to="/">Home</Link></li> */}
-                    <li><a href="/dashboard" onClick={handleHome}>Home</a></li>
-                    <li><a href="/" onClick={handleLogout}>Logout</a></li>
+                    <li id='home'><a href="/dashboard" onClick={handleHome}>Home</a></li>
+                    <li id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>
+                    <li id='profile'><a onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</a></li>
                 </ul>
-                <button onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</button>
             </div>
             {isProfileOpen && (<div className='profileTab'>
                 <button onClick={() => {setIsProfileOpen(false)}}>close</button>

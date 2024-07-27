@@ -128,7 +128,7 @@ const CreateFramework = () => {
     };
 
     return (
-      <div>
+      <div style={{ marginTop: '100px'}}>
         <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
         {isOpen && <div>
           <Slider 
