@@ -46,7 +46,7 @@ const Recommendations = ({companyId}) => {
     return (
         <div className="recommendations-container">
             {reccs.map((r) => (
-                <button 
+                <button className="recommendations-button" 
                     key={r.id} 
                     onClick={() => navigate(`/company/${encodeURIComponent(r.id)}`, {
                         state: { 

@@ -469,9 +469,12 @@ export const getCompaniesOfIndustry = async(industryName) => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
+        console.log('Searching for companies in industry, ', industryName);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
+        return [];
     }
 }
 
