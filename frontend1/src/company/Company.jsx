@@ -299,7 +299,7 @@ const Company = () => {
         />
         <Box component="main" sx={{ 
           flexGrow: 1, 
-          paddingTop: '2vh',
+          padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
         }}>
@@ -308,12 +308,12 @@ const Company = () => {
           <Stack id="heading" direction="row" spacing={3}>
             <Typography variant="h3">{companyName}</Typography>
             <Stack alignItems="center" justifyContent="center">
-              <Typography>58.78</Typography>
-              <Typography>Current Price</Typography>
+              <Typography align="center">58.78</Typography>
+              <Typography align="center">Current Price</Typography>
             </Stack>
             <Stack alignItems="center" justifyContent="center">
-              <Typography>80.1</Typography>
-              <Typography>ESG Score</Typography>
+              <Typography align="center">80.1</Typography>
+              <Typography align="center">ESG Score</Typography>
             </Stack>
             <Button onClick={handleClickReport}>Save Report</Button>
             <Button onClick={openReportModal}>Save Report</Button>
@@ -322,7 +322,9 @@ const Company = () => {
           </Stack>
           <Box>
             <Box>
-              <Stack direction="row" justifyContent="space-between">
+              <Stack direction="row" justifyContent="space-between"
+                sx={{backgroundColor: "white"}}
+              >
                 <SimpleLineChart />
                 <Recommendations companyId={companyId}/>
               </Stack>
