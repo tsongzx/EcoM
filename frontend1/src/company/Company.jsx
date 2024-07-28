@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 import Navbar from '../Navbar.jsx';
-import './Company.css';
+import './company_css/Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
 import ReportModal from './ReportModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
@@ -27,9 +27,12 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import CreateFramework from './CreateFramework.jsx';
-import Recommendations from './Recommendations.jsx';
 import LeftPanel from './LeftPanel.jsx';
 import FrameworkTable from './FrameworkTable';
+import CompanyHeader from './CompanyHeader.jsx';
+import CompanyBody from './CompanyBody.jsx';
+import GraphTableToggle from './GraphTableToggle.jsx';
+import Visualisations from './Visualisations.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -61,6 +64,7 @@ const Company = () => {
   const [allIndicatorsFixed, setAllIndicatorsFixed] = useState(null);
   const [selectedIndicatorsFixed, setSelectedIndicatorsFixed] = useState(null);
 
+  const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
   // useEffect(() => {
   //   console.log(lockedSliders);
   // }, [lockedSliders]);
@@ -196,32 +200,13 @@ const Company = () => {
     }
   };
 
-  const openWatchlistModal = () => {
-    setWatchlistModalOpen(true);
-  };
-
   const handleCloseWatchList = () => {
     setWatchlistModalOpen(false);
   };
 
-  const openReportModal = () => {
-    setOpenReportModal(true);
-  }
-
   const handleCloseReportModal = () => {
     setOpenReportModal(false);
   }
-
-  const handleToggleFavourite = () => {
-    const companyId_int = Number(companyId);
-    if (!isInFavs) {
-      addToFavourites(companyId_int);
-    } else {
-      deleteFromFavourites(companyId_int);
-    }
-    setIsInFavs(!isInFavs);
-  };
-
   // useEffect(() => {
   // }, [allIndicators]);
  
@@ -252,17 +237,6 @@ const Company = () => {
   // useEffect(() => {
   //   console.log(sliderValuesIndicator);
   // }, [sliderValuesIndicator]);
-
-  const handleClickReport = () => {
-    navigate(`/report/${companyId}`, 
-      { state: { 
-          id: companyId, 
-          companyName,
-          framework: selectedFramework,
-          year: selectedYear,
-        } 
-      });
-  }
 
   return (
     <Box>
@@ -305,35 +279,22 @@ const Company = () => {
         }}>
           <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
           {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
-          <Stack id="heading" direction="row" spacing={3}>
-            <Typography variant="h3">{companyName}</Typography>
-            <Stack alignItems="center" justifyContent="center">
-              <Typography align="center">58.78</Typography>
-              <Typography align="center">Current Price</Typography>
-            </Stack>
-            <Stack alignItems="center" justifyContent="center">
-              <Typography align="center">80.1</Typography>
-              <Typography align="center">ESG Score</Typography>
-            </Stack>
-            <Button onClick={handleClickReport}>Save Report</Button>
-            <Button onClick={openReportModal}>Save Report</Button>
-            <Button onClick={openWatchlistModal}>Add to List</Button>
-            <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
-          </Stack>
-          <Box>
-            <Box>
-              <Stack direction="row" justifyContent="space-between"
-                sx={{backgroundColor: "white"}}
-              >
-                <SimpleLineChart />
-                <Recommendations companyId={companyId}/>
-              </Stack>
-              <Stack direction="row">
-                <Button>AI Predict</Button>
-              </Stack>
-            </Box>
-          </Box>
-          <FrameworkTable
+          <CompanyHeader
+            setWatchlistModalOpen={setWatchlistModalOpen}
+            setOpenReportModal={setOpenReportModal}
+            companyId={companyId}
+            isInFavs={isInFavs} 
+            setIsInFavs={setIsInFavs}
+            companyName={companyName}
+            selectedFramework={selectedFramework}
+            selectedYear={selectedYear}
+          />
+          <CompanyBody companyId={companyId}/>
+          <GraphTableToggle
+            frameworkDisplay={frameworkDisplay}
+            setFrameworkDisplay={setFrameworkDisplay}
+          />
+          {frameworkDisplay == 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear} 
@@ -343,7 +304,8 @@ const Company = () => {
             selectedIndicators={selectedIndicators}
             metricNames={metricNames}
             allIndicators={allIndicators}
-          />
+          />}
+          {frameworkDisplay == 'graphical' && <Visualisations/>}
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework/>
         </Box>

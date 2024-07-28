@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getCompaniesOfIndustry, getIndustry, getFavouritesList } from "../helper";
 import { useNavigate } from "react-router-dom";
-import './Recommendations.css';
+import './company_css/Recommendations.css';
 import { Button, Stack } from "@mui/material";
 //given a Company Id return a mapped list of buttons of companies in that industry
 
