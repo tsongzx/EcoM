@@ -17,14 +17,17 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
     const [Gmetrics, setG] = useState([]);
     const [value, setValue] = useState("1");
 
-    useEffect(async() => {
-      console.log('INSIDE THE METRICS MODAL');
+    useEffect(() => {
+      const setMetrics = async() => {
+        console.log('INSIDE THE METRICS MODAL');
         //fetch all the metrics available and sort them into their categories
         const allMetrics = await getAllMetrics();
         //this stuff could be cached HIGHKEY!!!
         setE(allMetrics.E);
         setS(allMetrics.S);
         setG(allMetrics.G);
+      };
+      setMetrics();
     },[]);
 
     useEffect(() => {

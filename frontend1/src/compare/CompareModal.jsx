@@ -45,7 +45,7 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
     fetchCompany();
   }, [page]);
 
-  useEffect(async () => {
+  const setIndustryAndCompany = async() => {
     if (selectedIndustry) {
       console.log(selectedIndustry);
       const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
@@ -53,6 +53,9 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
       const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
       setAllCompanies(companyOfIndustryFiltered);
     }
+  };
+  useEffect(() => {
+    setIndustryAndCompany();
   }, [selectedIndustry]);
 
   const handleClose = () => {
