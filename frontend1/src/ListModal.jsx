@@ -7,20 +7,16 @@ const ListModal = ({ isOpen, onClose, list }) => {
   const [companiesInList, setCompaniesInList] = useState({});
 
   useEffect(() => {
-    const setData = async() => {
+    const someFunction = async() => {
       console.log(list);
       const companies = await fetchCompaniesInList(list.id);
       setCompaniesInList(companies);
-    };
-    setData();
+    }
+    someFunction();
   }, []);
 
   useEffect(() => {
-    // let companyNames = [];
-    // for (let company of companiesInList) {
-    //   console.log(company); /// WILL DO THIS ARVO
-    // }
-    const getCompanyNames = async() => {
+    const someFunction = async() => {
       let companyNames = [];
       for (let company of Object.keys(companiesInList)) {
         const company1 = companiesInList[company];
@@ -29,8 +25,7 @@ const ListModal = ({ isOpen, onClose, list }) => {
       }
       console.log(companyNames);
     }
-    getCompanyNames();
-    
+    someFunction();
   }, [companiesInList]);
 
 

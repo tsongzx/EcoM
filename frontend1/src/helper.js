@@ -358,6 +358,7 @@ export const getIndicatorInfo = async(companyName) => {
 }
 
 export const getMetricForFramework = async(frameworkId) => {
+    console.log(frameworkId);
     try {
         const response = await axios.get(`http://127.0.0.1:8000/framework/metrics/${frameworkId}`, 
         {
@@ -439,27 +440,6 @@ export const getAllIndicators = async() => {
             }
         });
 
-        return response.data;
-    } catch (error) {
-        console.log(`Error getting metric: ${error}`);
-    }
-}
-
-export const getMetricScore = async(metricId, companyName, indicators) => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/calculate_metric', 
-        {
-            params: {
-                metric_id: metricId,
-                company_name: companyName,
-                indicators: indicators
-            },             
-            
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Cookies.get('authToken')}`
-            }
-        });
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
