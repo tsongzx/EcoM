@@ -10,7 +10,11 @@ def getCompanyHist (companyCode, time):
     return msft.history(period="1mo")
 
 
-msft = yf.Ticker("MSFT")
+
+msft = yf.Ticker("AMZN")
+f = open("demo.txt", "a")
+f.write(msft.sustainability.to_string())
+f.close()
 
 print("1 here")
 # get all stock info
@@ -19,6 +23,7 @@ print("2 here")
 # get historical market data
 hist = msft.history(period="1mo")
 print("3 here")
+print(hist)
 # show meta information about the history (requires history() to be called first)
 msft.history_metadata
 print("4 here")
