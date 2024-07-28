@@ -24,13 +24,16 @@ const Profile = () => {
     // const conPInput = document.getElementById('pfpCPass');
 
     //Get user Information on mount
-    useEffect(async() => {
-        const userInfo = await getUserInfo();
-        console.log('userINFO inside INIT USE EFFECT', userInfo);
-        console.log(`got user information ${userInfo.name}, ${userInfo.password}`);
-        setName(userInfo.full_name);
-        setUpdatedName(userInfo.full_name);
-        setEmail(userInfo.email);
+    useEffect(() => {
+        const setData = async() => {
+          const userInfo = await getUserInfo();
+          console.log('userINFO inside INIT USE EFFECT', userInfo);
+          console.log(`got user information ${userInfo.name}, ${userInfo.password}`);
+          setName(userInfo.full_name);
+          setUpdatedName(userInfo.full_name);
+          setEmail(userInfo.email);
+        }
+        setData();
     },[]);
 
     const getUserInfo = async () => {
