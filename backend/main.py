@@ -1148,6 +1148,14 @@ async def chat(
     user_query: chat_schemas.ChatQuery,
     user: user_schemas.UserInDB = Depends(get_user)  
 ):
+    instructions = "You are an ESG related chatbot. You calculate various ESG scores out of 100, which is derived by the average of many metrics. Your 7 key frameworks are IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework You have over 70,000 companies in your data base. You can add companies to your watchlist, compare multiple companies at once, view industry averages etc."
+    #see if this works as a way to personalise our chat bot
+    prompt = """
+    {}
+    User: Tell me about yourself.
+    Chatbot:
+    """.format(instructions)
+    
     # dont accept empty queries
     # Using GPT-4 with the ChatCompletion endpoint
     response = await client.chat.completions.create(
@@ -1163,6 +1171,7 @@ async def chat(
     Config.chat_prompts.append({"role": "assistant", "content": chatbot_response})
     # message = response.choices[0].message.content
 
+    print(chatbot_response) 
     return {'response': chatbot_response}
 
 
