@@ -2,27 +2,27 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const token = Cookies.get('authToken');
-let indicatorData = null;
+// let indicatorData = null;
 
-const fetchIndicatorData = async() => {
-    try {
-        const response = await fetch('../backend/db/metrics.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        indicatorData = await response.json();
-        return;
-    } catch (error) {
-        console.error("Unable to fetch data:", error);
-        return null;
-    }
-}
+// const fetchIndicatorData = async() => {
+//     try {
+//         const response = await fetch('../backend/db/metrics.json');
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         indicatorData = await response.json();
+//         return;
+//     } catch (error) {
+//         console.error("Unable to fetch data:", error);
+//         return null;
+//     }
+// }
 
-const initialise = async() => {
-    await fetchIndicatorData();
-}
+// const initialise = async() => {
+//     await fetchIndicatorData();
+// }
 
-initialise();
+// initialise();
 
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
