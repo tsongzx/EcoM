@@ -2,17 +2,62 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Button, Paper } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from 'react-select';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { fetchCompanies, fetchIndustries, getCompaniesOfIndustry } from '../helper';
+import { useNavigate } from 'react-router-dom';
 
-const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOpen }) => {
+const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCompareModalOpen, selectedFramework }) => {
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyName, label: companyName }]);
+  const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyId, label: companyName }]);
+  const [allCompanies, setAllCompanies] = useState([]);
+  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [listOfIndustries, setListOfIndustries] = useState([]);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Use useNavigate for navigation
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(companyName);
+  }, []);
+
+  useEffect(() => {
+    console.log(selectedCompanies);
+  }, [selectedCompanies]);
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      setLoading(true);
+      try {
+        const completeIndustryList = await fetchIndustries();
+        setListOfIndustries(completeIndustryList);
+
+        const completeCompanyList = await fetchCompanies(page);
+        const filteredCompanyList = completeCompanyList.filter(company => company.company_name !== companyName);
+        console.log(filteredCompanyList);
+        setAllCompanies(prevCompanies => [...prevCompanies, ...filteredCompanyList]);
+        setHasMore(completeCompanyList.length > 0);
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+      }
+      setLoading(false);
+    };
+    fetchCompany();
+  }, [page]);
+
+  useEffect(async () => {
+    if (selectedIndustry) {
+      console.log(selectedIndustry);
+      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
+      console.log(companyOfIndustry);
+      const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
+      setAllCompanies(companyOfIndustryFiltered);
+    }
+  }, [selectedIndustry]);
 
   const handleClose = () => {
     setCompareModalOpen(false);
-    setSelectedCompanies([{ value: companyName, label: companyName }]);
+    setSelectedCompanies([{ value: companyId, label: companyName }]);
     setError(null);
   };
 
@@ -33,20 +78,27 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
     setError(null);
   };
 
-  const options = [
-    { value: 'Company 1', label: 'Company 1' },
-    { value: 'Company 2', label: 'Company 2' },
-    { value: 'Company 3', label: 'Company 3' },
-    { value: 'Company 4', label: 'Company 4' },
-    { value: 'Company 5', label: 'Company 5' },
-    { value: 'Company 6', label: 'Company 6' },
-  ];
+  const handleMenuScrollToBottom = () => {
+    if (!loading && hasMore) {
+      setPage(prevPage => prevPage + 1);
+    }
+  };
 
+  //set default framework if Framework is NULL
   const handleCompare = () => {
     if (selectedCompanies.length < 2) {
       setError('Please select at least 2 companies to compare.');
     } else {
-      navigate('/compare', { state: { companies: selectedCompanies } });
+      console.log('handling compare with...');
+      const compareCompanies = selectedCompanies.map((company) => ({
+        id: company.value,
+        companyName: company.label,
+        framework: selectedFramework ?? null,
+        year: null,
+        selected: false
+    }));
+    console.log(compareCompanies);
+      navigate('/compare', { state: { companiesList: compareCompanies, selectedFramework } });
     }
   };
 
@@ -55,9 +107,9 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
       open={isOpen}
       onClose={handleClose}
     >
-      <Box style={{display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh'}}>
+      <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
         <Paper style={{ minWidth: '50%', minHeight: '50%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', padding: 16 }}>
-          <Box style={{display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%'}}>
+          <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
             <Typography variant="h4" component="h1" fontWeight="bold">Add More Companies</Typography>
           </Box>
           <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '15px', width: '100%' }}>
@@ -75,22 +127,45 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
               </Box>
             ))}
           </Box>
-          <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '30px', width: '100%' }}>
-            <Typography variant="h6" component="h1" fontWeight="bold">Add Companies</Typography>
-            <Select
-              value={selectedCompany}
-              onChange={handleSelectChange}
-              options={options}
-              placeholder="Select a company..."
-              styles={{ container: base => ({ ...base, width: '73%' }), menu: base => ({ ...base, maxHeight: '100px', overflowY: 'auto' }) }}
-            />
-            {error && (
-              <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
-                {error}
-              </Typography>
-            )}
-          </Box>
-          <Box style={{display: "flex", width: "100%", justifyContent: 'space-between'}} mt={2}>
+
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+            <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '30px', width: '100%' }}>
+              <Typography variant="h6" component="h1" fontWeight="bold">Add Industry</Typography>
+
+              <Select
+                value={selectedIndustry}
+                styles={{ container: (provided) => ({ ...provided, width: '50%' }) }}
+                options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
+                placeholder="Select an option"
+                maxMenuHeight={100}
+                onChange={(selectedOption) => {
+                  console.log("Selected Industry:", selectedOption.label); // Log the selected industry name
+                  setSelectedIndustry(selectedOption);
+                }}
+              />
+            </Box>
+            <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '30px', width: '100%' }}>
+              <Typography variant="h6" component="h1" fontWeight="bold">Add Companies</Typography>
+              <Select
+                value={selectedCompany}
+                onChange={handleSelectChange}
+                options={allCompanies.map(company => ({ value: company.id, label: company.company_name }))}
+                placeholder="Select a company..."
+                styles={{
+                  container: base => ({ ...base, width: '73%' }),
+                  menu: base => ({ ...base, maxHeight: '100px' }), // Set max height for the menu
+                  menuList: base => ({ ...base, maxHeight: '100px', overflowY: 'auto' }) // Ensure only menuList has scroll
+                }}
+                onMenuScrollToBottom={handleMenuScrollToBottom}
+              />
+              {error && (
+                <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
+                  {error}
+                </Typography>
+              )}
+            </Box>
+          </div>
+          <Box style={{ display: "flex", width: "100%", justifyContent: 'space-between', marginTop: '120px' }} mt={2}>
             <Button onClick={handleClose} variant="contained" color="primary" sx={{ mr: 2 }}>Close</Button>
             <Button onClick={handleCompare} variant="contained" color="secondary">Compare</Button>
           </Box>

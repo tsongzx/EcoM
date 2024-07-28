@@ -1,7 +1,6 @@
 .nav {
-    background-color: aqua;
-    padding: 20px 10px;
-    margin-bottom: 10px;
+    background-color: #B4B2FC;
+    padding: 5px 10px;
     position: sticky;
     top: 0;
     width: 100%;
@@ -17,6 +16,13 @@ ul {
 
 li {
     margin-right: 20px;
+    background-color: #0D2149;
+    padding: 10px;
+    color: #B4B2FC;
+}
+
+#home {
+    color: #B4B2FC;
 }
 
 a {
@@ -26,6 +32,7 @@ a {
 }
 
 .profileTab {
+    display: none;
     background-color: rgb(237, 205, 145);
     position: absolute;
     height: 100vh;

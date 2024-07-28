@@ -1,10 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+#homeTitleContainer {
+    height: 100vh;
+    background-color: #081124;
+}
+
+#header {
+    color: #081124;
+    background-color: #B4B2FC;
+    padding: 15px;
+    font-weight: bold;
+}
 
 #homeTitle {
     font-family: Montserrat;
     font-size: 6em;
     letter-spacing: 0.04rem;
     margin-bottom: 0px;
+    color: white;
+    margin-top: -10px;
+}
+
+#titleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+#homeDesc {
+    color: white;
+    
 }
 
 #Home Button {
@@ -20,6 +46,12 @@
 }
 
 #Home .registerButton {
+    background-color: white;
+    color: black;
+    border: solid #1976d2 1px;
+}
+
+#Home .loginButton {
     background-color: white;
     color: black;
     border: solid #1976d2 1px;
@@ -72,6 +104,11 @@
     bottom: 50px;
     display: flex;
     flex-direction: column;
+    color: white;
+}
+
+#learnMore {
+    color: white;
 }
 
 #learnMore {

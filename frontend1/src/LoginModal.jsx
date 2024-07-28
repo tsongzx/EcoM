@@ -1,5 +1,6 @@
 import {React, useState, useEffect} from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Link } from '@mui/material';
+import './LoginModal.css'
 
 const LoginModal = ({ open, handleCloseLogin, handleLogin, goToRegister, setErrorMessage, errorMessage }) => {
 
@@ -37,8 +38,8 @@ const LoginModal = ({ open, handleCloseLogin, handleLogin, goToRegister, setErro
   }
 
   return (
-    <Dialog open={open} onClose={clickOutLogin}>
-      <DialogTitle style={{ textAlign: 'center' }}>Login</DialogTitle>
+    <Dialog id='loginContainer' open={open} onClose={clickOutLogin}>
+      <DialogTitle id='title' style={{ textAlign: 'center' }}>Login</DialogTitle>
       <DialogContent style={{ display: 'flex', flexDirection: 'column' }}>
         <TextField autoFocus margin="dense" label="Email Address" type="email" fullWidth value={email} onChange={(e) => setEmail(e.target.value)} />
         <TextField margin="dense" label="Password" type="password" fullWidth value={password} onChange={(e) => setPassword(e.target.value)} />
