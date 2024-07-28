@@ -104,7 +104,7 @@ const Company = () => {
   }, [metricNames]);
 
 
-  useEffect(async() => {
+  const setData = async() => {
     const fetchData = async () => {
       await addToRecentlyViewed(companyId);
       // const recentList = await ();
@@ -129,6 +129,9 @@ const Company = () => {
     } else {
       setIsInFavs(false);
     }
+  }
+  useEffect(() => {
+    setData();
   }, [companyId]);
 
   
