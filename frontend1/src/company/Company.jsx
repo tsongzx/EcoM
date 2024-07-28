@@ -63,6 +63,7 @@ import CreateFramework from './CreateFramework.jsx';
 import Recommendations from './Recommendations.jsx';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+import LeftPanel from './LeftPanel.jsx';
 
 
 const Company = () => {
@@ -1022,7 +1023,7 @@ const Company = () => {
   return (
     <>
       <Navbar />
-
+      <LeftPanel></LeftPanel>
       <div style={{ paddingTop: '100px'}}>
         <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
           Return to Dashboard
