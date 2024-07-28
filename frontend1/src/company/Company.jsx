@@ -49,7 +49,6 @@ import {
   getMetricName,
   getIndicatorsForMetric,
   getIndicatorInfo,
-  getMetricScore,
   getFavouritesList,
   getIndustryMean,
   getMetricCategory,
@@ -194,8 +193,7 @@ const Company = () => {
     console.log(metricNames);
   }, [metricNames]);
 
-
-  const setData = async() => {
+  useEffect(() => {
     const fetchData = async () => {
       await addToRecentlyViewed(companyId);
       // const recentList = await ();
@@ -210,19 +208,19 @@ const Company = () => {
     };
     fetchData();
 
-    const favsList = await getFavouritesList();
-    console.log('FAVS LIST:');
-    console.log(favsList);
-    const listSearch = favsList.find(item => item.company_id === companyId);
-    if (listSearch) {
-      console.log('IN FAVS');
-      setIsInFavs(true);
-    } else {
-      setIsInFavs(false);
+    const fetchLists = async () => {
+      const favsList = await getFavouritesList();
+      console.log('FAVS LIST:');
+      console.log(favsList);
+      const listSearch = favsList.find(item => item.company_id === companyId);
+      if (listSearch) {
+        console.log('IN FAVS');
+        setIsInFavs(true);
+      } else {
+        setIsInFavs(false);
+      }
     }
-  }
-  useEffect(() => {
-    setData();
+    fetchLists();
   }, [companyId]);
 
   
@@ -230,6 +228,7 @@ const Company = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (selectedFramework) {
+        console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
         if (metrics) {
           const nameOfMetrics = [];
@@ -361,7 +360,7 @@ const Company = () => {
     const frameworkId = Number(event.target.value) + 1;
     setSelectedFramework(frameworkId);
 
-    const metrics = await getMetricForFramework(true, frameworkId);
+    const metrics = await getMetricForFramework(frameworkId);
     if (metrics) {
       const nameOfMetrics = [];
       const metricIds = [];
@@ -377,7 +376,7 @@ const Company = () => {
       const newAllIndicators = {};
       for (const id of metricIds) {
         try {
-          const indicators = await getIndicatorsForMetric(selectedFramework, id);
+          const indicators = await getIndicatorsForMetric(frameworkId, id);
           newAllIndicators[id] = indicators;
         } catch (error) {
           console.log(error);
@@ -1029,7 +1028,7 @@ const Company = () => {
           Return to Dashboard
         </Button>
         <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
-        <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} />
+        {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
         <div className="companyHeading">
           <div className="metainfoContainer">
             <div className="companyName metainfo">
