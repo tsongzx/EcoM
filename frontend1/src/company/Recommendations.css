@@ -1,0 +1,28 @@
+.recommendations-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    padding: 2px 2px;
+}
+
+/* button {
+    border: 1px solid black;
+}
+
+button:hover {
+    border: 1px solid blue;
+} */
+
+.recommendations-button {
+    margin-bottom: 5px;
+    border-radius: 10px;
+    border: solid 1px black;
+    cursor: pointer;
+    padding: 3px 5px;
+}
+
+.recommendations-button:hover {
+    border: solid 2px blue;
+    padding: 2px 4px;
+}

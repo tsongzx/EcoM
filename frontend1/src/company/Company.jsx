@@ -37,6 +37,7 @@ import InfoIcon from '@mui/icons-material/Info';
 import Navbar from '../Navbar.jsx';
 import './Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
+import ReportModal from './ReportModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
@@ -59,6 +60,7 @@ import Cookies from 'js-cookie';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import CreateFramework from './CreateFramework.jsx';
+import Recommendations from './Recommendations.jsx';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 
@@ -71,6 +73,7 @@ const Company = () => {
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [reportModal, setOpenReportModal] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
   const [officialFrameworks, setOfficialFrameworks] = useState(null);
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
@@ -194,12 +197,12 @@ const Company = () => {
   useEffect(async() => {
     const fetchData = async () => {
       await addToRecentlyViewed(companyId);
-      const recentList = await getRecentlyViewed();
-      if (Array.isArray(recentList) && recentList.includes(companyId)) {
-        setIsInFavs(true);
-      } else {
-        setIsInFavs(false);
-      }
+      // const recentList = await ();
+      // if (Array.isArray(recentList) && recentList.includes(companyId)) {
+      //   console.log('company is in Favourites/ watchlist');
+      // } else {
+      //   console.log('company is NOT IN Favourites/ watchlist');
+      // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
       setOfficialFrameworks(availableOfficialFramework);
@@ -207,7 +210,11 @@ const Company = () => {
     fetchData();
 
     const favsList = await getFavouritesList();
-    if (Array.isArray(favsList) && favsList.includes(companyId)) {
+    console.log('FAVS LIST:');
+    console.log(favsList);
+    const listSearch = favsList.find(item => item.company_id === companyId);
+    if (listSearch) {
+      console.log('IN FAVS');
       setIsInFavs(true);
     } else {
       setIsInFavs(false);
@@ -328,19 +335,60 @@ const Company = () => {
     setCompareModalOpen(true);
   };
 
+  const openReportModal = () => {
+    setOpenReportModal(true);
+  }
+
+  const handleCloseReportModal = () => {
+    setOpenReportModal(false);
+  }
+
   const handleToggleFavourite = () => {
-    setIsInFavs(!isInFavs);
     const companyId_int = Number(companyId);
-    if (isInFavs) {
+    if (!isInFavs) {
       addToFavourites(companyId_int);
     } else {
       deleteFromFavourites(companyId_int);
     }
+    setIsInFavs(!isInFavs);
   };
 
-  const handleFrameworkChange = (event) => {
+  const handleFrameworkChange = async (event) => {
     const frameworkId = Number(event.target.value) + 1;
     setSelectedFramework(frameworkId);
+
+    const metrics = await getMetricForFramework(true, frameworkId);
+    if (metrics) {
+      const nameOfMetrics = [];
+      const metricIds = [];
+      for (const item of Object.values(metrics)) {
+        const name = await getMetricName(item.metric_id);
+        nameOfMetrics.push({ id: item.metric_id, name: name });
+        metricIds.push(item.metric_id);
+      }
+      setMetricNames(nameOfMetrics);
+      
+      setSelectedMetrics(metricIds);
+      
+      const newAllIndicators = {};
+      for (const id of metricIds) {
+        try {
+          const indicators = await getIndicatorsForMetric(selectedFramework, id);
+          newAllIndicators[id] = indicators;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      setAllIndicators(newAllIndicators);
+      
+      const newSelectedIndicators = {};
+      for (const id of metricIds) {
+        console.log(id);
+        newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
+      }
+      console.log(newSelectedIndicators);
+      setSelectedIndicators(newSelectedIndicators);
+    }
   };
 
   useEffect(() => {
@@ -957,14 +1005,27 @@ const Company = () => {
     );
   };
 
+  const handleClickReport = () => {
+    navigate(`/report/${companyId}`, 
+      { state: { 
+          id: companyId, 
+          companyName,
+          framework: selectedFramework,
+          year: selectedYear,
+        } 
+      });
+  }
+
   return (
     <>
       <Navbar />
+
       <div style={{ paddingTop: '100px'}}>
         <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
           Return to Dashboard
         </Button>
         <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
+        <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} />
         <div className="companyHeading">
           <div className="metainfoContainer">
             <div className="companyName metainfo">
@@ -980,7 +1041,8 @@ const Company = () => {
             </div>
           </div>
           <div className="quickControls">
-            <Button>Save Report</Button>
+            <Button onClick={handleClickReport}>Save Report</Button>
+            <Button onClick={openReportModal}>Save Report</Button>
             <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
           </div>
         </div>
@@ -993,7 +1055,7 @@ const Company = () => {
               <Button onClick={openCompareModal}>Compare</Button>
             </div>
           </div>
-          <p>recommendations placeholder</p>
+          <Recommendations companyId={companyId} />
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
           <div style={{ width: '45%', display: 'flex', flexDirection: 'column'}}>
@@ -1279,7 +1341,7 @@ const Company = () => {
           </div>
         </div>
         <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
-        {/* <CreateFramework/> */}
+        <CreateFramework/>
 
       </div>
     </>
