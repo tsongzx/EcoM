@@ -14,9 +14,10 @@
         "@react-pdf/renderer": "^3.4.4",
         "axios": "^1.7.2",
         "js-cookie": "^3.0.5",
-        "react": "^17.0.2",
+        "react": "^18.3.1",
         "react-chatbotify": "^1.7.0",
-        "react-dom": "^17.0.2",
+        "react-dom": "^18.3.1",
+        "react-pdf": "^9.1.0",
         "react-router-dom": "^6.23.1",
         "react-scripts": "5.0.1",
         "react-select": "^5.8.0",
@@ -49,6 +50,7 @@
         ]
     },
     "devDependencies": {
+        "@ag-media/react-pdf-table": "^1.0.1",
         "@types/cypress": "^1.1.3"
     }
 }
