@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -20,6 +21,7 @@ import {
   Card,
   Grid,
   Slider,
+  Popover,
   TableContainer,
   Table,
   Paper,
@@ -27,9 +29,11 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  TextField
+  TextField,
+  Tooltip
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import InfoIcon from '@mui/icons-material/Info';
 import Navbar from '../Navbar.jsx';
 import './Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
@@ -47,7 +51,8 @@ import {
   getMetricScore,
   getFavouritesList,
   getIndustryMean,
-  getMetricCategory
+  getMetricCategory,
+  getAllIndicators,
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -74,6 +79,7 @@ const Company = () => {
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [allIndicators, setAllIndicators] = useState({});
+  const [allIndicatorsInfo, setAllIndicatorsInfo] = useState({});
   const [selectedIndicators, setSelectedIndicators] = useState({});
   const [expandedMetrics, setExpandedMetrics] = useState({});
   const [tableCollapsed, setTableCollapsed] = useState(true);
@@ -107,6 +113,30 @@ const Company = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  // For resetting to default
+  const [metricNamesFixed, setMetricNamesFixed] = useState(null);
+  const [selectedMetricsFixed, setSelectedMetricsFixed] = useState(null);
+  const [allIndicatorsFixed, setAllIndicatorsFixed] = useState(null);
+  const [selectedIndicatorsFixed, setSelectedIndicatorsFixed] = useState(null);
+  const [sliderValuesFixed, setSliderValuesFixed] = useState(null);
+  const [sliderValuesIndicatorFixed, setSliderValuesIndicatorFixed] = useState(null);
+  const [triggerSource, setTriggerSource] = useState(false);
+
+  const resetToDefault = () => {
+    setTriggerSource(true);
+    setMetricNames(metricNamesFixed);
+    setSelectedMetrics(selectedMetricsFixed);
+    setAllIndicators(allIndicatorsFixed);
+    setSelectedIndicators(selectedIndicatorsFixed);
+    // setSliderValuesFixed(sliderValuesFixed);
+    // setSliderValuesIndicatorFixed(sliderValuesIndicatorFixed);
+  }
+
+  const loadIndicatorInfo = (indicatorId) => {
+    const description = allIndicatorsInfo.find(obj => obj.id === indicatorId).description;
+    return description;
+  }
+
   const checkPillarWeighting = () => {
     const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
     if ((!decimalRegex.test(modalE) || !decimalRegex.test(modalS) || !decimalRegex.test(modalG))) {
@@ -135,20 +165,14 @@ const Company = () => {
     console.log(lockedSliders);
   }, [lockedSliders]);
 
-  const toggleLockE = () => {
-    setIsLockedE(true);
-  };
-
-  const toggleLockS = () => {
-    setIsLockedS(true);
-  };
-
-  const toggleLockG = () => {
-    setIsLockedG(true);
-  };
+  useEffect(() => {
+    console.log(allIndicatorsInfo);
+  }, [allIndicatorsInfo]);
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
+      const allIndicators1 = await getAllIndicators();
+      setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
@@ -207,7 +231,9 @@ const Company = () => {
 
           }
           setMetricNames(nameOfMetrics);
+          setMetricNamesFixed(nameOfMetrics);
           setSelectedMetrics(metricIds);
+          setSelectedMetricsFixed(metricIds);
           
           const newAllIndicators = {};
           for (let id of metricIds) {
@@ -216,18 +242,21 @@ const Company = () => {
           }
 
           setAllIndicators(newAllIndicators);
+          setAllIndicatorsFixed(newAllIndicators);
           
           const newSelectedIndicators = {};
           for (const id of metricIds) {
             newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
           }
           setSelectedIndicators(newSelectedIndicators);
+          setSelectedIndicatorsFixed(newSelectedIndicators);
 
           const initialSliderValues = {};
           for (let id of metricIds) {
             initialSliderValues[id] = metrics.find(item => item.metric_id === id).weighting;
           }
           setSliderValues(initialSliderValues);
+          setSliderValuesFixed(initialSliderValues);
 
           const initialSliderValuesIndicator = {};
           Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
@@ -237,6 +266,7 @@ const Company = () => {
           });
           console.log(initialSliderValuesIndicator);
           setSliderValuesIndicator(initialSliderValuesIndicator);
+          setSliderValuesIndicatorFixed(initialSliderValuesIndicator);
         }
       }
     };
@@ -440,6 +470,7 @@ const Company = () => {
   };
 
   useEffect(() => {
+
     console.log('here111');
     let newLockedSliders = {};
     let newSliderValues = {};
@@ -507,22 +538,6 @@ const Company = () => {
         }
       }
     }
-    // for (let entry of selectedMetrics) {
-    //   let category = metricNames.find(metric => metric.id === entry).category;
-    //   if (!lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
-    //     if (category === 'E') {
-    //       newSliderValues[entry] = sliderValues[entry];
-    //     } else if (category === 'S') {
-    //       newSliderValues[entry] = sliderValues[entry];
-    //     } else {
-    //       newSliderValues[entry] = sliderValues[entry];
-    //     }
-    //   } else if (!lockedSliders.hasOwnProperty(entry) && !sliderValues.hasOwnProperty(entry)) {
-    //     newSliderValues[entry] = 0;
-    //   } else {
-    //     newSliderValues[entry] = sliderValues[entry];
-    //   }
-    // }
 
     for (let entry of selectedMetrics) {
       let category = metricNames.find(metric => metric.id === entry).category;
@@ -544,8 +559,14 @@ const Company = () => {
     }
 
     setSliderValues(newSliderValues);
+    
+    if (triggerSource === true) {
+      setSelectedIndicators(selectedIndicatorsFixed);
+      setSliderValues(sliderValuesFixed);
+      
+    } 
 
-  }, [selectedMetrics]);
+  }, [selectedMetrics, triggerSource]);
 
   useEffect(() => {
     let newLockedSlidersIndicators = {};
@@ -593,7 +614,13 @@ const Company = () => {
 
     setSliderValuesIndicator(newSliderValuesIndicators);
 
-  }, [selectedIndicators]);
+    if (triggerSource === true) {
+      setSliderValuesIndicator(sliderValuesIndicatorFixed);
+      setTriggerSource(false);
+    } 
+    
+
+  }, [selectedIndicators, triggerSource]);
 
   const handleLockClick = (id) => {
     setLockedSliders((prevLockedSliders) => {
@@ -782,7 +809,6 @@ const Company = () => {
     }
   };
 
-
   const renderMetricsByCategory = (category) => {
     if (!metricNames) return null;
   
@@ -837,28 +863,50 @@ const Company = () => {
                   >
                     {allIndicators[metric.id]?.map((indicator) => (
                       <div key={indicator.indicator_id} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
-                        <FormControlLabel
-                          key={indicator.indicator_id}
-                          value={indicator.indicator_id.toString()}
-                          control={
-                            <Checkbox
-                              checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false}
-                              sx={{
-                                color: 'red',
-                                '&.Mui-checked': {
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '80%'}}>
+                          <FormControlLabel
+                            key={indicator.indicator_id}
+                            value={indicator.indicator_id.toString()}
+                            control={
+                              <Checkbox
+                                checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false}
+                                sx={{
                                   color: 'red',
-                                },
+                                  '&.Mui-checked': {
+                                    color: 'red',
+                                  },
+                                }}
+                              />
+                            }
+                            label={indicator.indicator_name}
+                            onChange={(event) => handleIndicatorChange(event, metric.id)}
+                            sx={{
+                              '& .MuiFormControlLabel-label': {
+                                fontSize: '15px', 
+                              },
+                            }}
+                          />
+                          <Tooltip placement="right" 
+                            title={
+                              <Typography variant="h6" sx={{ fontSize: '16px' }}>
+                                {loadIndicatorInfo(indicator.indicator_id)}
+                              </Typography>
+                            }
+                          >
+                            <Box
+                              sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: 'black',
+                                borderRadius: '50%',
+                                color: 'white', 
                               }}
-                            />
-                          }
-                          label={indicator.indicator_name}
-                          onChange={(event) => handleIndicatorChange(event, metric.id)}
-                          sx={{
-                            '& .MuiFormControlLabel-label': {
-                              fontSize: '15px', 
-                            },
-                          }}
-                        />
+                            >
+                              <InfoIcon />
+                            </Box>
+                          </Tooltip>
+                        </div>
                         {selectedIndicators.hasOwnProperty(metric.id) && selectedIndicators[metric.id].includes(indicator.indicator_id) && (
                           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                             <Slider
@@ -1124,9 +1172,12 @@ const Company = () => {
                   </Dialog>
 
                   {Object.keys(selectedIndicators).length > 0 && (
-                    <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px' }}>
+                    <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                       <Button variant="contained" color="primary">
                         Calculate Score
+                      </Button>
+                      <Button variant="contained" color="primary" onClick={resetToDefault}>
+                        Reset to Default
                       </Button>
                     </div>
                   )}
