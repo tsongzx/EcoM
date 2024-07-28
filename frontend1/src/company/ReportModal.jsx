@@ -29,6 +29,16 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
       }
       setData();
     }, [])
+    useEffect(() => {
+        const someFunction = async() => {
+            const company_info = await getCompanyFromRecentlyViewed(companyId);
+            const company_metrics = await getCompanyMetrics(companyName);
+            console.log(company_metrics);
+            setMetrics(company_metrics);
+        };
+
+        someFunction();
+    }, []);
 
     const closeReportModal = () => {
         handleClose();
