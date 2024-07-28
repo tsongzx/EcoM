@@ -23,12 +23,6 @@ class CompanyData(Base):
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
     company_name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
     perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
-    # data_type: Mapped[Data_Type] = mapped_column(Enum(
-    #   *get_args(Data_Type),
-    #   name="data_type",
-    #   create_constraint=True,
-    #   validate_strings=True,
-    # ))
     disclosure: Mapped[Disclosure] = mapped_column(Enum(
       *get_args(Disclosure),
       name="disclosure",

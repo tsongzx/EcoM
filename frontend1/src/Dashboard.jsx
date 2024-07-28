@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
 import ChatFeature from './chatbot/Chatbot.jsx';
+import './Dashboard.css'
 
 const Dashboard = () => {
   const navigate = useNavigate();
