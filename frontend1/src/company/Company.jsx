@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
+  Stack,
+  Typography,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
 import './Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
@@ -195,20 +196,12 @@ const Company = () => {
     }
   };
 
-  const handleReturn = () => {
-    navigate('/dashboard');
-  };
-
   const openWatchlistModal = () => {
     setWatchlistModalOpen(true);
   };
 
   const handleCloseWatchList = () => {
     setWatchlistModalOpen(false);
-  };
-
-  const openCompareModal = () => {
-    setCompareModalOpen(true);
   };
 
   const openReportModal = () => {
@@ -302,6 +295,7 @@ const Company = () => {
             setSliderValuesIndicator={setSliderValuesIndicator}
             setSliderValues={setSliderValues}
             selectedFramework={selectedFramework}
+            setCompareModalOpen={setCompareModalOpen}
         />
         <Box component="main" sx={{ 
           flexGrow: 1, 
@@ -309,42 +303,34 @@ const Company = () => {
           overflow: "hidden",
           overflowY: "scroll",
         }}>
-          <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
-            Return to Dashboard
-          </Button>
           <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
           {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
-          <div className="companyHeading">
-            <div className="metainfoContainer">
-              <div className="companyName metainfo">
-                <h1>{companyName}</h1>
-              </div>
-              <div className="currentPrice metainfo">
-                <h2>58.78</h2>
-                <p>current price</p>
-              </div>
-              <div className="esgScore metainfo">
-                <h2>80.1</h2>
-                <p>ESG Score</p>
-              </div>
-            </div>
-            <div className="quickControls">
-              <Button onClick={handleClickReport}>Save Report</Button>
-              <Button onClick={openReportModal}>Save Report</Button>
-              <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
-            </div>
-          </div>
-          <div className="chartAndReccomendations">
-            <div className="chart">
-              <SimpleLineChart />
-              <div className="chartControls">
-                <Button onClick={openWatchlistModal}>Add to List</Button>
+          <Stack id="heading" direction="row" spacing={3}>
+            <Typography variant="h3">{companyName}</Typography>
+            <Stack alignItems="center" justifyContent="center">
+              <Typography>58.78</Typography>
+              <Typography>Current Price</Typography>
+            </Stack>
+            <Stack alignItems="center" justifyContent="center">
+              <Typography>80.1</Typography>
+              <Typography>ESG Score</Typography>
+            </Stack>
+            <Button onClick={handleClickReport}>Save Report</Button>
+            <Button onClick={openReportModal}>Save Report</Button>
+            <Button onClick={openWatchlistModal}>Add to List</Button>
+            <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
+          </Stack>
+          <Box>
+            <Box>
+              <Stack direction="row" justifyContent="space-between">
+                <SimpleLineChart />
+                <Recommendations companyId={companyId}/>
+              </Stack>
+              <Stack direction="row">
                 <Button>AI Predict</Button>
-                <Button onClick={openCompareModal}>Compare</Button>
-              </div>
-            </div>
-            <Recommendations companyId={companyId} />
-          </div>
+              </Stack>
+            </Box>
+          </Box>
           <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}

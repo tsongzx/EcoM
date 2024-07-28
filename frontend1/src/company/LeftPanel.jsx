@@ -1,20 +1,13 @@
 import React, { useEffect, useState } from "react";
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import {
+  Box,
+  Button,
+} from '@mui/material';
 import SelectFramework from './SelectFramework';
 import MetricIndicatorsCard from './MetricIndicatorsCard';
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 const drawerWidth = 240;
 
 const LeftPanel = ({
@@ -24,8 +17,18 @@ const LeftPanel = ({
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen
 }) => {
+  const navigate = useNavigate();
+
+  const handleReturn = () => {
+    navigate('/dashboard');
+  };
+
+  const openCompareModal = () => {
+    setCompareModalOpen(true);
+  };
+
   return (
     <Box
       sx={{
@@ -34,7 +37,18 @@ const LeftPanel = ({
         overflow: "hidden",
         overflowY: "scroll",
       }}>
-        <div style={{ display: 'flex', flexDirection: 'column'}}>
+        <Button sx={{width: '100%'}}
+          variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
+          Return to Dashboard
+        </Button>
+        <Button variant="contained" 
+          sx={{width: '100%', margin: '1vh 0'}} 
+          onClick={openCompareModal}>Compare</Button>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          paddingTop: '1vh'
+        }}>
           <SelectFramework
             setSelectedFramework={setSelectedFramework}
             setMetricNames={setMetricNames}
