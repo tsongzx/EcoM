@@ -28,8 +28,7 @@ import Cookies from 'js-cookie';
 import CreateFramework from './CreateFramework.jsx';
 import Recommendations from './Recommendations.jsx';
 import LeftPanel from './LeftPanel.jsx';
-import Framework from './Framework.jsx';
-
+import FrameworkTable from './FrameworkTable';
 
 const Company = () => {
   const location = useLocation();
@@ -273,77 +272,93 @@ const Company = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box>
       <Navbar  /*sx={{ width: `calc(100% - ${240}px)`, ml: `${240}px` }}*//>
-      {/* <LeftPanel></LeftPanel> */}
-      <Box component="main" sx={{ flexGrow: 1, paddingTop: '100px'}}>
-        <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
-          Return to Dashboard
-        </Button>
-        <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
-        {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
-        <div className="companyHeading">
-          <div className="metainfoContainer">
-            <div className="companyName metainfo">
-              <h1>{companyName}</h1>
-            </div>
-            <div className="currentPrice metainfo">
-              <h2>58.78</h2>
-              <p>current price</p>
-            </div>
-            <div className="esgScore metainfo">
-              <h2>80.1</h2>
-              <p>ESG Score</p>
-            </div>
-          </div>
-          <div className="quickControls">
-            <Button onClick={handleClickReport}>Save Report</Button>
-            <Button onClick={openReportModal}>Save Report</Button>
-            <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
-          </div>
-        </div>
-        <div className="chartAndReccomendations">
-          <div className="chart">
-            <SimpleLineChart />
-            <div className="chartControls">
-              <Button onClick={openWatchlistModal}>Add to List</Button>
-              <Button>AI Predict</Button>
-              <Button onClick={openCompareModal}>Compare</Button>
-            </div>
-          </div>
-          <Recommendations companyId={companyId} />
-        </div>
-        <Framework
-          setSelectedFramework={setSelectedFramework}
-          officialFrameworks={officialFrameworks}
-          indicatorsCompany={indicatorsCompany}
-          selectedYear={selectedYear}
-          setSelectedYear={setSelectedYear} 
-          companyName={companyName}
-          availableYears={availableYears}
-          selectedIndicators={selectedIndicators}
-          selectedMetrics={selectedMetrics}
-          metricNames={metricNames}
-          setSelectedIndicators={setSelectedIndicators}
-          setSelectedMetrics={setSelectedMetrics}
-          allIndicators={allIndicators}
-          allIndicatorsInfo={allIndicatorsInfo}
-          setMetricNames={setMetricNames}
-          setAllIndicators={setAllIndicators}
-          sliderValues={sliderValues}
-          sliderValuesFixed={sliderValuesFixed}
-          sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
-          metricNamesFixed={metricNamesFixed}
-          selectedMetricsFixed={selectedMetricsFixed}
-          allIndicatorsFixed={allIndicatorsFixed}
-          selectedIndicatorsFixed={selectedIndicatorsFixed}
-          sliderValuesIndicator={sliderValuesIndicator}
-          setSliderValuesIndicator={setSliderValuesIndicator}
-          setSliderValues={setSliderValues}
-          selectedFramework={selectedFramework}
+      <Box sx={{
+        height: 'calc(100vh - 5vh)',
+        display: 'flex',
+        position: 'relative',
+      }}>
+        <LeftPanel
+            setSelectedFramework={setSelectedFramework}
+            officialFrameworks={officialFrameworks}
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            selectedFramework={selectedFramework}
         />
-        <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
-        <CreateFramework/>
+        <Box component="main" sx={{ 
+          flexGrow: 1, 
+          paddingTop: '2vh',
+          overflow: "hidden",
+          overflowY: "scroll",
+        }}>
+          <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
+            Return to Dashboard
+          </Button>
+          <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
+          {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
+          <div className="companyHeading">
+            <div className="metainfoContainer">
+              <div className="companyName metainfo">
+                <h1>{companyName}</h1>
+              </div>
+              <div className="currentPrice metainfo">
+                <h2>58.78</h2>
+                <p>current price</p>
+              </div>
+              <div className="esgScore metainfo">
+                <h2>80.1</h2>
+                <p>ESG Score</p>
+              </div>
+            </div>
+            <div className="quickControls">
+              <Button onClick={handleClickReport}>Save Report</Button>
+              <Button onClick={openReportModal}>Save Report</Button>
+              <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
+            </div>
+          </div>
+          <div className="chartAndReccomendations">
+            <div className="chart">
+              <SimpleLineChart />
+              <div className="chartControls">
+                <Button onClick={openWatchlistModal}>Add to List</Button>
+                <Button>AI Predict</Button>
+                <Button onClick={openCompareModal}>Compare</Button>
+              </div>
+            </div>
+            <Recommendations companyId={companyId} />
+          </div>
+          <FrameworkTable
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear} 
+            companyName={companyName}
+            availableYears={availableYears}
+            selectedFramework={selectedFramework}
+            selectedIndicators={selectedIndicators}
+            metricNames={metricNames}
+            allIndicators={allIndicators}
+          />
+          <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
+          <CreateFramework/>
+        </Box>
       </Box>
     </Box>
   );

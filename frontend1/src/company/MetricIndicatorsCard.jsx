@@ -680,8 +680,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     });
   };  
   return (
-    <Card style={{ marginTop: '100px', marginLeft: '40px' }}>
-      <FormControl style={{ marginLeft: '20px', display: 'flex', flexDirection: 'column', flex: '1' }} component="fieldset">
+    <Card style={{ marginTop: '2vh' }}>
+      <FormControl style={{ marginLeft: '1.5vw', display: 'flex', flexDirection: 'column', flex: '1' }} component="fieldset">
         <FormLabel component="legend" onClick={handleExpandClick1} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
           Metrics and Indicators
           <IconButton onClick={handleExpandClick1} size="small">
