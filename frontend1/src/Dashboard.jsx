@@ -31,13 +31,15 @@ const Dashboard = () => {
   const [error, setError] = useState(false);
   const [favsList, setFavsList] = useState([]);
 
-  useEffect(async() => {
-
+  const setIndustryAndCompany = async() => {
     if (selectedIndustry) {
       console.log(selectedIndustry);
       const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
       setListOfCompanies(companyOfIndustry);
     }
+  }
+  useEffect(() => {
+    setIndustryAndCompany();
   }, [selectedIndustry]);
 
   // useEffect(() => {

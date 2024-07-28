@@ -15,15 +15,19 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
     const [desc, setDesc] = useState('This is a basic description');
     const [headCountry, setHeadCountry] = useState('Australia');
     const [industry, setIndustry] = useState('Manufacturing');
-    const [metrics, setMetrics] = useState();
+    const [metrics, setMetrics] = useState({});
     const [textTitleInput, setTextTitleInput] = useState('');
     const [textIntroInput, setTextIntroInput] = useState('');
     const [textConcInput, setTextConcInput] = useState('');
 
-    useEffect( async () => {
+    useEffect(() => {
+      const setData = async() => {
         const company_info = await getCompanyFromRecentlyViewed(companyId);
         const company_metrics = await getCompanyMetrics(companyName);
+        console.log(company_metrics);
         setMetrics(company_metrics);
+      }
+      setData();
     }, [])
 
     const closeReportModal = () => {
@@ -68,11 +72,11 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
                     <TD>Disclosure</TD>
                 </TH>
 
-                {metrics?.map((metric, index) => <TR key={index}>
+                {/* {metrics?.map((metric, index) => <TR key={index}>
                         <TD>{metric.indicator_name}</TD>
                         <TD>{metric.indicator_value}</TD>
                         <TD>{metric.disclosure}</TD>
-                    </TR>)}
+                    </TR>)} */}
                 </Table>
                 </View>
               </Page>
