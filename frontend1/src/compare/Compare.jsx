@@ -331,6 +331,7 @@ const Compare = () => {
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={years.map((year) => ({ value: year, label: year }))}
                       label="Year"
+                      placeholder="Select Year"
                       maxMenuHeight={100}
                       onChange={(selectedOption) => setYear(selectedOption)}
                     />
@@ -339,12 +340,19 @@ const Compare = () => {
             {companies.map((company, index) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                 <div>
-                  <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected compare-anchor' : 'compare-anchor'} >{company.companyName}</a>
+                    <div className='comparecompanyheadertitle'> <a 
+                    onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
+                    className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
+                      {company.companyName}
+                    </a> 
+                    <button onClick={() => handleDeleteFromTable(company.id)}>X</button>
+                    </div>
                   <div className='companyParamContainer'>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
                       label="Framework"
+                      placeholder="Framework"
                       maxMenuHeight={100}
                       defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
                       onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
