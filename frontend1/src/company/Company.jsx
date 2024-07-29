@@ -310,7 +310,7 @@ const Company = () => {
             frameworkDisplay={frameworkDisplay}
             setFrameworkDisplay={setFrameworkDisplay}
           />
-          {frameworkDisplay == 'tabular' && <FrameworkTable
+          {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear} 
@@ -321,7 +321,7 @@ const Company = () => {
             metricNames={metricNames}
             allIndicators={allIndicators}
           />}
-          {frameworkDisplay == 'graphical' && <Visualisations/>}
+          {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework/>
         </Box>
