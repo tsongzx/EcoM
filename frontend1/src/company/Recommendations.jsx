@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { getCompaniesOfIndustry, getIndustry, getFavouritesList } from "../helper";
 import { useNavigate } from "react-router-dom";
-import './Recommendations.css';
+import './company_css/Recommendations.css';
+import { Button, Stack } from "@mui/material";
 //given a Company Id return a mapped list of buttons of companies in that industry
 
 const Recommendations = ({companyId}) => {
@@ -44,9 +45,17 @@ const Recommendations = ({companyId}) => {
     }
     
     return (
-        <div className="recommendations-container">
+        <Stack id="recommendations-container"
+          maxWidth='300px'
+          width='100%'
+          justifyContent="space-evenly"
+        >
+            <Button variant="contained">
+                Others also viewed
+            </Button>   
             {reccs.map((r) => (
-                <button className="recommendations-button" 
+                <Button className="recommendations-button" 
+                    variant="outlined"
                     key={r.id} 
                     onClick={() => navigate(`/company/${encodeURIComponent(r.id)}`, {
                         state: { 
@@ -57,9 +66,9 @@ const Recommendations = ({companyId}) => {
                     })}
                 >
                     {r.company_name}
-                </button>
+                </Button>
             ))}
-        </div>
+        </Stack>
     );
 }
 

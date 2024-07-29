@@ -2,27 +2,27 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const token = Cookies.get('authToken');
-let indicatorData = null;
+// let indicatorData = null;
 
-const fetchIndicatorData = async() => {
-    try {
-        const response = await fetch('../backend/db/metrics.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        indicatorData = await response.json();
-        return;
-    } catch (error) {
-        console.error("Unable to fetch data:", error);
-        return null;
-    }
-}
+// const fetchIndicatorData = async() => {
+//     try {
+//         const response = await fetch('../backend/db/metrics.json');
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         indicatorData = await response.json();
+//         return;
+//     } catch (error) {
+//         console.error("Unable to fetch data:", error);
+//         return null;
+//     }
+// }
 
-const initialise = async() => {
-    await fetchIndicatorData();
-}
+// const initialise = async() => {
+//     await fetchIndicatorData();
+// }
 
-initialise();
+// initialise();
 
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
@@ -129,6 +129,28 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
         return [];
     }
 }
+
+export const getCompanyMetrics = async (companyName) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/indicators/${companyName}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_name: companyName
+                }
+            } 
+        );
+        const companyInfo = response.data;
+        return companyInfo;
+    } catch (error) {
+        console.log('Error fetching company', error);
+        return [];
+    }
+}
+
 
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
@@ -336,6 +358,7 @@ export const getIndicatorInfo = async(companyName) => {
 }
 
 export const getMetricForFramework = async(frameworkId) => {
+    console.log(frameworkId);
     try {
         const response = await axios.get(`http://127.0.0.1:8000/framework/metrics/${frameworkId}`, 
         {
@@ -407,22 +430,16 @@ export const getIndicatorsForMetric = async(frameworkId, metricId) => {
     }
 }
 
-
-export const getMetricScore = async(metricId, companyName, indicators) => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/calculate_metric', 
+export const getAllIndicators = async() => {
+    try {   
+        const response = await axios.get(`http://127.0.0.1:8000/indicators/all`, 
         {
-            params: {
-                metric_id: metricId,
-                company_name: companyName,
-                indicators: indicators
-            },             
-            
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
+
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);

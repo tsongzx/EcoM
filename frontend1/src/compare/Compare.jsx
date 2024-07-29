@@ -49,7 +49,7 @@ const Compare = () => {
   const [isSelectedCompany, setIsSelectedCompany] = useState();
   const [selectedCompany, setSelectedCompany] = useState();
 
-  useEffect(async() => {
+  const setData = async () => {
     console.log('INSIDE INIT USE EFFECT');
     //get all the frameworks
     const fws = await getOfficialFrameworks();
@@ -66,6 +66,9 @@ const Compare = () => {
     console.log(modifiedfws);
     setFrameworks(modifiedfws);
     setCompanies(companiesList);
+  } 
+  useEffect(() => {
+    setData();
   }, []);
 
   //THE ONLY TIME WE UPDATE METRICS IS ON COMPANY CHANGE, FRAMEWORK CHANGE and MODAL CLOSE, and METRIC DELTE
@@ -290,6 +293,8 @@ const Compare = () => {
       document.addEventListener('click', handler);
     }
 
+    // console.log('Removing Click Event Handler');
+    // document.removeEventListener('click', handler);
     return () => {
       console.log('Removing Click Event Handler');
       document.removeEventListener('click', handler);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from '@mui/material/Modal';
 import { Button, Typography, Checkbox, TextField, Box } from "@mui/material";
-import './WatchlistModal.css'
+import './company_css/WatchlistModal.css'
 // import axios from "axios";
 import Cookies from "js-cookie";
 import {getFormattedUserLists, createList, addCompanyToList, removeCompanyFromList} from "../helper.js";
