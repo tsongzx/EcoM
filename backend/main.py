@@ -25,6 +25,7 @@ from typing import List, Any
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import liveData
     
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
@@ -522,8 +523,7 @@ async def get_company(
 @app.get("/company/indicators/{company_name}", tags=["company"])
 async def get_company_indicators(
     company_name: str,
-    # year: int,
-    user: user_schemas.UserInDB = Depends(get_user),
+    # year: int,    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     company_data = session.query(company_models.CompanyData).filter(
@@ -538,6 +538,46 @@ async def get_company_indicators(
         
         by_year[entry.indicator_year_int][entry.indicator_name] = entry
     return by_year
+
+# Company's Live information
+# Returns a dictionary of several live Company Information
+@app.get("/company/information/{company_code}", tags=["company"])
+async def get_company_info(
+    company_code: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    info = liveData.getCompanyInfo(company_code)
+    return info
+
+# Company's Live Stock History
+# Get the Company's Stock Price history, period is how far the history
+# will date back into for example: 1 month is "1mo"
+@app.get("/company/history/{company_code},{period}", tags=["company"])
+async def get_company_history(
+    company_code: str,
+    time: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    hist = liveData.getCompanyHist(company_code, time)
+    return hist
+
+# Company's Live ESG Ratings
+# This data will return a dataframe, please check the 
+# exampleReturnSustainbility.txt file to see an example
+# If you would like me to return any value please let me (Geoffrey) know
+@app.get("/company/sustainability/{company_code}", tags=["company"])
+async def get_company_sustainability(
+    company_code: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    sustainability = liveData.getCompanyESG(company_code)
+    return sustainability
+
+
+
 
 # ***************************************************************
 #                        Framework Apis
