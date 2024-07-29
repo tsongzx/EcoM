@@ -1166,7 +1166,7 @@ async def chat(
 #                        Visualisation Apis
 # ***************************************************************
 
-@app.get("/graph/indicators", tags=["Graph"])
+@app.post("/graph/indicators/", tags=["Graph"])
 async def get_indicators_graph(
     indicators: List[str],
     companies: List[str],
