@@ -34,7 +34,6 @@ a {
 }
 
 .profileTab {
-    display: none;
     background-color: rgb(237, 205, 145);
     position: absolute;
     height: 100vh;
