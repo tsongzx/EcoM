@@ -797,36 +797,36 @@ async def delete_framework(
     return {"message": f"Successfully deleted framework {framework_id}"}
 
 # calculate framework score
-@app.get("/framework/score/", tags=["Framework"])
-async def get_framework_score(
-    # is_official_framework: bool = Query(...), 
-    # framework_id: int = Query(...),
-    framework_id: int,
-    company_name: str,
-    year: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> int:
-    """_summary_: TO DO: USE BATCH PROCESSSING. ACCEPT MULTIPLE
-    FRAMEWORKS / COMPANY_NAMES / YEARS AT ONCE
-    """    
-    framework = session.query(framework_models.Frameworks).get(framework_id)
-    total_score = 0
-    categories = ["E", "S", "G"]
+# @app.get("/framework/score/", tags=["Framework"])
+# async def get_framework_score(
+#     # is_official_framework: bool = Query(...), 
+#     # framework_id: int = Query(...),
+#     framework_id: int,
+#     company_name: str,
+#     year: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> int:
+#     """_summary_: TO DO: USE BATCH PROCESSSING. ACCEPT MULTIPLE
+#     FRAMEWORKS / COMPANY_NAMES / YEARS AT ONCE
+#     """    
+#     framework = session.query(framework_models.Frameworks).get(framework_id)
+#     total_score = 0
+#     categories = ["E", "S", "G"]
     
-    for category in categories:
-        metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
+#     for category in categories:
+#         metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
         
-        score = 0
-        for metric in metrics:
-            metric_value = await calculate_metric(metric.metric_id, company_name, year, user, session)
+#         score = 0
+#         for metric in metrics:
+#             metric_value = await calculate_metric(metric.metric_id, company_name, year, user, session)
 
-            score += metric_value * metric.weighting
+#             score += metric_value * metric.weighting
 
-        category_weighting = getattr(framework, category, 0)
+#         category_weighting = getattr(framework, category, 0)
 
-        total_score += score * category_weighting
-    return score
+#         total_score += score * category_weighting
+#     return score
 
 #***************************************************************
 #                        Indicator Apis
@@ -999,7 +999,7 @@ def get_company_indicators_by_metric(
     metric_id: int,
     company_name: str,
     year: int,
-    indicators: List[Any] = Depends(get_indicators),
+    indicators: List[Any] = Depends(get_framework_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
@@ -1015,48 +1015,48 @@ def get_company_indicators_by_metric(
     return values
 
 # fix to get by year and apply weighting!
-@app.get("/metric/score", tags=["Metrics"])
-# need to modify this to the metric for a given year!!!
-async def calculate_metric(
-    metric_id: int,
-    company_name: str,
-    # year filter
-    year: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-):
-    file_name = 'db/metrics.json'
-    # Open and read the JSON file - USE CACHING!?!?
-    with open(file_name, 'r') as file:
-        indicator_data = json.load(file)
+# @app.get("/metric/score", tags=["Metrics"])
+# # need to modify this to the metric for a given year!!!
+# async def calculate_metric(
+#     metric_id: int,
+#     company_name: str,
+#     # year filter
+#     year: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     file_name = 'db/metrics.json'
+#     # Open and read the JSON file - USE CACHING!?!?
+#     with open(file_name, 'r') as file:
+#         indicator_data = json.load(file)
 
-    overall_score = 0  
-    print("calculating metric")
-    indicators = get_indicators(metric_id, user, session)
+#     overall_score = 0  
+#     print("calculating metric")
+#     indicators = get_indicators(metric_id, user, session)
     
-    company_values = get_company_indicators_by_metric(metric_id, company_name, year, indicators, user, session)
+#     company_values = get_company_indicators_by_metric(metric_id, company_name, year, indicators, user, session)
     
-    weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    for value in company_values:
-        if value.indicator_value is None:
-            # indicator does not exist for that company for that year
-            continue
-        indicator_scaling = indicator_data[value.indicator_name]
+#     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
+#     for value in company_values:
+#         if value.indicator_value is None:
+#             # indicator does not exist for that company for that year
+#             continue
+#         indicator_scaling = indicator_data[value.indicator_name]
 
-        lower = indicator_scaling["lower"]
-        higher = indicator_scaling["higher"]
-        scaled_score = 0
-        if higher == lower:
-            scaled_score = 100
-            continue
-        elif indicator_scaling["indicator"] == "positive":
-            scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
-        else:
-            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
+#         lower = indicator_scaling["lower"]
+#         higher = indicator_scaling["higher"]
+#         scaled_score = 0
+#         if higher == lower:
+#             scaled_score = 100
+#             continue
+#         elif indicator_scaling["indicator"] == "positive":
+#             scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
+#         else:
+#             scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
         
-        overall_score += scaled_score * weights.get(value.indicator_name)
+#         overall_score += scaled_score * weights.get(value.indicator_name)
   
-    return overall_score
+#     return overall_score
 
 
 # @app.get("/metrics/category", tags=["Metrics"])
@@ -1124,44 +1124,44 @@ async def get_companies_in_industry(
 
     return companies
   
-@app.get("/industry/framework/average/", tags=["Industry"])
-async def get_framework_industry_average(
-    industry: str,
-    framework_id: int,
-    year: int,
-    companies: List[company_models.Company] = Depends(get_companies_in_industry),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    # fix - get average for an industry for a framework 
-    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-    TODO: BATCH PROCESSING
-    """    
-    # @GEOFF: CONSIDER BATCH PROCESSING
-    score = 0
-    for company in companies:
-        score += await get_framework_score(framework_id, company.company_name, year, user, session)
+# @app.get("/industry/framework/average/", tags=["Industry"])
+# async def get_framework_industry_average(
+#     industry: str,
+#     framework_id: int,
+#     year: int,
+#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     # fix - get average for an industry for a framework 
+#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+#     TODO: BATCH PROCESSING
+#     """    
+#     # @GEOFF: CONSIDER BATCH PROCESSING
+#     score = 0
+#     for company in companies:
+#         score += await get_framework_score(framework_id, company.company_name, year, user, session)
     
-    return score / len(companies) if companies else 0
+#     return score / len(companies) if companies else 0
 
-@app.get("/industry/metric/average/", tags=["Industry"])
-async def get_metric_industry_average(
-    metric_id: int,
-    year: int,
-    companies: List[company_models.Company] = Depends(get_companies_in_industry),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    # fix - get average for an industry for a framework 
-    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-      TODO: BATCH PROCESSING
-    """    
-    # @GEOFF: CONSIDER BATCH PROCESSING
-    score = 0
-    for company in companies:
-        score += await calculate_metric(metric_id, company.company_name, year, user, session)
+# @app.get("/industry/metric/average/", tags=["Industry"])
+# async def get_metric_industry_average(
+#     metric_id: int,
+#     year: int,
+#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     # fix - get average for an industry for a framework 
+#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+#       TODO: BATCH PROCESSING
+#     """    
+#     # @GEOFF: CONSIDER BATCH PROCESSING
+#     score = 0
+#     for company in companies:
+#         score += await calculate_metric(metric_id, company.company_name, year, user, session)
     
-    return score / len(companies) if companies else 0
+#     return score / len(companies) if companies else 0
   
 @app.get("/industry/indicator/average/", tags=["Industry"])
 async def get_indicator_industry_averages(
