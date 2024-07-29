@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import './CreateFramework.css'
+import './company_css/CreateFramework.css'
 import { TextField } from "@mui/material";
 import { getUserId, getAllMetrics } from "../helper.js";
 import Textarea from '@mui/joy/Textarea';
