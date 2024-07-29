@@ -128,6 +128,8 @@ const Home = () => {
           <Button className="loginButton" type="submit" variant="contained" onClick={openLoginModal}>Login</Button>
           <Button className="registerButton" type="submit" variant="contained" onClick={openRegisterModal}>Register</Button>
         </Card>
+        
+
         <LoginModal 
           open={loginModalOpen} 
           handleCloseLogin={handleCloseLogin} 
@@ -145,28 +147,18 @@ const Home = () => {
           errorMessage={errorMessage}
         />
       </Card>
-      <div id='homeTitleContainer' style={{ height: '100vh', background: 'linear-gradient(to right, #3373b0, #e7f1fb)' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-          <h1 id='homeTitle'>CRUMPET</h1>
-          <p>ESG Analysis Platform</p>
+      <div id='homeTitleContainer'>
+        <div id='header'>
+          ESG NOW
+        </div>
+        <div id='titleContainer'>
+          <h1 id='homeTitle'>ESG NOW</h1>
+          <p id='homeDesc'>ESG Analysis Platform</p>
           <div style={{ display: 'flex', maxWidth: '400px', minWidth: '250px', justifyContent: 'space-between' }}>
             <Button className="titleButton loginButton" type="submit" variant="contained" onClick={openLoginModal}>Login</Button>
             <Button className="titleButton registerButton" type="submit" variant="contained" onClick={openRegisterModal}>Register</Button>
           </div>
         </div>
-        <button id="learnMore" onClick={() => {
-          window.scrollBy({
-            top: window.innerHeight,
-            behavior: "smooth",
-          });
-        }}>
-          <svg fill="#000000" height="20px" width="20px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 330">
-            <path id="XMLID_225_" d="M325.607,79.393c-5.857-5.857-15.355-5.858-21.213,0.001l-139.39,139.393L25.607,79.393
-              c-5.857-5.857-15.355-5.858-21.213,0.001c-5.858,5.858-5.858,15.355,0,21.213l150.004,150c2.813,2.813,6.628,4.393,10.606,4.393
-              s7.794-1.581,10.606-4.394l149.996-150C331.465,94.749,331.465,85.251,325.607,79.393z"/>
-          </svg>
-          learn more
-        </button>
       </div>
       <div id='homeAbout'>
         <div className='aboutContainer'>

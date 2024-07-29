@@ -9,18 +9,27 @@ from route_tags import tags_metadata
 import schemas.user_schemas as user_schemas
 import schemas.list_schemas as list_schemas
 import schemas.framework_schemas as framework_schemas
+import schemas.metric_schemas as metric_schemas
+import schemas.chat_schemas as chat_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
-import json
+import json 
 from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
 from typing import List, Any
-
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
+import liveData
+    
+load_dotenv()
+print(os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
 
 def get_session():
     session = SessionLocal()
@@ -119,9 +128,6 @@ async def get_user(
     #     raise credentials_exception
     return user
 
-# update password
-
-
 @app.put("/user/password", tags=["User"])
 async def change_user_password(
     request: user_schemas.PasswordUpdate,
@@ -145,8 +151,6 @@ async def change_user_password(
 
     # alternatively just return empty {}
     return {"message": "Password changed successfully"}
-
-# update name
 
 
 @app.put("/user/full-name", response_model=user_schemas.UserInDB, tags=["User"])
@@ -175,7 +179,6 @@ async def get_lists(
     # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
-    # token_data = await is_authenticated(session, authorization.credentials)
     lists = session.query(list_models.UserList).filter(
         list_models.UserList.user_id == user.id).all()
 
@@ -265,16 +268,15 @@ async def add_company_to_list(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    company = session.query(company_models.CompanyData).filter_by(
-        id=request.company_id).first()
-    list = session.query(list_models.UserList).filter_by(
-        id=request.list_id).first()
+    company = session.query(company_models.Company).get(request.company_id)
+    list = session.query(list_models.UserList).get(request.list_id)
+
     if company is None or list is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Company or list does not exist")
 
     existing_company = session.query(list_models.List).filter_by(list_id=request.list_id)\
-        .filter_by(company_id=company.id)\
+        .filter_by(company_id=request.company_id)\
         .first()
 
     if existing_company:
@@ -299,15 +301,14 @@ async def is_company_in_list(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) -> bool:
-    company = session.query(company_models.CompanyData).filter_by(
-        id=company_id).first()
-    list = session.query(list_models.UserList).filter_by(id=list_id).first()
+    company = session.query(company_models.Company).get(company_id)
+    list = session.query(list_models.UserList).get(list_id)
     if company is None or list is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
                             detail="Company or list does not exist")
 
     existing_company = session.query(list_models.List).filter_by(list_id=list_id)\
-        .filter_by(company_id=company.id)\
+        .filter_by(company_id=company_id)\
         .first()
 
     return True if existing_company else False
@@ -478,9 +479,9 @@ async def add_to_recently_viewed(
         session.delete(statement)
         session.commit()
 
-    if recent_companies_length >= 20:
-        statement = session.query(list_models.List).where(
-            list_models.List.list_id == recent_id).order_by(list_models.List.id).first()
+    if recent_companies_length >= 5:
+        statement = session.query(list_models.List).where(list_models.List.list_id == recent_id).order_by(list_models.List.id).first()
+
         session.delete(statement)
         session.commit()
 
@@ -522,69 +523,89 @@ async def get_company(
 @app.get("/company/indicators/{company_name}", tags=["company"])
 async def get_company_indicators(
     company_name: str,
-    user: user_schemas.UserInDB = Depends(get_user),
+    # year: int,    user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     company_data = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name == company_name).all()
-    # company_indicators = []
-    # for data in company_data:
-    #     indicators = {
-    #         "Name": data.metric_name,
-    #         "Description": data.metric_description,
-    #         "Unit": data.metric_unit,
-    #         "Value": data.metric_value,
-    #         "Year": data.metric_year,
-    #         "Period": data.metric_period,
-    #     }
-    #     company_indicators.append(indicators)
-    return company_data
+        company_models.CompanyData.company_name == company_name,
+        # company_models.CompanyData.indicator_year_int == company_name,
+    ).all()
+    
+    by_year = {}
+    for entry in company_data:
+        if entry.indicator_year_int not in by_year:
+            by_year[entry.indicator_year_int] = {}
+        
+        by_year[entry.indicator_year_int][entry.indicator_name] = entry
+    return by_year
+
+# Company's Live information
+# Returns a dictionary of several live Company Information
+@app.get("/company/information/{company_code}", tags=["company"])
+async def get_company_info(
+    company_code: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    info = liveData.getCompanyInfo(company_code)
+    return info
+
+# Company's Live Stock History
+# Get the Company's Stock Price history, period is how far the history
+# will date back into for example: 1 month is "1mo", 5 days would be "5d"
+@app.get("/company/history/{company_code},{period}", tags=["company"])
+async def get_company_history(
+    company_code: str,
+    period: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    hist = liveData.getCompanyHist(company_code, period)
+    return hist
+
+# Company's Live ESG Ratings
+# This data will return a dataframe, please check the 
+# exampleReturnSustainbility.txt file to see an example
+# If you would like me to return any value please let me (Geoffrey) know
+@app.get("/company/sustainability/{company_code}", tags=["company"])
+async def get_company_sustainability(
+    company_code: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    sustainability = liveData.getCompanyESG(company_code)
+    return sustainability
+
+
+
 
 # ***************************************************************
 #                        Framework Apis
 # ***************************************************************
 
 
-@app.get("/official_framework/all", tags=["Framework"])
-async def get_official_frameworks(
+@app.get("/frameworks/all", tags=["Framework"])
+async def get_frameworks(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    """_summary_: retrieve all official frameworks
+    """_summary_: retrieve all frameworks of the user
 
     Args:
         user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns: list of official framework objects
-
-    """
-    official_frameworks = session.query(
-        framework_models.OfficialFrameworks).all()
-    return official_frameworks
-
-
-@app.get("/user_framework/all", tags=["Framework"])
-async def get_user_frameworks(
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-):
-    """_summary_: retrieve user defined frameworks
-
-    Args:
-        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
-        session (Session, optional): _description_. Defaults to Depends(get_session).
-
-    Returns: list of user defined framework objects
-    """
-    user_frameworks = session.query(
-        framework_models.UserFrameworks).filter_by(user_id=user.id).all()
-    return user_frameworks
-
-
+        
+    """    
+    return session.query(framework_models.Frameworks).filter(
+        or_(framework_models.Frameworks.user_id == user.id,
+            framework_models.Frameworks.is_official_framework == True
+        )
+    ).all()
+  
 @app.get("/framework/{framework_id}", tags=["Framework"])
 async def get_framework(
-    is_official_framework: bool,
     framework_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -592,27 +613,17 @@ async def get_framework(
     """_summary_: retrieve details for a single framework
 
     Args:
-        is_official_framework (bool): _description_
         framework_id (int): _description_
         user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns:
         _type_: retrieves information for a framework 
-    """
-    if is_official_framework:
-        framework = session.query(framework_models.OfficialFrameworks).filter_by(
-            id=framework_id).first()
-    else:
-        framework = session.query(framework_models.UserFrameworks).filter_by(
-            id=framework_id).first()
-
-    return framework
-
-
+    """    
+    return session.query(framework_models.Frameworks).get(framework_id)
+  
 @app.get("/framework/metrics/{framework_id}", tags=["Framework"])
 async def get_framework_metrics(
-    is_official_framework: bool,
     framework_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -620,7 +631,6 @@ async def get_framework_metrics(
     """_summary_: retrieve metrics for a single framework.
 
     Args:
-        is_official_framework (bool): _description_
         framework_id (int): _description_
         user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
         session (Session, optional): _description_. Defaults to Depends(get_session).
@@ -628,26 +638,43 @@ async def get_framework_metrics(
     Returns:
         _type_: returns the metrics in the framework, empty list if framework ID is invalid 
     """
-    metrics = session.query(framework_models.CustomMetrics).filter_by(
-        is_official_framework=is_official_framework, framework_id=framework_id).all()
+    metrics = session.query(framework_models.CustomMetrics).filter_by(framework_id=framework_id).all() 
 
-    # if no metrics found, no custom metric weights have been set for official framework
-    if len(metrics) == 0 and is_official_framework:
-        metrics = session.query(framework_models.OfficialFrameworkMetrics).filter_by(
-            framework_id=framework_id).all()
+    # if no metrics found, no custom metric weights have been set for official framework 
+    if len(metrics) == 0:
+        metrics = session.query(framework_models.OfficialFrameworkMetrics).filter_by(framework_id = framework_id).all()
+    
+    return metrics
+
+from typing import Literal
+Category = Literal["E", "S", "G"]
+
+@app.get("/framework/metrics/category/", tags=["Framework"])
+async def get_framework_metrics_by_category(
+    framework_id: int,
+    category: Category,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):  
+    metrics = session.query(framework_models.CustomMetrics).filter_by(framework_id=framework_id,
+                                                                        category=category).all() 
+
+    # if no metrics found, no custom metric weights have been set for official framework 
+    if len(metrics) == 0:
+        metrics = session.query(framework_models.OfficialFrameworkMetrics).filter_by(framework_id=framework_id,
+                                                                                      category=category).all()
 
     return metrics
 
-
-@app.post("/framework/create/", response_model=framework_schemas.Framework, tags=["Framework"])
+@app.post("/framework/create/", tags=["Framework"])
 async def create_framework(
     details: framework_schemas.CustomFramework,
+    category_weightings: framework_schemas.CategoryWeights,
     metrics: List[framework_schemas.CustomFrameworkMetrics],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-) -> framework_schemas.Framework:
-    """_summary_: creates user customised framework. Please remember to add
-      subcateories as metrics. 
+):
+    """_summary_: creates user customised framework. Subcategory is only either 'E, S or G'
 
     Args:
         details (framework_schemas.CustomFramework): _description_
@@ -656,13 +683,16 @@ async def create_framework(
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns:
-        framework_schemas.Framework: contains is_official_framework bool and
         framework id
-    """
-    framework = framework_models.UserFrameworks(
-        framework_name=details.framework_name,
-        description=details.description,
-        user_id=details.user_id,
+    """    
+    framework = framework_models.Frameworks(
+        framework_name=details.framework_name, 
+        description=details.description, 
+        user_id=user.id,
+        is_official_framework=False,
+        E=category_weightings.E,
+        S=category_weightings.S,
+        G=category_weightings.G, 
     )
     session.add(framework)
     session.commit()
@@ -671,28 +701,27 @@ async def create_framework(
 
     for metric in metrics:
         new_metric = framework_models.CustomMetrics(
-            is_official_framework=False,
             framework_id=framework.id,
-            parent_id=metric.parent_id,
+            category=metric.category,
             metric_id=metric.metric_id,
             weighting=metric.weighting,
+            user_id=user.id
         )
         objects_to_insert.append(new_metric)
 
     session.add_all(objects_to_insert)
     session.commit()
-    return framework_schemas.Framework(is_official_framework=False, framework_id=framework.id)
+    return framework.id
 
-
-@app.put("/user_framework/modify/", tags=["Framework"])
-async def modify_user_framework(
+@app.put("/framework/modify/", tags=["Framework"])
+async def modify_custom_framework(
     framework_id: int,
     request: framework_schemas.UpdateCustomFramework,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-):
-    """_summary_: Allows user to update custom made framework details
-
+) :
+    """_summary_: Allows user to update custom made framework details only
+        - Please check on frontend first 
     Args:
         framework_id (int): _description_
         request (framework_schemas.UpdateCustomFramework): _description_
@@ -700,10 +729,15 @@ async def modify_user_framework(
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns: message on success
-    """
-    framework = session.query(framework_models.UserFrameworks).filter_by(
-        id=framework_id).first()
-    framework.framework_name = request.framework_name
+    """    
+    framework = session.query(framework_models.Frameworks).get(framework_id)
+    
+    if framework.is_official_framework:
+        raise HTTPException(
+          status_code=status.HTTP_400_BAD_REQUEST,
+          detail="Cannot modify official framework",
+        )
+    framework.framework_name = request.framework_name   
     framework.description = request.description
     session.commit()
     return {"message": f"Successfully modified framework details {framework_id}"}
@@ -711,15 +745,16 @@ async def modify_user_framework(
 
 @app.put("/framework/modify_metrics/", tags=["Framework"])
 async def modify_framework_metrics(
-    framework_details: framework_schemas.Framework,
+    framework_id: int,
     metrics: List[framework_schemas.CustomFrameworkMetrics],
+    category_weightings: framework_schemas.CategoryWeights,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     """_summary_: modify a framework. 
         Metrics and weightings can be modified for user defined frameworks.
         Only metric weights can be modified for official frameworks. 
-
+        - Check for this on frontend please??
     Args:
         framework_details (framework_schemas.Framework): _description_
         metrics (List[framework_schemas.ModifyFrameworkMetrics]): _description_
@@ -727,12 +762,18 @@ async def modify_framework_metrics(
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns: message on success
-    """
-    # delete all previous rows for tat framework
+    """    
+    framework = session.query(framework_models.Frameworks).get(framework_id)
+    # could do check here for not modifying official metrics
+    # update category weights
+    framework.E = category_weightings.E
+    framework.S = category_weightings.S
+    framework.G = category_weightings.G
+    
+    # delete all previous rows for that framework 
     statement = delete(framework_models.CustomMetrics).where(
         and_(
-            framework_models.CustomMetrics.framework_id == framework_details.framework_id,
-            framework_models.CustomMetrics.is_official_framework == framework_details.is_official_framework,
+            framework_models.CustomMetrics.framework_id == framework_id,
         )
     )
     session.execute(statement)
@@ -742,18 +783,18 @@ async def modify_framework_metrics(
 
     for metric in metrics:
         new_metric = framework_models.CustomMetrics(
-            is_official_framework=framework_details.is_official_framework,
-            framework_id=framework_details.framework_id,
-            parent_id=metric.parent_id,
+            framework_id=framework_id,
+            category=metric.category,
             metric_id=metric.metric_id,
             weighting=metric.weighting,
+            user_id=user.id,
         )
         objects_to_insert.append(new_metric)
 
     session.add_all(objects_to_insert)
     session.commit()
 
-    return {"message": f"Successfully modified framework metrics {framework_details.framework_id}"}
+    return {"message" : f"Successfully modified framework metrics {framework_id}"}
 
 # route to delete framework - can only delete custom frameworks
 
@@ -772,123 +813,80 @@ async def delete_framework(
         session (Session, optional): _description_. Defaults to Depends(get_session).
 
     Returns: message on success
-    """
+    """    
+    framework = session.query(framework_models.Frameworks).get(framework_id)
+
+    if framework.is_official_framework:
+        raise HTTPException(
+          status_code=status.HTTP_400_BAD_REQUEST,
+          detail="Cannot delete official framework",
+        )
+
     statement = delete(framework_models.CustomMetrics).where(
         and_(
             framework_models.CustomMetrics.framework_id == framework_id,
-            framework_models.CustomMetrics.is_official_framework == False,
         )
     )
     session.execute(statement)
-    statement = delete(framework_models.UserFrameworks).where(
-        framework_models.UserFrameworks.id == framework_id,
+    statement = delete(framework_models.Frameworks).where(
+        framework_models.Frameworks.id == framework_id,
     )
     session.execute(statement)
     session.commit()
     return {"message": f"Successfully deleted framework {framework_id}"}
 
 # calculate framework score
-
-
-@app.get("/official_framework/score/", tags=["Framework"])
-async def get_official_framework_score(
-    # is_official_framework: bool = Query(...),
-    # framework_id: int = Query(...),
-    framework_id: int,
-    use_default: bool,
-    company_name: str,
-    # probs do smt wit tis Any:
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> int:
-    metrics = get_framework_metrics(True, framework_id)
-
-    if len(metrics) == 0:
-        return 0
-    # note to self: add subcateory metrics to officialframework metrics
-    # set root (aka directly below framework) as  parentid as 0
-    score = 0
-    for metric in metrics:
-        metric_value = calculate_metric(metric.metric_id, company_name)
-        if use_default:
-            # calculate default
-            # get metrics wit te same parent
-            # get metric scores (get_metric)
-            # calculate score for subcateory
-            score += metric_value
-            # use default_weight
-        else:
-            # calculate usin custom metrics
-            score += metric_value * metric.weighting
-    return score
-
-# must modify - current very acky metod
-
-
-@app.get("/user_framework/score/", tags=["Framework"])
-async def get_user_framework_score(
-    # is_official_framework: bool = Query(...),
+@app.get("/framework/score/", tags=["Framework"])
+async def get_framework_score(
+    # is_official_framework: bool = Query(...), 
     # framework_id: int = Query(...),
     framework_id: int,
     company_name: str,
-    # probs do smt wit tis Any:
-    metrics: Any = Depends(get_framework_metrics),
+    year: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) -> int:
-    if len(metrics) == 0:
-        return 0
-    # note to self: add subcateory metrics to officialframework metrics
-    # set root (aka directly below framework) as  parentid as 0
-    use_default = all(isinstance(
-        item, framework_models.OfficialFrameworkMetrics) for item in metrics)
-    score = 0
-    for metric in metrics:
-        metric_value = calculate_metric(metric.metric_id, company_name)
-        if use_default:
-            # calculate default
-            # get metrics wit te same parent
-            # get metric scores (get_metric)
-            # calculate score for subcateory
-            score += metric_value
-            # use default_weight
-        else:
-            # calculate usin custom metrics
+    """_summary_: TO DO: USE BATCH PROCESSSING. ACCEPT MULTIPLE
+    FRAMEWORKS / COMPANY_NAMES / YEARS AT ONCE
+    """    
+    framework = session.query(framework_models.Frameworks).get(framework_id)
+    total_score = 0
+    categories = ["E", "S", "G"]
+    
+    for category in categories:
+        metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
+        
+        score = 0
+        for metric in metrics:
+            metric_value = await calculate_metric(metric.metric_id, company_name, year, user, session)
+
             score += metric_value * metric.weighting
+
+        category_weighting = getattr(framework, category, 0)
+
+        total_score += score * category_weighting
     return score
 
-    # non acky
-    # someow create a tree - discuss wit eoff
-    # for metric in metrics:
-    #     metric_value = calculate_metric(metric.metric_id)
-    #     if use_default:
-    #         # calculate default
-    #         # get metrics wit te same parent
-    #         # get metric scores (get_metric)
-    #         # calculate score for subcateory
-    #         score += metric_value
-    #         # use default_weight
-    #     else:
-    #         # calculate usin custom metrics
-    #         score += metric_value * metric.weighting
-    # return score
-# et
-# ***************************************************************
+#***************************************************************
 #                        Indicator Apis
 # ***************************************************************
 
 
 @app.get("/indicators", tags=["Indicators"])
-async def get_indicators(
+def get_indicators(
+    framework_id: int,
     metric_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-):
-    indicators = session.query(metrics_models.MetricIndicators).filter_by(
-        metric_id=metric_id).all()
-
+) :
+    # get custom weights
+    indicators = session.query(metrics_models.CustomMetricIndicators).filter_by(metric_id=metric_id,
+                                                                   user_id=user.id,
+                                                                   framework_id=framework_id).all()
+    # if custom weights don't exist, use default
+    if len(indicators) == 0:
+        indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
     return indicators
-
 
 @app.get("/indicators/all", tags=["Indicators"])
 async def get_all_indicators(
@@ -929,53 +927,131 @@ async def get_metric_name(
 async def get_all_metrics(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-):
-    # fix this later
-    metrics = session.query(metrics_models.Metrics).limit(54).all()
+) :
+    # fix this later 
+    metrics = session.query(metrics_models.Metrics).all()
+      
+    metrics_dict = {}
+    for metric in metrics:
+        if metric.category not in metrics_dict:
+            metrics_dict[metric.category] = []
+        metrics_dict[metric.category].append(metric)
+    return metrics_dict 
 
-    return metrics
+@app.post("/metric/modify", tags=["Metrics"])
+def modify_metric(
+    metric_id: int,
+    framework_id: int,
+    indicators: List[metric_schemas.CustomMetricIndicators],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    # delete custom metric weightings if they exist
+    statement = delete(metrics_models.CustomMetricIndicators).where(
+        and_(
+            metrics_models.CustomMetricIndicators.framework_id == framework_id,
+            metrics_models.CustomMetricIndicators.metric_id == metric_id,
+            metrics_models.CustomMetricIndicators.user_id == user.id,
+        )
+    )
+    session.execute(statement)
+    session.commit()
 
+    objects_to_insert = []
 
-@app.get("/calculate_metric", tags=["Metrics"])
+    for indicator in indicators:
+        new_indicator = metrics_models.CustomMetricIndicators(
+            framework_id=framework_id,
+            metric_id=metric_id,
+            weighting=indicator.weighting,
+            indicator_name=indicator.indicator_name,
+            indicator_id=indicator.indicator_id,  
+            user_id=user.id,
+        )
+        objects_to_insert.append(new_indicator)
+
+    session.add_all(objects_to_insert)
+    session.commit()
+    # indicator weights is unique for a framework
+    return []
+
+@app.get("/company/metric/indicators", tags=["Company"])
+def get_company_indicators_by_metric(
+    metric_id: int,
+    company_name: str,
+    year: int,
+    indicators: List[Any] = Depends(get_indicators),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: MAY NEED TO REMOVE YEAR FILTER
+    """    
+    indicator_names = [indicator.indicator_name for indicator in indicators]
+    values = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name == company_name,
+        company_models.CompanyData.indicator_year_int == year,
+        company_models.CompanyData.indicator_name.in_(indicator_names),
+    ).all()
+    
+    return values
+
+# fix to get by year and apply weighting!
+@app.get("/metric/score", tags=["Metrics"])
 # need to modify this to the metric for a given year!!!
 async def calculate_metric(
     metric_id: int,
     company_name: str,
     # year filter
-    indicators: Any = Depends(get_indicators),
+    year: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     file_name = 'db/metrics.json'
-    # Open and read the JSON file
+    # Open and read the JSON file - USE CACHING!?!?
     with open(file_name, 'r') as file:
         indicator_data = json.load(file)
 
-    # fix this later
-    overall_score = 0
-    for indicator in indicators:
-        # get value for indicator
-        value = session.query(company_models.CompanyData).filter_by(company_name=company_name,
-                                                                    indicator_name=indicator.indicator_name).first()
-        if value is None:
+    overall_score = 0  
+    print("calculating metric")
+    indicators = get_indicators(metric_id, user, session)
+    
+    company_values = get_company_indicators_by_metric(metric_id, company_name, year, indicators, user, session)
+    
+    weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
+    for value in company_values:
+        if value.indicator_value is None:
             # indicator does not exist for that company for that year
             continue
-
         indicator_scaling = indicator_data[value.indicator_name]
-        if indicator_scaling["indicator"] == "positive":
-            lower = indicator_scaling["lower"]
-            higher = indicator_scaling["higher"]
+
+        lower = indicator_scaling["lower"]
+        higher = indicator_scaling["higher"]
+        scaled_score = 0
+        if higher == lower:
+            scaled_score = 100
+            continue
+        elif indicator_scaling["indicator"] == "positive":
             scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
         else:
-            lower = indicator_scaling["lower"]
-            higher = indicator_scaling["higher"]
-            scaled_score = 100 * \
-                (higher - value.indicator_value)/(higher - lower)
-        overall_score += scaled_score
+            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
+        
+        overall_score += scaled_score * weights.get(value.indicator_name)
+  
+    return overall_score
 
-    return overall_score / len(indicators)
 
-# ***************************************************************
+# @app.get("/metrics/category", tags=["Metrics"])
+# async def get_metrics_by_category(
+#     category: Category,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     """_summary_: TO DO: currently not one to to one mapping between
+#       metrics and categories so this is currently getting fixed
+#     """   
+#     # TO DO: GET ALL METRICS IN A CATEGORY!!
+#     return []
+#***************************************************************
 #                        Industry Apis
 # ***************************************************************
 
@@ -1028,30 +1104,99 @@ async def get_companies_in_industry(
         industry=industry).all()
 
     return companies
-
-# ignore
-
-
-@app.get("/industry/average/", tags=["Industry"])
-async def get_industry_average(
+  
+@app.get("/industry/framework/average/", tags=["Industry"])
+async def get_framework_industry_average(
     industry: str,
     framework_id: int,
+    year: int,
+    companies: List[company_models.Company] = Depends(get_companies_in_industry),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
+) :
+    # fix - get average for an industry for a framework 
+    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+    TODO: BATCH PROCESSING
+    """    
+    # @GEOFF: CONSIDER BATCH PROCESSING
+    score = 0
+    for company in companies:
+        score += await get_framework_score(framework_id, company.company_name, year, user, session)
+    
+    return score / len(companies) if companies else 0
+
+@app.get("/industry/metric/average/", tags=["Industry"])
+async def get_metric_industry_average(
+    metric_id: int,
+    year: int,
+    companies: List[company_models.Company] = Depends(get_companies_in_industry),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    # fix - get average for an industry for a framework 
+    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+      TODO: BATCH PROCESSING
+    """    
+    # @GEOFF: CONSIDER BATCH PROCESSING
+    score = 0
+    for company in companies:
+        score += await calculate_metric(metric_id, company.company_name, year, user, session)
+    
+    return score / len(companies) if companies else 0
+  
+@app.get("/industry/indicator/average/", tags=["Industry"])
+async def get_indicator_industry_averages(
+    indicators: List[str],
+    year: int,
+    companies: List[company_models.Company] = Depends(get_companies_in_industry),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    # fix - get average for an industry for a framework 
+    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+    """    
+    score = 0
+    company_names = [company.company_name for company in companies]
+
+    values = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name.in_(company_names),
+        company_models.CompanyData.indicator_year_int == year,
+        company_models.CompanyData.indicator_name.in_(indicators),
+    ).all()
+    
+    # Organise data by indicator
+    indicator_values = {}
+    for value in values:
+        if value.indicator_name not in indicator_values:
+            indicator_values[value.indicator_name] = 0
+        indicator_values[value.indicator_name] += value.indicator_value
+
+    num_companies = len(companies)
+    indicator_averages = {indicator_name: total / num_companies for indicator_name, total in indicator_values.items()}
+    return indicator_averages
+
+#***************************************************************
+#                        Chatbot Apis
+# ***************************************************************
+
+@app.post("/chat", tags=["Chatbot"])
+async def chat(
+    user_query: chat_schemas.ChatQuery,
+    user: user_schemas.UserInDB = Depends(get_user)  
 ):
-    """_summary_: ignore right now!
+    # dont accept empty queries
+    # Using GPT-4 with the ChatCompletion endpoint
+    response = await client.chat.completions.create(
+        model="gpt-4o-mini",
+        # require accuracy
+        temperature=0,
+        # dont want the messages to be too long
+        max_tokens=300,
+        messages=[*Config.chat_prompts, { "role": "user", "content": user_query.query}]
+    )
+    chatbot_response = response.choices[0].message['content']
+    # get records of chatbot responses
+    Config.chat_prompts.append({"role": "assistant", "content": chatbot_response})
+    # message = response.choices[0].message.content
 
-    Args:
-        industry (str): _description_
-        framework_id (int): _description_
-        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
-        session (Session, optional): _description_. Defaults to Depends(get_session).
-
-    Returns:
-        _type_: _description_
-    """
-    # fix - get average for an industry for a framework
-    companies = session.query(company_models.Company).filter_by(
-        industry=industry).all()
-
-    return companies
+    return {'response': chatbot_response}

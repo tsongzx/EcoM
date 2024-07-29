@@ -10,16 +10,22 @@ db='crumpeteers'
 # below is required when importing to local db
 # SET GLOBAL local_infile=1;
 
-do
 mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << EOF | tee -a $MYSQL_OUTPUT
   LOAD DATA LOCAL INFILE "db/official frameworks.csv"
-    INTO TABLE OfficialFrameworks 
+    INTO TABLE Frameworks 
     FIELDS TERMINATED BY '|' 
       ENCLOSED BY '"'
-    LINES TERMINATED BY '\n'
+    LINES TERMINATED BY '\r\n'
     IGNORE 1 ROWS 
     (id, framework_name, description);
   SHOW WARNINGS;
+
+  UPDATE Frameworks
+  SET
+      is_official_framework = True,
+      E = 0.33333,
+      S = 0.33333,
+      G = 0.33333;
+
 EOF
   echo $f 'ran'
-done

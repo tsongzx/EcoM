@@ -1,34 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
+  Box,
   Button,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Radio,
-  RadioGroup,
-  IconButton,
-  Collapse,
-  Card,
-  Grid,
-  TableContainer,
-  Table,
-  Paper,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody
+  Stack,
+  Typography,
 } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Navbar from '../Navbar.jsx';
-import './Company.css';
+import './company_css/Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
+import ReportModal from './ReportModal.jsx';
 import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
-  getRecentlyViewed,
   addToFavourites,
   deleteFromFavourites,
   getOfficialFrameworks,
@@ -36,161 +20,165 @@ import {
   getMetricName,
   getIndicatorsForMetric,
   getIndicatorInfo,
-  getFrameworkScore,
-  getMetricScore,
-  getFavouritesList
+  getFavouritesList,
+  getAllIndicators,
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+
 import CreateFramework from './CreateFramework.jsx';
+import LeftPanel from './LeftPanel.jsx';
+import FrameworkTable from './FrameworkTable';
+import CompanyHeader from './CompanyHeader.jsx';
+import CompanyBody from './CompanyBody.jsx';
+import GraphTableToggle from './GraphTableToggle.jsx';
+import Visualisations from './Visualisations.jsx';
 
 const Company = () => {
   const location = useLocation();
-  const { companyId, companyName } = location.state || {};
+  const navigate = useNavigate();
+  const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
   const stateCompanyName = location.state?.companyName;
   const displayCompanyName = companyName || stateCompanyName;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
+  const [reportModal, setOpenReportModal] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
   const [officialFrameworks, setOfficialFrameworks] = useState(null);
-  const [selectedFramework, setSelectedFramework] = useState(null);
-  const [expanded, setExpanded] = useState(false);
-  const [expanded1, setExpanded1] = useState(false);
+  const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
   const [allIndicators, setAllIndicators] = useState({});
+  const [allIndicatorsInfo, setAllIndicatorsInfo] = useState({});
   const [selectedIndicators, setSelectedIndicators] = useState({});
-  const [expandedMetrics, setExpandedMetrics] = useState({});
-  const [tableCollapsed, setTableCollapsed] = useState(true);
-  const [indicatorsCompany, setIndicatorsCompany] = useState(null);
-  const [frameworkScore, setFrameworkScore] = useState(null);
-  const [metricScore, setMetricScore] = useState(null);
+  const [selectedYear, setSelectedYear] = useState('');
   const token = Cookies.get('authToken');
+  const [availableYears, setAvailableYears] = useState([]);
+  const [indicatorsCompany, setIndicatorsCompany] = useState(null);
+  const [sliderValues, setSliderValues] = useState({});
+  const [sliderValuesIndicator, setSliderValuesIndicator] = useState({});
+  const [sliderValuesFixed, setSliderValuesFixed] = useState(null);
+  const [sliderValuesIndicatorFixed, setSliderValuesIndicatorFixed] = useState(null);
+  const [metricNamesFixed, setMetricNamesFixed] = useState(null);
+  const [selectedMetricsFixed, setSelectedMetricsFixed] = useState(null);
+  const [allIndicatorsFixed, setAllIndicatorsFixed] = useState(null);
+  const [selectedIndicatorsFixed, setSelectedIndicatorsFixed] = useState(null);
+
+  const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
+  // useEffect(() => {
+  //   console.log(lockedSliders);
+  // }, [lockedSliders]);
+
+  // useEffect(() => {
+  //   console.log(allIndicatorsInfo);
+  // }, [allIndicatorsInfo]);
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
+      const allIndicators1 = await getAllIndicators();
+      setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
-      console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
+      const years = Object.keys(companyIndicators);
+      setAvailableYears(years);
+      if (years.length > 0) {
+        setSelectedYear(years[years.length - 1]); 
+      }
+      
     };
 
     fetchCompanyIndicators(companyName);
   }, []);
 
+  // useEffect(() => {
+  //   console.log(metricNames);
+  // }, [metricNames]);
 
-  useEffect(async() => {
+  useEffect(() => {
     const fetchData = async () => {
-      console.log(companyId);
       await addToRecentlyViewed(companyId);
-      const recentList = await getRecentlyViewed();
-      if (Array.isArray(recentList) && recentList.includes(companyId)) {
-        setIsInFavs(true);
-      } else {
-        setIsInFavs(false);
-      }
+      // const recentList = await ();
+      // if (Array.isArray(recentList) && recentList.includes(companyId)) {
+      //   console.log('company is in Favourites/ watchlist');
+      // } else {
+      //   console.log('company is NOT IN Favourites/ watchlist');
+      // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
       setOfficialFrameworks(availableOfficialFramework);
     };
     fetchData();
 
-    const favsList = await getFavouritesList();
-    console.log('FAVS LIST:');
-    console.log(favsList);
-    if (Array.isArray(favsList) && favsList.includes(companyId)) {
-      console.log('IN FAVS');
-      setIsInFavs(true);
-    } else {
-      console.log('NOT IN FAVS');
-      setIsInFavs(false);
+    const fetchLists = async () => {
+      const favsList = await getFavouritesList();
+      console.log('FAVS LIST:');
+      console.log(favsList);
+      const listSearch = favsList.find(item => item.company_id === companyId);
+      if (listSearch) {
+        console.log('IN FAVS');
+        setIsInFavs(true);
+      } else {
+        setIsInFavs(false);
+      }
     }
+    fetchLists();
   }, [companyId]);
 
   useEffect(() => {
     const fetchData = async () => {
       if (selectedFramework) {
-        const metrics = await getMetricForFramework(true, selectedFramework);
-        console.log(metrics);
+        console.log(selectedFramework);
+        const metrics = await getMetricForFramework(selectedFramework);
         if (metrics) {
           const nameOfMetrics = [];
           const metricIds = [];
           for (const item of Object.values(metrics)) {
             const name = await getMetricName(item.metric_id);
-            nameOfMetrics.push({ id: item.metric_id, name: name });
+            nameOfMetrics.push({ id: item.metric_id, name: name, category: item.category, weighting: item.weighting });
             metricIds.push(item.metric_id);
           }
           setMetricNames(nameOfMetrics);
-          
+          setMetricNamesFixed(nameOfMetrics);
           setSelectedMetrics(metricIds);
+          setSelectedMetricsFixed(metricIds);
           
           const newAllIndicators = {};
-          const allMetricScores = {};
-          for (const id of metricIds) {
-            try {
-              const indicators = await getIndicatorsForMetric(id);
-              console.log(indicators);
-              newAllIndicators[id] = indicators;
-
-              // const scoreMetric = await getMetricScore(id, companyName, indicators);
-              // console.log(scoreMetric);
-              // allMetricScores[id] = scoreMetric;
-              
-            } catch (error) {
-              console.log(error);
-            }
+          for (let id of metricIds) {
+            const indicators = await getIndicatorsForMetric(parseInt(selectedFramework), parseInt(id));
+            newAllIndicators[id] = indicators;
           }
-          console.log(newAllIndicators);
+
           setAllIndicators(newAllIndicators);
-          // setMetricScore(allMetricScores);
+          setAllIndicatorsFixed(newAllIndicators);
           
           const newSelectedIndicators = {};
           for (const id of metricIds) {
             newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
           }
           setSelectedIndicators(newSelectedIndicators);
+          setSelectedIndicatorsFixed(newSelectedIndicators);
+
+          const initialSliderValues = {};
+          for (let id of metricIds) {
+            initialSliderValues[id] = metrics.find(item => item.metric_id === id).weighting;
+          }
+          setSliderValues(initialSliderValues);
+          setSliderValuesFixed(initialSliderValues);
+
+          const initialSliderValuesIndicator = {};
+          Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
+            // const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.id === entry)?.weighting;
+            const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+            initialSliderValuesIndicator[entry] = weighting;
+          });
+          console.log(initialSliderValuesIndicator);
+          setSliderValuesIndicator(initialSliderValuesIndicator);
+          setSliderValuesIndicatorFixed(initialSliderValuesIndicator);
         }
-        // const scoreFramework = await getFrameworkScore(selectedFramework, true, companyName);
-        // console.log(scoreFramework);
-        // setFrameworkScore(scoreFramework);
       }
     };
     fetchData();
   }, [selectedFramework]);
-
-  useEffect(() => {
-    const fetchIndicators = async () => {
-      const newAllIndicators = {};
-      for (const id of selectedMetrics) {
-        try {
-          const indicators = await getIndicatorsForMetric(id);
-          newAllIndicators[id] = indicators;
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      setAllIndicators(newAllIndicators);
-    };
-    if (selectedMetrics.length > 0) {
-      fetchIndicators();
-    }
-  }, [selectedMetrics]);
-
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
-
-  const handleExpandClick1 = () => {
-    setExpanded1(!expanded1);
-  };
-
-  const handleMetricExpandClick = (metricId) => {
-    setExpandedMetrics((prev) => ({
-      ...prev,
-      [metricId]: !prev[metricId]
-    }));
-  };
 
   const addToRecentlyViewed = async (cId) => {
     if (!token) {
@@ -207,348 +195,122 @@ const Company = () => {
           }
         }
       );
-      console.log(response.data);
     } catch (error) {
       console.log(error);
     }
-  };
-
-  const handleReturn = () => {
-    window.history.back();
-  };
-
-  const openWatchlistModal = () => {
-    setWatchlistModalOpen(true);
   };
 
   const handleCloseWatchList = () => {
     setWatchlistModalOpen(false);
   };
 
-  const openCompareModal = () => {
-    setCompareModalOpen(true);
-  };
+  const handleCloseReportModal = () => {
+    setOpenReportModal(false);
+  }
+  // useEffect(() => {
+  // }, [allIndicators]);
+ 
+  // useEffect(() => {
+  //   console.log(sliderValues);
+  // }, [sliderValues]);
 
-  const handleToggleFavourite = () => {
-    setIsInFavs(!isInFavs);
-    //depending on isInFavs, either add or delete from favourites (called WatchList in backend)
-    const companyId_int = Number(companyId);
-    if (isInFavs) {
-      addToFavourites(companyId_int);
-    } else {
-      deleteFromFavourites(companyId_int);
-    }
-  };
+  // useEffect(() => {
+  //   console.log(selectedMetrics);
+  // }, [selectedMetrics]);
 
-  const handleFrameworkChange = async (event) => {
-    const frameworkId = Number(event.target.value) + 1;
-    setSelectedFramework(frameworkId);
+  // useEffect(() => {
+  //   console.log(selectedIndicators);
+  // }, [selectedIndicators]);
 
-    const metrics = await getMetricForFramework(true, frameworkId);
-    if (metrics) {
-      const nameOfMetrics = [];
-      const metricIds = [];
-      for (const item of Object.values(metrics)) {
-        const name = await getMetricName(item.metric_id);
-        nameOfMetrics.push({ id: item.metric_id, name: name });
-        metricIds.push(item.metric_id);
-      }
-      setMetricNames(nameOfMetrics);
-      
-      setSelectedMetrics(metricIds);
-      
-      const newAllIndicators = {};
-      for (const id of metricIds) {
-        try {
-          const indicators = await getIndicatorsForMetric(id);
-          newAllIndicators[id] = indicators;
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      setAllIndicators(newAllIndicators);
-      
-      const newSelectedIndicators = {};
-      for (const id of metricIds) {
-        console.log(id);
-        newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
-      }
-      console.log(newSelectedIndicators);
-      setSelectedIndicators(newSelectedIndicators);
-    }
-  };
+  // useEffect(() => {
+  //   console.log(allIndicators);
+  // }, [allIndicators]);  
 
-  const handleMetricChange = async (event) => {
-    const metricId = Number(event.target.value);
-  
-    let newSelectedIndicators = { ...selectedIndicators };
-    let newSelectedMetrics = [...selectedMetrics];
-  
-    if (selectedMetrics.includes(metricId)) {
-      newSelectedMetrics = selectedMetrics.filter((id) => id !== metricId);
-      delete newSelectedIndicators[metricId];
-    } else {
-      newSelectedMetrics = [...selectedMetrics, metricId];
-      try {
-        const indicators = await getIndicatorsForMetric(metricId);
-        newSelectedIndicators[metricId] = indicators.map(indicator => indicator.indicator_id);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  
-    setSelectedMetrics(newSelectedMetrics);
-    setSelectedIndicators(newSelectedIndicators);
-  
-    const fetchIndicators = async () => {
-      const newAllIndicators = {};
-      for (const id of newSelectedMetrics) {
-        try {
-          const indicators = await getIndicatorsForMetric(id);
-          newAllIndicators[id] = indicators;
-        } catch (error) {
-          console.log(error);
-        }
-      }
-      setAllIndicators(newAllIndicators);
-    };
-    fetchIndicators();
-  };
+  // useEffect(() => {
+  //   console.log(lockedSlidersIndicators);
+  // }, [lockedSlidersIndicators])  
 
-  const handleIndicatorChange = (event, metricId) => {
-    const indicatorId = Number(event.target.value);
-    
-    setSelectedIndicators((prevSelectedIndicators) => {
-      const metricIndicators = prevSelectedIndicators[metricId] || [];
-      const isSelected = metricIndicators.includes(indicatorId);
-      
-      const updatedIndicators = isSelected
-        ? metricIndicators.filter((id) => id !== indicatorId)
-        : [...metricIndicators, indicatorId];
-      
-      const newIndicators = {
-        ...prevSelectedIndicators,
-        [metricId]: updatedIndicators.length > 0 ? updatedIndicators : undefined,
-      };
-      
-      const result = Object.fromEntries(
-        Object.entries(newIndicators).filter(([_, indicators]) => indicators !== undefined)
-      );
-      
-      return result;
-    });
-  };  
-  
+  // useEffect(() => {
+  //   console.log(errorE);
+  // }, [errorE]);
 
-  useEffect(() => {
-    console.log(selectedIndicators);
-  }, [selectedIndicators]);
-
-  useEffect(() => {
-    console.log(allIndicators);
-  }, [allIndicators]);
-
-  
+  // useEffect(() => {
+  //   console.log(sliderValuesIndicator);
+  // }, [sliderValuesIndicator]);
 
   return (
-    <>
-      <Navbar />
-      <Button variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
-        Return to Dashboard
-      </Button>
-      <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
-      <div className="companyHeading">
-        <div className="metainfoContainer">
-          <div className="companyName metainfo">
-            <h1>{companyName}</h1>
-            <h3>NASDAQ, inc. ETF - What is this for?</h3>
-          </div>
-          <div className="currentPrice metainfo">
-            <h2>58.78</h2>
-            <p>current price</p>
-          </div>
-          <div className="esgScore metainfo">
-            <h2>80.1</h2>
-            <p>ESG Score</p>
-          </div>
-        </div>
-        <div className="quickControls">
-          <Button>Save Report</Button>
-          <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
-        </div>
-      </div>
-      <div className="chartAndReccomendations">
-        <div className="chart">
-          <SimpleLineChart />
-          <div className="chartControls">
-            <Button onClick={openWatchlistModal}>Add to List</Button>
-            <Button>AI Predict</Button>
-            <Button onClick={openCompareModal}>Compare</Button>
-          </div>
-        </div>
-        <p>recommendations placeholder</p>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'row'}}>
-        <div style={{ width: '30%', display: 'flex', flexDirection: 'column'}}>
-          <Card style={{ marginTop: '20px'}}>
-            <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
-              <FormLabel component="legend" onClick={handleExpandClick}>
-                Select Framework
-                <IconButton onClick={handleExpandClick} size="small">
-                  {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
-              </FormLabel>
-              <Collapse in={expanded}>
-                <RadioGroup
-                  aria-labelledby="select-framework-radio-buttons-group"
-                  name="select-framework-radio-buttons-group"
-                  value={selectedFramework ? String(selectedFramework - 1) : ''}
-                  onChange={handleFrameworkChange}
-                >
-                  {officialFrameworks &&
-                    Object.entries(officialFrameworks).map(([key, framework]) => (
-                      <FormControlLabel key={key} value={key} control={<Radio />} label={framework.framework_name} />
-                    ))}
-                </RadioGroup>
-              </Collapse>
-            </FormControl>
-          </Card>
-          <Card style={{ marginTop: '100px' }}>
-            <FormControl style={{ marginLeft: '20px', cursor: 'pointer' }} component="fieldset">
-              <FormLabel component="legend" onClick={handleExpandClick1} style={{ display: 'flex', alignItems: 'center' }}>
-                Metrics and Indicators
-                <IconButton onClick={handleExpandClick1} size="small">
-                  {expanded1 ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                </IconButton>
-              </FormLabel>
-              <Collapse in={expanded1}>
-                <div style={{ display: 'flex', flexDirection: 'row', flexGrow: '1' }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', flexGrow: '1' }}>
-                    <FormGroup>
-                      {metricNames &&
-                        metricNames.map((metric) => (
-                          <div key={metric.id} style={{ display: 'flex', flexDirection: 'column', marginBottom: '20px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                              <FormControlLabel
-                                value={metric.id.toString()}
-                                control={<Checkbox checked={selectedMetrics.includes(metric.id)} />}
-                                label={metric.name}
-                                onChange={handleMetricChange}
-                              />
-                              <IconButton
-                                onClick={() => handleMetricExpandClick(metric.id)}
-                                style={{
-                                  width: '24px',
-                                  height: '24px',
-                                  borderRadius: '50%',
-                                  color: 'rgba(0, 0, 0, 0.54)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                                size="small"
-                              >
-                                {expandedMetrics[metric.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-                              </IconButton>
-                            </div>
-                            <Collapse in={expandedMetrics[metric.id]}>
-                              <FormGroup
-                                style={{ marginLeft: '30px' }}
-                                name="indicators"
-                                value={selectedIndicators[metric.id] || []}
-                              >
-                                {allIndicators[metric.id]?.map((indicator) => (
-                                  <FormControlLabel
-                                    key={indicator.indicator_id}
-                                    value={indicator.indicator_id.toString()}
-                                    control={<Checkbox checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false} />}
-                                    label={indicator.indicator_name}
-                                    onChange={(event) => handleIndicatorChange(event, metric.id)}
-                                  />
-                                ))}
-                              </FormGroup>
-                            </Collapse>
-                          </div>
-                        ))}
-                    </FormGroup>
-                  </div>
-                </div>
-
-                {/* Button - Only visible when section is expanded */}
-                {Object.keys(selectedIndicators).length > 0 && (
-                  <div style={{ marginLeft: '20px', marginTop: '20px' }}>
-                    <Button variant="contained" color="primary">
-                      Calculate Score
-                    </Button>
-                  </div>
-                )}
-              </Collapse>
-            </FormControl>
-          </Card>
-        </div>
-
-        <div style={{ width: '60%', marginTop: '20px', marginLeft: '10px'}}>
-          <Card>
-            <IconButton onClick={() => setTableCollapsed(!tableCollapsed)}>
-              {tableCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
-            </IconButton>
-            <Collapse in={!tableCollapsed}>
-              {selectedFramework && (
-                <Grid item xs={6}>
-                  <TableContainer component={Paper} style={{ marginLeft: '50px', border: '1px solid #ddd' }}>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Metric</TableCell>
-                          <TableCell style={{ borderRight: '1px solid #ddd', width: '30%' }}>Indicator</TableCell>
-                          <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {Object.entries(selectedIndicators).map(([metricId, indicatorIds]) => {
-                          const metricName = metricNames.find(m => m.id === Number(metricId))?.name || 'Unknown Metric';
-                          const indicators = allIndicators[metricId] || [];
-                          return (
-                            indicatorIds.map((indicatorId, index) => {
-                              const indicator = indicators.find(ind => ind.indicator_id === indicatorId);
-                              return (
-                                <TableRow key={`${metricId}-${indicatorId}`}>
-                                  {index === 0 && (
-                                    <TableCell
-                                      rowSpan={indicatorIds.length}
-                                      style={{ borderRight: '1px solid #ddd' }}
-                                    >
-                                      {metricName}
-                                    </TableCell>
-                                  )}
-                                  <TableCell style={{ borderRight: '1px solid #ddd' }}>
-                                    {indicator ? indicator.indicator_name : 'Unknown Indicator'}
-                                  </TableCell>
-                                  <TableCell style={{ borderBottom: '1px solid #ddd' }}>
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </Grid>
-              )}
-
-              {!selectedFramework && (
-                <div>
-                  hi
-                </div>
-              )}
-            </Collapse>
-          </Card>
-        </div>
-      </div>
-      <CompareModal companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} />
-      <CreateFramework/>
-    </>
+    <Box>
+      <Navbar  /*sx={{ width: `calc(100% - ${240}px)`, ml: `${240}px` }}*//>
+      <Box sx={{
+        height: 'calc(100vh - 5vh)',
+        display: 'flex',
+        position: 'relative',
+      }}>
+        <LeftPanel
+            setSelectedFramework={setSelectedFramework}
+            officialFrameworks={officialFrameworks}
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            selectedFramework={selectedFramework}
+            setCompareModalOpen={setCompareModalOpen}
+        />
+        <Box component="main" sx={{ 
+          flexGrow: 1, 
+          padding: '2vh 1vw 0 1vw',
+          overflow: "hidden",
+          overflowY: "scroll",
+        }}>
+          <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
+          {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
+          <CompanyHeader
+            setWatchlistModalOpen={setWatchlistModalOpen}
+            setOpenReportModal={setOpenReportModal}
+            companyId={companyId}
+            isInFavs={isInFavs} 
+            setIsInFavs={setIsInFavs}
+            companyName={companyName}
+            selectedFramework={selectedFramework}
+            selectedYear={selectedYear}
+          />
+          <CompanyBody companyId={companyId}/>
+          <GraphTableToggle
+            frameworkDisplay={frameworkDisplay}
+            setFrameworkDisplay={setFrameworkDisplay}
+          />
+          {frameworkDisplay == 'tabular' && <FrameworkTable
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setSelectedYear={setSelectedYear} 
+            companyName={companyName}
+            availableYears={availableYears}
+            selectedFramework={selectedFramework}
+            selectedIndicators={selectedIndicators}
+            metricNames={metricNames}
+            allIndicators={allIndicators}
+          />}
+          {frameworkDisplay == 'graphical' && <Visualisations/>}
+          <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
+          <CreateFramework/>
+        </Box>
+      </Box>
+    </Box>
   );
 };
 

@@ -21,14 +21,8 @@ class CompanyData(Base):
     __tablename__ = 'CompanyData'
    
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False, autoincrement=True)
-    company_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    company_name: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
     perm_id: Mapped[str] = mapped_column(String(100), nullable=False) 
-    # data_type: Mapped[Data_Type] = mapped_column(Enum(
-    #   *get_args(Data_Type),
-    #   name="data_type",
-    #   create_constraint=True,
-    #   validate_strings=True,
-    # ))
     disclosure: Mapped[Disclosure] = mapped_column(Enum(
       *get_args(Disclosure),
       name="disclosure",
@@ -43,4 +37,6 @@ class CompanyData(Base):
     nb_points_of_observations: Mapped[int] = mapped_column()
     indicator_period:  Mapped[str] = mapped_column(String(100))
     provider_name:  Mapped[str] = mapped_column(String(100), nullable=False) 
-    reported_date:  Mapped[DateTime] = mapped_column(DateTime)      
+    reported_date:  Mapped[DateTime] = mapped_column(DateTime, nullable=True) 
+    indicator_year_int: Mapped[int] = mapped_column(nullable=True)
+     

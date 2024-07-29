@@ -1,0 +1,21 @@
+/* .chatbot-container {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  zIndex: 1000;
+  height: 20vh !important;
+  width: 10vw !important;
+} */
+
+.rcb-chat-window {
+  /* zIndex: 1000 */
+  height: auto !important;
+  width: auto !important;
+  /* inset: 'auto'; */
+  /* borderRadius: '10px'; */
+  /* position: 'fixed'; */
+  /* // bottom: '20px';
+  // right: 20; */
+  /* display: 'flex',
+  flexDirection: 'column' */
+}

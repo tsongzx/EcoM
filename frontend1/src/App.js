@@ -6,7 +6,7 @@ import Dashboard from './Dashboard.jsx';
 import Company from './company/Company.jsx';
 import Compare from './compare/Compare.jsx';
 import Profile from './Profile.jsx';
-
+import Report from './reports/Report.jsx'
 function App() {
   return (
     <Router>
@@ -17,6 +17,7 @@ function App() {
           <Route path="/company/:companyId" element={<Company />} />
           <Route path="/compare" element={<Compare/>}/>
           <Route path="/profile" element={<Profile/>}/>
+          <Route path="/report/:companyId" element={<Report/>}/>
         </Routes>
       </div>
     </Router>

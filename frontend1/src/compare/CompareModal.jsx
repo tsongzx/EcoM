@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, Typography, Button, Paper, Card, CardContent } from '@mui/material';
+import { Modal, Box, Typography, Button, Paper } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from 'react-select';
 import { fetchCompanies, fetchIndustries, getCompaniesOfIndustry } from '../helper';
 import { useNavigate } from 'react-router-dom';
 
-const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOpen }) => {
+const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCompareModalOpen, selectedFramework }) => {
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyName, label: companyName }]);
+  const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyId, label: companyName }]);
   const [allCompanies, setAllCompanies] = useState([]);
-  // const [listOfCompanies, setListOfCompanies] = useState(null);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [listOfIndustries, setListOfIndustries] = useState([]);
   const [page, setPage] = useState(0);
@@ -21,6 +20,10 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
   useEffect(() => {
     console.log(companyName);
   }, []);
+
+  useEffect(() => {
+    console.log(selectedCompanies);
+  }, [selectedCompanies]);
 
   useEffect(() => {
     const fetchCompany = async () => {
@@ -41,19 +44,24 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
     };
     fetchCompany();
   }, [page]);
-
-  useEffect(async() => {
-    if (selectedIndustry) {
-      console.log(selectedIndustry);
-      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
-      const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
-      setAllCompanies(companyOfIndustryFiltered);
+  
+  useEffect(() => {
+    const someFunction = async() => {
+      if (selectedIndustry) {
+        console.log(selectedIndustry);
+        const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
+        console.log(companyOfIndustry);
+        const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
+        setAllCompanies(companyOfIndustryFiltered);
+      }
     }
+
+    someFunction();
   }, [selectedIndustry]);
 
   const handleClose = () => {
     setCompareModalOpen(false);
-    setSelectedCompanies([{ value: companyName, label: companyName }]);
+    setSelectedCompanies([{ value: companyId, label: companyName }]);
     setError(null);
   };
 
@@ -80,11 +88,21 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
     }
   };
 
+  //set default framework if Framework is NULL
   const handleCompare = () => {
     if (selectedCompanies.length < 2) {
       setError('Please select at least 2 companies to compare.');
     } else {
-      navigate('/compare', { state: { companies: selectedCompanies } });
+      console.log('handling compare with...');
+      const compareCompanies = selectedCompanies.map((company) => ({
+        id: company.value,
+        companyName: company.label,
+        framework: selectedFramework ?? null,
+        year: null,
+        selected: false
+    }));
+    console.log(compareCompanies);
+      navigate('/compare', { state: { companiesList: compareCompanies, selectedFramework } });
     }
   };
 
@@ -114,7 +132,7 @@ const CompareModal = ({ companyName, isOpen, compareModalOpen, setCompareModalOp
             ))}
           </Box>
 
-          <div style={{display: 'flex', flexDirection: 'row', width: '100%'}}>
+          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
             <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '30px', width: '100%' }}>
               <Typography variant="h6" component="h1" fontWeight="bold">Add Industry</Typography>
 

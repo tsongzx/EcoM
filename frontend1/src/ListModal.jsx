@@ -6,24 +6,26 @@ const ListModal = ({ isOpen, onClose, list }) => {
 
   const [companiesInList, setCompaniesInList] = useState({});
 
-  useEffect(async () => {
-    console.log(list);
-    const companies = await fetchCompaniesInList(list.id);
-    setCompaniesInList(companies);
+  useEffect(() => {
+    const someFunction = async() => {
+      console.log(list);
+      const companies = await fetchCompaniesInList(list.id);
+      setCompaniesInList(companies);
+    }
+    someFunction();
   }, []);
 
-  useEffect( async () => {
-    // let companyNames = [];
-    // for (let company of companiesInList) {
-    //   console.log(company); /// WILL DO THIS ARVO
-    // }
-    let companyNames = [];
-    for (let company of Object.keys(companiesInList)) {
-      const company1 = companiesInList[company];
-      const companyInfo = await getCompanyFromRecentlyViewed(company1);
-      companyNames.push(companyInfo);
+  useEffect(() => {
+    const someFunction = async() => {
+      let companyNames = [];
+      for (let company of Object.keys(companiesInList)) {
+        const company1 = companiesInList[company];
+        const companyInfo = await getCompanyFromRecentlyViewed(company1);
+        companyNames.push(companyInfo);
+      }
+      console.log(companyNames);
     }
-    console.log(companyNames);
+    someFunction();
   }, [companiesInList]);
 
 

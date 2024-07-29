@@ -27,6 +27,16 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
   UPDATE MetricIndicators
   INNER JOIN Indicators ON MetricIndicators.indicator_name = Indicators.name 
   SET MetricIndicators.indicator_id = Indicators.id;
+
+  CREATE TEMPORARY TABLE category_counts AS
+  SELECT metric_id, COUNT(*) AS num_metrics
+  FROM MetricIndicators
+  GROUP BY metric_id;
+
+  UPDATE MetricIndicators indicators
+  JOIN category_counts cc
+  ON indicators.metric_id = cc.metric_id
+  SET indicators.weighting = 1.0 / cc.num_metrics;
 EOF
 echo $f 'ran'
 
