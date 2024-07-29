@@ -833,13 +833,24 @@ async def get_framework_score(
 # ***************************************************************
 
 
-@app.get("/indicators", tags=["Indicators"])
-def get_indicators(
+@app.get("/indicators/{framework_id}", tags=["Indicators"])
+def get_framework_indicators(
     framework_id: int,
     metric_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
+    """_summary_: retrieves indicators for a specific framework
+
+    Args:
+        framework_id (int): _description_
+        metric_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: list of indicators 
+    """    
     # get custom weights
     indicators = session.query(metrics_models.CustomMetricIndicators).filter_by(metric_id=metric_id,
                                                                    user_id=user.id,
@@ -847,6 +858,26 @@ def get_indicators(
     # if custom weights don't exist, use default
     if len(indicators) == 0:
         indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
+    return indicators
+  
+@app.get("/indicators/metric", tags=["Indicators"])
+def get_indicators_for_metric(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: retrieves indicators for a metric (not unique to a framework)
+
+    Args:
+        framework_id (int): _description_
+        metric_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: list of default indicators
+    """                                                                   
+    indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
     return indicators
 
 @app.get("/indicators/all_by_id", tags=["Indicators"])
