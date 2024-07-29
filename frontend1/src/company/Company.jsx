@@ -22,6 +22,7 @@ import {
   getIndicatorInfo,
   getFavouritesList,
   getAllIndicators,
+  getAllMetricsAvailable
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -48,6 +49,7 @@ const Company = () => {
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
+  const [allMetrics, setAllMetrics] = useState({});
   const [allIndicators, setAllIndicators] = useState({});
   const [allIndicatorsInfo, setAllIndicatorsInfo] = useState({});
   const [selectedIndicators, setSelectedIndicators] = useState({});
@@ -69,12 +71,14 @@ const Company = () => {
   //   console.log(lockedSliders);
   // }, [lockedSliders]);
 
-  // useEffect(() => {
-  //   console.log(allIndicatorsInfo);
-  // }, [allIndicatorsInfo]);
+  useEffect(() => {
+    console.log(allIndicatorsInfo);
+  }, [allIndicatorsInfo]);
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
+      const allMetricsAvailable = await getAllMetricsAvailable();
+      setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
@@ -124,8 +128,11 @@ const Company = () => {
     fetchLists();
   }, [companyId]);
 
+  
+
   useEffect(() => {
     const fetchData = async () => {
+      console.log('hereeee');
       if (selectedFramework) {
         console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
@@ -180,6 +187,10 @@ const Company = () => {
     fetchData();
   }, [selectedFramework]);
 
+  useEffect(() => {
+    console.log(metricNamesFixed);
+  }, [metricNamesFixed]);
+
   const addToRecentlyViewed = async (cId) => {
     if (!token) {
       console.error('No authToken cookie found');
@@ -207,6 +218,10 @@ const Company = () => {
   const handleCloseReportModal = () => {
     setOpenReportModal(false);
   }
+
+  useEffect(() => {
+    console.log(metricNames);
+  }, [metricNames]);
   // useEffect(() => {
   // }, [allIndicators]);
  
@@ -214,17 +229,17 @@ const Company = () => {
   //   console.log(sliderValues);
   // }, [sliderValues]);
 
-  // useEffect(() => {
-  //   console.log(selectedMetrics);
-  // }, [selectedMetrics]);
+  useEffect(() => {
+    console.log(selectedMetrics);
+  }, [selectedMetrics]);
 
-  // useEffect(() => {
-  //   console.log(selectedIndicators);
-  // }, [selectedIndicators]);
+  useEffect(() => {
+    console.log(selectedIndicators);
+  }, [selectedIndicators]);
 
-  // useEffect(() => {
-  //   console.log(allIndicators);
-  // }, [allIndicators]);  
+  useEffect(() => {
+    console.log(allIndicators);
+  }, [allIndicators]);  
 
   // useEffect(() => {
   //   console.log(lockedSlidersIndicators);
@@ -270,6 +285,7 @@ const Company = () => {
             setSliderValues={setSliderValues}
             selectedFramework={selectedFramework}
             setCompareModalOpen={setCompareModalOpen}
+            allMetrics={allMetrics}
         />
         <Box component="main" sx={{ 
           flexGrow: 1, 

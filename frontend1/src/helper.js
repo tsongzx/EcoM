@@ -618,7 +618,6 @@ export const getAllMetrics = async() => {
         console.log(error);
         return [];
     }
-
     
 
     caches.open('allMetrics').then()
@@ -659,4 +658,20 @@ export const calculateGeneralMetricScore = async(metricId, metricName, companyLi
   }));
   // return collected information, (in future maybe ESG score if framework and industry ranking)
   return {metricId, metricName, companies};
+}
+
+export const getAllMetricsAvailable = async() => {
+    
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/metrics`, 
+            {           
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
 }

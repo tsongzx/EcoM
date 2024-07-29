@@ -58,6 +58,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   const [modalOpen, setModalOpen] = useState(false);
 
+  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
+
   useEffect(() => {
     let newLockedSlidersIndicators = {};
     let newSliderValuesIndicators = {};
@@ -267,6 +269,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   }
 
   const resetToDefault = () => {
+    console.log(metricNamesFixed);
     setTriggerSource(true);
     setMetricNames(metricNamesFixed);
     setSelectedMetrics(selectedMetricsFixed);
@@ -280,7 +283,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     if (!metricNames) return null;
   
     const filteredMetrics = metricNames.filter(metric => metric.category === category);
-  
+    console.log(selectedMetrics);
     return (
       <div style={{ display: 'flex', flexDirection: 'column'}}>
         <FormGroup style={{ marginTop: '10px'}}>
@@ -423,6 +426,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     );
   };
+
   const handleWeightingChange = (pillar, value) => {
     const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
     const numericValue = parseFloat(value);

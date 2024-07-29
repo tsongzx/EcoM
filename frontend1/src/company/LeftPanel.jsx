@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import SelectFramework from './SelectFramework';
 import MetricIndicatorsCard from './MetricIndicatorsCard';
+import AdditionalMetrics from "./AdditionalMetrics";
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
@@ -17,7 +18,7 @@ const LeftPanel = ({
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics
 }) => {
   const navigate = useNavigate();
 
@@ -28,6 +29,23 @@ const LeftPanel = ({
   const openCompareModal = () => {
     setCompareModalOpen(true);
   };
+
+  useEffect(() => {
+    console.log(metricNamesFixed);
+  }, [metricNamesFixed]);
+
+  useEffect(() => {
+    console.log('Selected Metrics:', selectedMetrics);
+  }, [selectedMetrics]);
+
+  const updateMetricName = (newValue, newValue1) => {
+    console.log('Updating metric names:', newValue, newValue1);
+    setMetricNames(newValue);
+    setSelectedMetrics(newValue1);
+    console.log('Metric names set:', newValue);
+    console.log('Selected metrics set:', newValue1);
+  };
+
 
   return (
     <Box
@@ -58,6 +76,31 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
             officialFrameworks={officialFrameworks}
             />
+          <AdditionalMetrics
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            allMetrics={allMetrics}
+            selectedFramework={selectedFramework}
+            setSelectedFramework={setSelectedFramework}
+            updateMetricName={updateMetricName}
+          />
           <MetricIndicatorsCard
             selectedIndicators={selectedIndicators}
             selectedMetrics={selectedMetrics}
