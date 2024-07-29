@@ -11,6 +11,7 @@ import schemas.list_schemas as list_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
+import schemas.graph_schemas as graph_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -1160,3 +1161,32 @@ async def chat(
     # message = response.choices[0].message.content
 
     return {'response': chatbot_response}
+  
+  #***************************************************************
+#                        Visualisation Apis
+# ***************************************************************
+
+@app.get("/graph/indicators", tags=["Graph"])
+async def get_indicators_graph(
+    indicators: List[str],
+    companies: List[str],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    data_by_year = {}
+    
+    company_data = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name.in_(companies),
+        company_models.CompanyData.indicator_name.in_(indicators),
+    ).all()
+
+    for entry in company_data:
+      if entry.indicator_year_int not in data_by_year:
+        data_by_year[entry.indicator_year_int] = []
+      
+      data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
+                                                year=entry.indicator_year_int,
+                                                company=entry.company_name)
+      data_by_year[entry.indicator_year].append(data_point)
+     
+    return data_by_year
