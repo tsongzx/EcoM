@@ -833,8 +833,8 @@ async def delete_framework(
 # ***************************************************************
 
 
-@app.get("/indicators/{framework_id}", tags=["Indicators"])
-def get_framework_indicators(
+@app.get("/indicators/", tags=["Indicators"])
+def get_indicators(
     framework_id: int,
     metric_id: int,
     user: user_schemas.UserInDB = Depends(get_user),
@@ -994,27 +994,27 @@ def modify_metric(
     # indicator weights is unique for a framework
     return []
 
-@app.get("/company/metric/indicators", tags=["Company"])
-def get_company_indicators_by_metric(
-    metric_id: int,
-    company_name: str,
-    year: int,
-    indicators: List[Any] = Depends(get_framework_indicators),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    """_summary_: MAY NEED TO REMOVE YEAR FILTER
-    """    
-    indicator_names = [indicator.indicator_name for indicator in indicators]
-    values = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name == company_name,
-        company_models.CompanyData.indicator_year_int == year,
-        company_models.CompanyData.indicator_name.in_(indicator_names),
-    ).all()
+# @app.get("/company/metric/indicators", tags=["Company"])
+# def get_company_indicators_by_metric(
+#     metric_id: int,
+#     company_name: str,
+#     year: int,
+#     indicators: List[Any] = Depends(get_indicators),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     """_summary_: MAY NEED TO REMOVE YEAR FILTER
+#     """    
+#     indicator_names = [indicator.indicator_name for indicator in indicators]
+#     values = session.query(company_models.CompanyData).filter(
+#         company_models.CompanyData.company_name == company_name,
+#         company_models.CompanyData.indicator_year_int == year,
+#         company_models.CompanyData.indicator_name.in_(indicator_names),
+#     ).all()
     
-    return values
+#     return values
 
-# fix to get by year and apply weighting!
+# # fix to get by year and apply weighting!
 # @app.get("/metric/score", tags=["Metrics"])
 # # need to modify this to the metric for a given year!!!
 # async def calculate_metric(
