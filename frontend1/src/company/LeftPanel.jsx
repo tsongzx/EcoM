@@ -38,7 +38,7 @@ const LeftPanel = ({
     console.log('Selected Metrics:', selectedMetrics);
   }, [selectedMetrics]);
 
-  const updateMetricName = (newValue, newValue1) => {
+  const updateMetricName = async (newValue, newValue1, unselectedMetricId) => {
     console.log('Updating metric names:', newValue, newValue1);
     setMetricNames(newValue);
     setSelectedMetrics(newValue1);
@@ -76,6 +76,27 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
             officialFrameworks={officialFrameworks}
             />
+          <MetricIndicatorsCard
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+          />
           <AdditionalMetrics
             selectedIndicators={selectedIndicators}
             selectedMetrics={selectedMetrics}
@@ -100,27 +121,6 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
             setSelectedFramework={setSelectedFramework}
             updateMetricName={updateMetricName}
-          />
-          <MetricIndicatorsCard
-            selectedIndicators={selectedIndicators}
-            selectedMetrics={selectedMetrics}
-            metricNames={metricNames}
-            setSelectedIndicators={setSelectedIndicators}
-            setSelectedMetrics={setSelectedMetrics}
-            allIndicators={allIndicators}
-            allIndicatorsInfo={allIndicatorsInfo}
-            setMetricNames={setMetricNames}
-            setAllIndicators={setAllIndicators}
-            sliderValues={sliderValues}
-            sliderValuesFixed={sliderValuesFixed}
-            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
-            metricNamesFixed={metricNamesFixed}
-            selectedMetricsFixed={selectedMetricsFixed}
-            allIndicatorsFixed={allIndicatorsFixed}
-            selectedIndicatorsFixed={selectedIndicatorsFixed}
-            sliderValuesIndicator={sliderValuesIndicator}
-            setSliderValuesIndicator={setSliderValuesIndicator}
-            setSliderValues={setSliderValues}
           />
         </div>
     </Box>

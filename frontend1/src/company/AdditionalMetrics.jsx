@@ -80,7 +80,7 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
 		}
 		
 		// Update the state
-		updateMetricName(newMetricNames, selectedMetricsCopy);
+		updateMetricName(newMetricNames, selectedMetricsCopy, unselectedMetricId);
 		
 		// Create a new array for unselectedMetrics
 		const newArray = unselectedMetrics.filter(item => item.id !== unselectedMetricId);
