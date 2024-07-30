@@ -11,6 +11,7 @@ import schemas.list_schemas as list_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
+import schemas.graph_schemas as graph_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -848,15 +849,29 @@ def get_indicators(
         indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
     return indicators
 
-@app.get("/indicators/all", tags=["Indicators"])
-async def get_all_indicators(
+@app.get("/indicators/all_by_id", tags=["Indicators"])
+async def get_all_indicators_dict_by_id(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     indicators = session.query(metrics_models.Indicators).all()
 
-    return indicators
+    indicators_dict = {}
+    for entry in indicators:
+      indicators_dict[entry.id] = entry
+    return indicators_dict
 
+@app.get("/indicators/all_by_name", tags=["Indicators"])
+async def get_all_indicators_dict_by_name(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    indicators = session.query(metrics_models.Indicators).all()
+
+    indicators_dict = {}
+    for entry in indicators:
+      indicators_dict[entry.name] = entry
+    return indicators_dict
 
 @app.get("/indicator", tags=["Indicators"])
 async def get_indicator(
@@ -865,6 +880,19 @@ async def get_indicator(
     session: Session = Depends(get_session),
 ):
     return session.query(metrics_models.Indicators).get(indicator_id)
+
+# @app.post("/indicators/info", tags=["Indicators"])
+# async def get_indicators_info_by_name(
+#     indicators: List[str],
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     info = session.query(metrics_models.Indicators).filter(metrics_models.Indicators.name.in_(indicators)).all()
+#     info_dict = {}
+#     for entry in info:
+#       info_dict[entry.name] = entry
+      
+#     return info_dict
 
 # ***************************************************************
 #                        Metric Apis
@@ -1160,3 +1188,32 @@ async def chat(
     # message = response.choices[0].message.content
 
     return {'response': chatbot_response}
+  
+  #***************************************************************
+#                        Visualisation Apis
+# ***************************************************************
+
+@app.post("/graph/indicators/", tags=["Graph"])
+async def get_indicators_graph(
+    indicators: List[str],
+    companies: List[str],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    data_by_year = {}
+    
+    company_data = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name.in_(companies),
+        company_models.CompanyData.indicator_name.in_(indicators),
+    ).all()
+
+    for entry in company_data:
+      if entry.indicator_year_int not in data_by_year:
+        data_by_year[entry.indicator_year_int] = []
+      
+      data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
+                                                year=entry.indicator_year_int,
+                                                company=entry.company_name)
+      data_by_year[entry.indicator_year].append(data_point)
+     
+    return data_by_year

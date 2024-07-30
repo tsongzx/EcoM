@@ -262,7 +262,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   }
 
   const loadIndicatorInfo = (indicatorId) => {
-    const description = allIndicatorsInfo.find(obj => obj.id === indicatorId).description;
+    const description = allIndicatorsInfo[indicatorId].description;
     return description;
   }
 

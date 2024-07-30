@@ -32,7 +32,7 @@ import FrameworkTable from './FrameworkTable';
 import CompanyHeader from './CompanyHeader.jsx';
 import CompanyBody from './CompanyBody.jsx';
 import GraphTableToggle from './GraphTableToggle.jsx';
-import Visualisations from './Visualisations.jsx';
+import Visualisations from './visualisations/Visualisations.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -272,7 +272,8 @@ const Company = () => {
             setCompareModalOpen={setCompareModalOpen}
         />
         <Box component="main" sx={{ 
-          flexGrow: 1, 
+          // flexGrow: 1, 
+          width: '70vw',
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
@@ -294,7 +295,7 @@ const Company = () => {
             frameworkDisplay={frameworkDisplay}
             setFrameworkDisplay={setFrameworkDisplay}
           />
-          {frameworkDisplay == 'tabular' && <FrameworkTable
+          {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear} 
@@ -305,7 +306,7 @@ const Company = () => {
             metricNames={metricNames}
             allIndicators={allIndicators}
           />}
-          {frameworkDisplay == 'graphical' && <Visualisations/>}
+          {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework/>
         </Box>
