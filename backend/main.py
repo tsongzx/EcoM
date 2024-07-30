@@ -1,8 +1,8 @@
+from urllib.parse import urljoin
 from sklearn.linear_model import LinearRegression
 from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
-
 import numpy as np
 from auth import generate_token, is_authenticated, authenticate_user, hash_password
 from schemas.predictive_schemas import PredictiveIndicators
@@ -29,6 +29,9 @@ from typing import List, Any, Dict
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import requests
+from bs4 import BeautifulSoup
+
     
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
@@ -1177,7 +1180,7 @@ async def chat(
 
 #***************************************************************
 #                   Predictive Analysis Apis
-# ***************************************************************
+# **************************************************************
 
 def linear_regression(data: List[company_models.CompanyData]) -> float:
 
@@ -1221,3 +1224,43 @@ async def get_predictive(
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
+
+#***************************************************************
+#                   Predictive Analysis Apis
+# **************************************************************
+
+def access_articles(URL: str) -> List[Dict[str, str]]:
+    page = requests.get(URL)
+    if page.status_code == 200:
+        soup = BeautifulSoup(page.content, "html.parser")
+        articles = []
+        results = soup.find_all('div', class_='text-component')
+
+        for article in results:
+            title_exists = article.find('h3')
+            link_exists = article.find('a')
+
+            if title_exists and link_exists:
+                title = title_exists.text.strip() 
+                link = urljoin(URL, link_exists['href'].strip())
+                if link.startswith("https://"):
+                    link_page = requests.get(link)
+                    if link_page.status_code == 404:
+                        continue
+                    articles.append({'title': title, 'link': link})
+
+    return articles
+
+@app.get("/articles", tags=["Articles"])
+async def articles(
+    URL: str,
+    token: str = Depends(oauth2_scheme),
+    session: Session = Depends(get_session)
+) -> List[Dict[str, str]]:
+
+    token_data = await is_authenticated(session, token)
+    user = get_user_using_id(session, id=token_data.userId)
+
+    return access_articles(URL)
+
+# URL = "https://www.pwc.com.au/environment-social-governance.html"
