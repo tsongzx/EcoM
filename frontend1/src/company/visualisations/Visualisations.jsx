@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getIndicatorsInfoByName } from '../helper';
-import VisualisationsTab from './visualisations/VisualisationsTab';
+import { getIndicatorsInfoByName } from '../../helper';
+import VisualisationsTab from './VisualisationsTab';
 import { Box } from '@mui/material';
 
 const Visualisations = ({companyIndicators, companyName}) => {
