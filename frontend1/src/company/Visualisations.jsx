@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllIndicators } from '../helper';
+import { getIndicatorsInfoByName } from '../helper';
 import VisualisationsTab from './visualisations/VisualisationsTab';
 import { Box } from '@mui/material';
 
@@ -12,7 +12,7 @@ const Visualisations = ({companyIndicators, companyName}) => {
     
   useEffect(() => {
     const getIndicatorInfo = async() => {
-      const info = await getAllIndicators();
+      const info = await getIndicatorsInfoByName();
       console.log(info);
       setIndicatorInfo(info);
     }
