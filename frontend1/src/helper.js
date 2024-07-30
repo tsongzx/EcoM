@@ -433,7 +433,8 @@ export const getAllIndicators = async() => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-
+        console.log('Indicators for metric ', metricId);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);

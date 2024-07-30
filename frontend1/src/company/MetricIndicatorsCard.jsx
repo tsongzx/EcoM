@@ -475,7 +475,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     );
   };
-
   const handleWeightingChange = (pillar, value) => {
     const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
     const numericValue = parseFloat(value);
