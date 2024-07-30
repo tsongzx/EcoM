@@ -93,6 +93,31 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
             officialFrameworks={officialFrameworks}
             />
+          <AdditionalMetrics
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            allMetrics={allMetrics}
+            selectedFramework={selectedFramework}
+            setSelectedFramework={setSelectedFramework}
+            updateMetricName={updateMetricName}
+          />
           <MetricIndicatorsCard
             selectedIndicators={selectedIndicators}
             selectedMetrics={selectedMetrics}

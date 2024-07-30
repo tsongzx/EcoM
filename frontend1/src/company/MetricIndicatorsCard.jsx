@@ -64,6 +64,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
 
+  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
+
   useEffect(() => {
     console.log(triggerSource);
     let newLockedSlidersIndicators = {};

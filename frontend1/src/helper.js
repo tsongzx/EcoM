@@ -684,6 +684,7 @@ export const getAllMetricsAvailable = async() => {
     } catch (error) {
         console.log(`Error getting industry: ${error}`)
     }
+<<<<<<< HEAD
 }
 
 export const getIndicatorFromMetric = async(metricId) => {
@@ -699,4 +700,6 @@ export const getIndicatorFromMetric = async(metricId) => {
     } catch (error) {
         console.log(`Error getting industry: ${error}`)
     }
+=======
+>>>>>>> 0d92e25a (Implemented additional metrics)
 }
