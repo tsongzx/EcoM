@@ -8,6 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
 import ChatFeature from './chatbot/Chatbot.jsx';
+import './Dashboard.css'
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,13 +31,15 @@ const Dashboard = () => {
   const [error, setError] = useState(false);
   const [favsList, setFavsList] = useState([]);
 
-  useEffect(async() => {
-
+  const setIndustryAndCompany = async() => {
     if (selectedIndustry) {
       console.log(selectedIndustry);
       const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
       setListOfCompanies(companyOfIndustry);
     }
+  }
+  useEffect(() => {
+    setIndustryAndCompany();
   }, [selectedIndustry]);
 
   // useEffect(() => {

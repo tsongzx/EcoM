@@ -2,27 +2,27 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const token = Cookies.get('authToken');
-let indicatorData = null;
+// let indicatorData = null;
 
-const fetchIndicatorData = async() => {
-    try {
-        const response = await fetch('../backend/db/metrics.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        indicatorData = await response.json();
-        return;
-    } catch (error) {
-        console.error("Unable to fetch data:", error);
-        return null;
-    }
-}
+// const fetchIndicatorData = async() => {
+//     try {
+//         const response = await fetch('../backend/db/metrics.json');
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! Status: ${response.status}`);
+//         }
+//         indicatorData = await response.json();
+//         return;
+//     } catch (error) {
+//         console.error("Unable to fetch data:", error);
+//         return null;
+//     }
+// }
 
-const initialise = async() => {
-    await fetchIndicatorData();
-}
+// const initialise = async() => {
+//     await fetchIndicatorData();
+// }
 
-initialise();
+// initialise();
 
 export const fetchLists = async() => {
     //get the names of all the lists and whether the company is contained inside that list
@@ -129,6 +129,28 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
         return [];
     }
 }
+
+export const getCompanyMetrics = async (companyName) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/indicators/${companyName}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_name: companyName
+                }
+            } 
+        );
+        const companyInfo = response.data;
+        return companyInfo;
+    } catch (error) {
+        console.log('Error fetching company', error);
+        return [];
+    }
+}
+
 
 //given a list id, get all the companies that are in that list
 export const fetchCompaniesInList = async(listId) => {
@@ -323,9 +345,7 @@ export const getOfficialFrameworks = async() => {
 export const getIndicatorInfo = async(companyName) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/indicators/${companyName}`, 
-            { params: {
-                company_name: companyName
-            }, headers: {
+            { headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
@@ -336,6 +356,7 @@ export const getIndicatorInfo = async(companyName) => {
 }
 
 export const getMetricForFramework = async(frameworkId) => {
+    console.log(frameworkId);
     try {
         const response = await axios.get(`http://127.0.0.1:8000/framework/metrics/${frameworkId}`, 
         {
@@ -390,10 +411,6 @@ export const getIndicatorsForMetric = async(frameworkId, metricId) => {
     try {   
         const response = await axios.get(`http://127.0.0.1:8000/indicators?framework_id=${frameworkId}&metric_id=${metricId}`, 
         {
-            params: {
-                framework_id: frameworkId,
-                metric_id: Number(metricId)
-            }, 
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -407,26 +424,37 @@ export const getIndicatorsForMetric = async(frameworkId, metricId) => {
     }
 }
 
-
-export const getMetricScore = async(metricId, companyName, indicators) => {
-    try {
-        const response = await axios.get('http://127.0.0.1:8000/calculate_metric', 
+export const getAllIndicators = async() => {
+    try {   
+        const response = await axios.get(`http://127.0.0.1:8000/indicators/all_by_id`, 
         {
-            params: {
-                metric_id: metricId,
-                company_name: companyName,
-                indicators: indicators
-            },             
-            
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
+        console.log('Indicators for metric ', metricId);
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
     }
+}
+
+export const getIndicatorsInfoByName = async() => {
+  try {   
+      const response = await axios.get(`http://127.0.0.1:8000/indicators/all_by_name`,
+      {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }
+      });
+
+      return response.data;
+  } catch (error) {
+      console.log(`Error getting metric: ${error}`);
+  }
 }
 
 export const getCompaniesOfIndustry = async(industryName) => {
@@ -601,7 +629,6 @@ export const getAllMetrics = async() => {
         console.log(error);
         return [];
     }
-
     
 
     caches.open('allMetrics').then()
@@ -642,4 +669,35 @@ export const calculateGeneralMetricScore = async(metricId, metricName, companyLi
   }));
   // return collected information, (in future maybe ESG score if framework and industry ranking)
   return {metricId, metricName, companies};
+}
+
+export const getAllMetricsAvailable = async() => {
+    
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/metrics`, 
+            {           
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
+}
+
+export const getIndicatorFromMetric = async(metricId) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/indicators/metric?metric_id=${metricId}`, 
+            {           
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
 }

@@ -44,15 +44,19 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
     };
     fetchCompany();
   }, [page]);
-
-  useEffect(async () => {
-    if (selectedIndustry) {
-      console.log(selectedIndustry);
-      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
-      console.log(companyOfIndustry);
-      const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
-      setAllCompanies(companyOfIndustryFiltered);
+  
+  useEffect(() => {
+    const someFunction = async() => {
+      if (selectedIndustry) {
+        console.log(selectedIndustry);
+        const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
+        console.log(companyOfIndustry);
+        const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
+        setAllCompanies(companyOfIndustryFiltered);
+      }
     }
+
+    someFunction();
   }, [selectedIndustry]);
 
   const handleClose = () => {
