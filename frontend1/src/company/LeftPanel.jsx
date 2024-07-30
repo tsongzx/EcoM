@@ -19,9 +19,13 @@ const LeftPanel = ({
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
+  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
+  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed
 }) => {
   const navigate = useNavigate();
+
+  const [exitFramework, setExitFramework] = useState(false);
 
   const handleReturn = () => {
     navigate('/dashboard');
@@ -79,6 +83,9 @@ const LeftPanel = ({
         <Button variant="contained" 
           sx={{width: '100%', margin: '1vh 0'}} 
           onClick={openCompareModal}>Compare</Button>
+        <Button variant="contained" 
+          sx={{width: '100%', margin: '1vh 0'}} 
+          onClick={() => setExitFramework(!exitFramework)}>Exit Framework View</Button>
         <div style={{ 
           display: 'flex', 
           flexDirection: 'column',
@@ -163,6 +170,8 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
             setSelectedFramework={setSelectedFramework}
             updateMetricName={updateMetricName}
+            exitFramework={exitFramework}
+            setExitFramework={setExitFramework}
           />
         </div>
     </Box>

@@ -636,18 +636,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   }
 
-  // const handleLockClickIndicator = (id) => {
-  //   setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
-  //     const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
-  //     if (newLockedSlidersIndicators[id]) {
-  //       delete newLockedSlidersIndicators[id];
-  //     } else {
-  //       newLockedSlidersIndicators[id] = true;
-  //     }
-  //     return newLockedSlidersIndicators;
-  //   });
-  // }
-
   const handleLockClickIndicator = (metricId, indicatorId) => {
     setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
       const newLockedSlidersIndicators = {...prevLockedSlidersIndicators};

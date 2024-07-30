@@ -35,6 +35,7 @@ import CompanyBody from './CompanyBody.jsx';
 import GraphTableToggle from './GraphTableToggle.jsx';
 import Visualisations from './visualisations/Visualisations.jsx';
 
+
 const Company = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -190,7 +191,9 @@ const Company = () => {
         }
       }
     };
-    fetchData();
+    if (selectedFramework) {
+      fetchData();
+    }
   }, [selectedFramework]);
 
   useEffect(() => {
@@ -292,6 +295,13 @@ const Company = () => {
             selectedFramework={selectedFramework}
             setCompareModalOpen={setCompareModalOpen}
             allMetrics={allMetrics}
+            setSliderValuesFixed={setSliderValuesFixed}
+            setSliderValuesIndicatorFixed={setSliderValuesIndicatorFixed}
+            setFrameworkDisplay={setFrameworkDisplay}
+            setMetricNamesFixed={setMetricNamesFixed}
+            setSelectedMetricsFixed={setSelectedMetricsFixed}
+            setAllIndicatorsFixed={setAllIndicatorsFixed}
+            setSelectedIndicatorsFixed={setSelectedIndicatorsFixed}
         />
         <Box component="main" sx={{ 
           // flexGrow: 1, 

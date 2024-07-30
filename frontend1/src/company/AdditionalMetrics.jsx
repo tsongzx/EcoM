@@ -27,12 +27,23 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, allMetrics, selectedFramework, setSelectedFramework, updateMetricName
+  setSliderValuesIndicator, setSliderValues, allMetrics, selectedFramework, setSelectedFramework, updateMetricName, exitFramework, setExitFramework
 }) => {
 
   const [unselectedMetrics, setUnselectedMetrics] = useState([]);
   const [open, setOpen] = useState({ E: true, S: true, G: true });
   const [expanded2, setExpanded2] = useState(false);
+
+  useEffect(() => {
+		if (exitFramework === true) {
+			setSelectedFramework(null);
+      setMetricNames(null);
+			setSelectedMetrics([]);
+			setSelectedIndicators({});
+      setExitFramework(false);
+		}
+
+  }, [exitFramework]);
 
   useEffect(() => {
     let unselectedMetrics1 = [];

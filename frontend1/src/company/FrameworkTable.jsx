@@ -20,6 +20,11 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   companyName, availableYears, selectedFramework, selectedIndicators, metricNames, allIndicators,
 }) => {
   const [tableCollapsed, setTableCollapsed] = useState(true);
+  {console.log('Selected Framework:', selectedFramework)};
+
+  useEffect(() => {
+    console.log(selectedFramework);
+  }, [selectedFramework]);
 
   const findIndicatorValue = (indicatorName) => {
     if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
