@@ -1,4 +1,4 @@
-from statistics import LinearRegression
+from sklearn.linear_model import LinearRegression
 from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
@@ -1068,7 +1068,7 @@ async def get_companies_in_industry(
         industry=industry).all()
 
     return companies
-  
+#test all of the average ones claire   
 @app.get("/industry/framework/average/", tags=["Industry"])
 async def get_framework_industry_average(
     industry: str,
@@ -1179,32 +1179,45 @@ async def chat(
 #                   Predictive Analysis Apis
 # ***************************************************************
 
-def linear_regression(data: List[Dict[str, Any]]) -> float:
+def linear_regression(data: List[company_models.CompanyData]) -> float:
 
-    years = np.array([point['indicator_year_int'] for point in data]).reshape(-1, 1)
-    values = np.array([point['indicator_value'] for point in data]).reshape(-1, 1)
+    years = np.array([point.indicator_year_int for point in data]).reshape(-1, 1)
+    values = np.array([point.indicator_value for point in data]).reshape(-1, 1)
 
     prediction = LinearRegression().fit(years, values).predict(np.array([[2025]]))
-    return prediction[0][0]
+    return round(prediction[0][0], 2)
 
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
     metric_unit = str,
+    company_name = str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
 ) -> PredictiveIndicators:
     data = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.indicator_name == indicator
+        company_models.CompanyData.indicator_name == indicator, 
+        company_models.CompanyData.company_name == company_name, 
     ).all()
 
-    if metric_unit == "%":
+    if not isinstance(metric_unit, str):
+        metric_unit = str(metric_unit)
+
+    if not data:
+        raise HTTPException(status_code=404, detail="Error")
+
+    if "%" in metric_unit:
         prediction = linear_regression(data)
-    elif metric_unit.lower() == "yes/no":
-        values = [point['indicator_value'] for point in data]
-        prediction = max(set(values), key=values.count)
+    elif metric_unit == 'Yes/No':
+        values = [point.indicator_value for point in data]
+        predicted_value = max(set(values), key=values.count) 
+        if predicted_value == 1:
+            prediction = 'Yes'
+        elif predicted_value == 0:
+            prediction = 'No'
+
     else: 
         #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
-    return PredictiveIndicators( indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
+    return PredictiveIndicators(indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
