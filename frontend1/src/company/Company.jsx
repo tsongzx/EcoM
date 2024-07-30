@@ -288,7 +288,8 @@ const Company = () => {
             allMetrics={allMetrics}
         />
         <Box component="main" sx={{ 
-          flexGrow: 1, 
+          // flexGrow: 1, 
+          width: '70vw',
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
