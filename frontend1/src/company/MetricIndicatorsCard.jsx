@@ -64,6 +64,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
 
+  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
+
   useEffect(() => {
     console.log(triggerSource);
     let newLockedSlidersIndicators = {};
@@ -632,18 +634,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       return 1 - totalWeighting;
     }
   }
-
-  // const handleLockClickIndicator = (id) => {
-  //   setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
-  //     const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
-  //     if (newLockedSlidersIndicators[id]) {
-  //       delete newLockedSlidersIndicators[id];
-  //     } else {
-  //       newLockedSlidersIndicators[id] = true;
-  //     }
-  //     return newLockedSlidersIndicators;
-  //   });
-  // }
 
   const handleLockClickIndicator = (metricId, indicatorId) => {
     setLockedSlidersIndicators((prevLockedSlidersIndicators) => {

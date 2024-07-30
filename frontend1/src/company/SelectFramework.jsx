@@ -65,7 +65,7 @@ const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetri
   };
 
   return (
-    <Card>
+    <Card style={{ marginTop: '20px'}}>
       <FormControl style={{ marginLeft: '1.5vw', cursor: 'pointer' }} component="fieldset">
         <FormLabel component="legend" onClick={handleExpandClick}>
           Select Framework
