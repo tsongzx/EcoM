@@ -432,7 +432,7 @@ export const getIndicatorsForMetric = async(frameworkId, metricId) => {
 
 export const getAllIndicators = async() => {
     try {   
-        const response = await axios.get(`http://127.0.0.1:8000/indicators/all`, 
+        const response = await axios.get(`http://127.0.0.1:8000/indicators/all_by_id`, 
         {
             headers: {
                 'Content-Type': 'application/json',
@@ -444,6 +444,22 @@ export const getAllIndicators = async() => {
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
     }
+}
+
+export const getIndicatorsInfoByName = async() => {
+  try {   
+      const response = await axios.get(`http://127.0.0.1:8000/indicators/all_by_name`,
+      {
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }
+      });
+
+      return response.data;
+  } catch (error) {
+      console.log(`Error getting metric: ${error}`);
+  }
 }
 
 export const getCompaniesOfIndustry = async(industryName) => {

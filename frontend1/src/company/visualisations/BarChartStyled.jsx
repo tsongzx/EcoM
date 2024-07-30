@@ -4,6 +4,10 @@ import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 
 const BarChartStyled = ({data, title, unit}) => {
 
+  console.log(data);
+  console.log(unit);
+  const yesNoTickFormatter = (tick) => (tick === 0 ? "N" : "Y");
+
   return (
     <ResponsiveContainer width="100%" aspect={1.5}>
       {title && <Typography variant="h5" sx={{ textAlign: 'center', height: 'auto' }}>{title}</Typography>}
@@ -29,18 +33,19 @@ const BarChartStyled = ({data, title, unit}) => {
           }}
           
         />
-        <YAxis tickCount={1} tickFormatter={
-            unit === "Yes/No" ?
-            (...allArgs)=>{ if(allArgs[0] ===0){ return "N" }else{ return "Y" }} : undefined
-          } 
+        <YAxis 
+          tickCount={unit === "Yes/No" ? 1 : undefined} 
+          tickFormatter={unit === "Yes/No" ? yesNoTickFormatter : undefined}
           fontFamily={'Roboto, sans-serif'}
         >         
           <Label 
             value={unit} 
             angle={-90}
             position="left"
-            textAnchor='middle'
-            fontFamily={'Roboto, sans-serif'}
+            style={{
+              textAnchor: 'middle',
+              fontFamily: 'Roboto, sans-serif',
+            }}
           />
         </YAxis>
         <Tooltip />
