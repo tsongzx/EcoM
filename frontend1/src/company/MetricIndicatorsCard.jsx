@@ -17,6 +17,7 @@ import {
   Card,
   Slider,
   TextField,
+  Modal,
   Tooltip
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
@@ -57,16 +58,32 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [modalG, setModalG] = useState(pillarWeighting['G']);
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalWeightingOpen, setModalWeightingOpen] = useState(false);
+  const [modalWeightingError, setModalWeightingError] = useState('');
+  const [changed, setChanged] = useState(false);
+
+  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
 
   useEffect(() => {
+    console.log(triggerSource);
     let newLockedSlidersIndicators = {};
     let newSliderValuesIndicators = {};
 
-    const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key));
+    // const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key));
+    const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key.split('-')[1]));
 
+    // for (let key of keys) {
+    //   if (Object.values(selectedIndicators).some(arr => arr.includes(key))) {
+    //     newLockedSlidersIndicators[key] = lockedSlidersIndicators[key];
+    //   }
+    // }
+    
     for (let key of keys) {
-      if (Object.values(selectedIndicators).some(arr => arr.includes(key))) {
-        newLockedSlidersIndicators[key] = lockedSlidersIndicators[key];
+      for (let [selectedKey, arr] of Object.entries(selectedIndicators)) {
+        if (arr.includes(key)) {
+          newLockedSlidersIndicators[`${selectedKey}-${key}`] = lockedSlidersIndicators[`${selectedKey}-${key}`];
+          break; 
+        }
       }
     }
 
@@ -79,12 +96,21 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       let unlockedWeighting = 0;
       let lockedWeighting = 0;
       let unlockedIndicators = 0;
+      let totalWeighting = 0;
       arr.forEach(value => {
-        if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator[value]) {
-          unlockedWeighting += sliderValuesIndicator[value];
+        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator[value]) {
+        if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator[`${key}-${value}`]) {
+          // console.log(sliderValuesIndicator[value]);
+          console.log(sliderValuesIndicator[`${key}-${value}`]);
+          // unlockedWeighting += sliderValuesIndicator[value];
+          unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
           unlockedIndicators += 1;
-        } else if (lockedSlidersIndicators.hasOwnProperty(value)) {
-          lockedWeighting += sliderValuesIndicator[value];
+        // } else if (lockedSlidersIndicators.hasOwnProperty(value)) {
+        } else if (lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`)) {
+          // lockedWeighting += sliderValuesIndicator[value];
+          lockedWeighting += sliderValuesIndicator[`${key}-${value}`];
+          // unlockedWeighting += sliderValuesIndicator[value];
+          unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
         } else {
           unlockedIndicators += 1;
         }
@@ -92,15 +118,23 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
       console.log(unlockedWeighting);
       arr.forEach(value => {
-        if (!lockedSlidersIndicators.hasOwnProperty(value)) {
-          newSliderValuesIndicators[value] = (1 - lockedWeighting) / unlockedIndicators;
+        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator.hasOwnProperty(value)) {
+          if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
+          // newSliderValuesIndicators[value] = (1 - lockedWeighting) * sliderValuesIndicator[value] / (unlockedWeighting - lockedWeighting);
+          newSliderValuesIndicators[`${key}-${value}`] = (1 - lockedWeighting) * sliderValuesIndicator[`${key}-${value}`] / (unlockedWeighting - lockedWeighting);
+        // } else if (!lockedSlidersIndicators.hasOwnProperty(value) && !sliderValuesIndicator.hasOwnProperty(value)) {
+        } else if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && !sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
+          // newSliderValuesIndicators[value] = 0;
+          newSliderValuesIndicators[`${key}-${value}`] = 0;
         } else {
-          newSliderValuesIndicators[value] = sliderValuesIndicator[value];
+          // newSliderValuesIndicators[value] = sliderValuesIndicator[value];
+          newSliderValuesIndicators[`${key}-${value}`] = sliderValuesIndicator[`${key}-${value}`];
         }
       })
       unlockedWeighting = 0;
       lockedWeighting = 0;
     });
+    console.log(newSliderValuesIndicators);
 
     setSliderValuesIndicator(newSliderValuesIndicators);
 
@@ -204,6 +238,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     setSliderValues(newSliderValues);
     
     if (triggerSource === true) {
+      console.log('here');
       setSelectedIndicators(selectedIndicatorsFixed);
       setSliderValues(sliderValuesFixed);
       
@@ -211,7 +246,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   }, [selectedMetrics, triggerSource]);
 
-  const handleMetricChange = async (event) => {
+  const handleMetricChange = (event) => {
     const metricId = Number(event.target.value);
   
     let newSelectedIndicators = { ...selectedIndicators };
@@ -262,11 +297,23 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   }
 
   const loadIndicatorInfo = (indicatorId) => {
-    const description = allIndicatorsInfo.find(obj => obj.id === indicatorId).description;
+    const description = allIndicatorsInfo[indicatorId].description;
     return description;
   }
 
+  useEffect(() => {
+    console.log(allIndicators);
+  }, [allIndicators]);
+
+  useEffect(() => {
+    console.log(selectedIndicators);
+  }, [selectedIndicators]);
+
+
   const resetToDefault = () => {
+    console.log(metricNamesFixed);
+    setLockedSliders({});
+    setLockedSlidersIndicators({});
     setTriggerSource(true);
     setMetricNames(metricNamesFixed);
     setSelectedMetrics(selectedMetricsFixed);
@@ -278,9 +325,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   const renderMetricsByCategory = (category) => {
     if (!metricNames) return null;
-  
     const filteredMetrics = metricNames.filter(metric => metric.category === category);
-  
+    console.log(selectedMetrics);
     return (
       <div style={{ display: 'flex', flexDirection: 'column'}}>
         <FormGroup style={{ marginTop: '10px'}}>
@@ -292,7 +338,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                   value={metric.id.toString()}
                   control={<Checkbox checked={selectedMetrics.includes(metric.id)} />}
                   label={<span style={{ fontSize: '17px' }}>{metric.name}</span>}
-                  onChange={handleMetricChange}
+                  onChange={(event) => handleMetricChange(event)}
                 />
                 <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                   <IconButton
@@ -383,26 +429,32 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                                 marginRight: '25px',
                                 marginTop: '5px',
                                 '& .MuiSlider-thumb': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-track': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-rail': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                               }}
-                              value={sliderValuesIndicator[indicator.indicator_id] || 0}
+                              // value={sliderValuesIndicator[indicator.indicator_id] || 0}
+                              value={sliderValuesIndicator[`${metric.id}-${indicator.indicator_id}`] || 0}
                               onChange={(event, newValue) => handleSliderChangeIndicators(indicator.indicator_id, newValue, metric.id)}
                               min={0}
                               max={1}
                               step={0.01}
                               valueLabelDisplay="auto"
                               valueLabelFormat={(value) => value.toFixed(6)}
-                              disabled={lockedSlidersIndicators[indicator.indicator_id]} 
+                              // disabled={lockedSlidersIndicators[indicator.indicator_id]} 
+                              disabled={lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`]} 
                             />
-                            <IconButton onClick={() => handleLockClickIndicator(indicator.indicator_id)} size="small">
-                              {lockedSlidersIndicators[indicator.indicator_id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                            <IconButton onClick={() => handleLockClickIndicator(metric.id, indicator.indicator_id)} size="small">
+                              {/* {lockedSlidersIndicators[indicator.indicator_id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />} */}
+                              {lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
                             </IconButton>
                           </div>
                         )}
@@ -455,7 +507,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     indicatorsOfConcern.forEach(indicator => {
       if (selectedIndicators[metricId].includes(indicator.indicator_id)) {
         console.log(indicator.weighting);
-        cumSum += sliderValuesIndicator[indicator.indicator_id];
+        // cumSum += sliderValuesIndicator[indicator.indicator_id];
+        cumSum += sliderValuesIndicator[`${metricId}-${indicator.indicator_id}`];
       }
     });
 
@@ -478,11 +531,13 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let indicatorsOfSameMetric = allIndicators[metricId];
     indicatorsOfSameMetric = indicatorsOfSameMetric
     .filter(indicator => indicator.indicator_id !== indicatorId)
-    .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
+    .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
+    // .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
     
     let lockedIndicators = allIndicators[metricId]
       .filter(indicator => indicator.indicator_id !== indicatorId)
-      .filter(indicator => lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
+      .filter(indicator => lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
+      // .filter(indicator => lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
 
     const additional = lockedIndicators.reduce((sum, indicator) => sum + indicator.weighting, 0);
 
@@ -501,13 +556,18 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       );
     }
 
+    console.log(indicatorsOfSameMetric);
+
     setSliderValuesIndicator(prevValues => {
       const updatedValues = {...prevValues};
       indicatorsOfSameMetric.forEach(item => {
-        updatedValues[item.indicator_id] = item.weighting;
+        // updatedValues[item.indicator_id] = isNaN(item.weighting) ? 0 : item.weighting;
+        updatedValues[`${metricId}-${item.indicator_id}`] = isNaN(item.weighting) ? 0 : item.weighting;
+
       });
 
-      updatedValues[indicatorId] = newValue;
+      // updatedValues[indicatorId] = newValue;
+      updatedValues[`${metricId}-${indicatorId}`] = newValue;
       return updatedValues;
     });
 
@@ -531,7 +591,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     let cumWeighting = 0;
     allMetrics.forEach(metric => 
-      cumWeighting += metric.weighting
+      cumWeighting += sliderValues[metric.id]
     );
 
     console.log(cumWeighting);
@@ -573,13 +633,25 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   }
 
-  const handleLockClickIndicator = (id) => {
+  // const handleLockClickIndicator = (id) => {
+  //   setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
+  //     const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
+  //     if (newLockedSlidersIndicators[id]) {
+  //       delete newLockedSlidersIndicators[id];
+  //     } else {
+  //       newLockedSlidersIndicators[id] = true;
+  //     }
+  //     return newLockedSlidersIndicators;
+  //   });
+  // }
+
+  const handleLockClickIndicator = (metricId, indicatorId) => {
     setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
-      const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
-      if (newLockedSlidersIndicators[id]) {
-        delete newLockedSlidersIndicators[id];
+      const newLockedSlidersIndicators = {...prevLockedSlidersIndicators};
+      if (newLockedSlidersIndicators[`${metricId}-${indicatorId}`]) {
+        delete newLockedSlidersIndicators[`${metricId}-${indicatorId}`];
       } else {
-        newLockedSlidersIndicators[id] = true;
+        newLockedSlidersIndicators[`${metricId}-${indicatorId}`] = true;
       }
       return newLockedSlidersIndicators;
     });
@@ -654,6 +726,64 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     });
 
   };
+
+  const checkAll = () => {
+    const pillarAddsUp = pillarWeighting['E'] + pillarWeighting['S'] + pillarWeighting['G'];
+    if ((pillarAddsUp <= 0.99999) || (pillarAddsUp >= 1.000001)) {
+      
+      setModalWeightingOpen(true);
+      setModalWeightingError('Please ensure your metric weightings add up to 1.');
+    } 
+    
+    let eWeighting = 0;
+    let sWeighting = 0;
+    let gWeighting = 0;
+
+    for (const key in sliderValues) {
+      let category = metricNames.find(indicator => indicator.id === parseInt(key)).category;
+      let weighting = sliderValues[parseInt(key)];
+
+      category === 'E' ? eWeighting += weighting : category === 'S' ? sWeighting += weighting : gWeighting += weighting;
+    }
+
+    console.log(eWeighting);
+
+    const eOK = (eWeighting >= 0.99999 && eWeighting <= 1.00001);
+    const sOK = (sWeighting >= 0.99999 && sWeighting <= 1.00001);
+    const gOK = (gWeighting >= 0.99999 && gWeighting <= 1.00001);
+
+    if (!eOK) {
+      setModalWeightingOpen(true);
+      setModalWeightingError('Please ensure your environmental metric weightings add up to 1.');
+    } else if (!sOK) {
+      setModalWeightingOpen(true);
+      setModalWeightingError('Please ensure your social metric weightings add up to 1.');
+    } else if (!gOK) {
+      setModalWeightingOpen(true);
+      setModalWeightingError('Please ensure your governance metric weightings add up to 1.');
+    }
+
+    for (const key in selectedIndicators) {
+      let indicatorWeighting = 0;
+      // selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[element]);
+      selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[`${key}-${element}`]);
+      console.log(key);
+      console.log(indicatorWeighting);
+      if ((indicatorWeighting <= 0.99999) || (indicatorWeighting > 1.00001)) {
+        let metricNameInvolved = metricNames.find(item => item.id === parseInt(key)).name;
+        setModalWeightingOpen(true);
+        setModalWeightingError(`Please ensure your selected indicators for ${metricNameInvolved} add up to 1.`);  
+      }
+    }
+    
+
+    console.log(sliderValuesIndicator);
+  }
+
+  const handleCloseCheckModal = () => {
+    setModalWeightingOpen(false);
+    setModalWeightingError('');
+  }
 
   const handleIndicatorChange = (event, metricId) => {
     const indicatorId = Number(event.target.value);
@@ -832,7 +962,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
           {Object.keys(selectedIndicators).length > 0 && (
             <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button variant="contained" color="primary">
+              <Button variant="contained" color="primary" onClick={() => checkAll()}>
                 Calculate Score
               </Button>
               <Button variant="contained" color="primary" onClick={resetToDefault}>
@@ -840,6 +970,33 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               </Button>
             </div>
           )}
+          <Modal
+            open={modalWeightingOpen}
+            onClose={() => setModalWeightingOpen(false)}
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
+          >
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 400,
+                bgcolor: 'background.paper',
+                border: '2px solid #000',
+                boxShadow: 24,
+                p: 4,
+              }}
+            >
+              <Typography id="modal-title" variant="h6" component="h2">
+                {modalWeightingError}
+              </Typography>
+              <Button variant="contained" color="primary" onClick={() => handleCloseCheckModal()}>
+                Close
+              </Button>
+            </Box>
+          </Modal>
         </Collapse>
       </FormControl>
     </Card>

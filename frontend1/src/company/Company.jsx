@@ -22,6 +22,7 @@ import {
   getIndicatorInfo,
   getFavouritesList,
   getAllIndicators,
+  getAllMetricsAvailable
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -32,7 +33,7 @@ import FrameworkTable from './FrameworkTable';
 import CompanyHeader from './CompanyHeader.jsx';
 import CompanyBody from './CompanyBody.jsx';
 import GraphTableToggle from './GraphTableToggle.jsx';
-import Visualisations from './Visualisations.jsx';
+import Visualisations from './visualisations/Visualisations.jsx';
 
 const Company = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const Company = () => {
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
+  const [allMetrics, setAllMetrics] = useState({});
   const [allIndicators, setAllIndicators] = useState({});
   const [allIndicatorsInfo, setAllIndicatorsInfo] = useState({});
   const [selectedIndicators, setSelectedIndicators] = useState({});
@@ -69,12 +71,14 @@ const Company = () => {
   //   console.log(lockedSliders);
   // }, [lockedSliders]);
 
-  // useEffect(() => {
-  //   console.log(allIndicatorsInfo);
-  // }, [allIndicatorsInfo]);
+  useEffect(() => {
+    console.log(allIndicatorsInfo);
+  }, [allIndicatorsInfo]);
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
+      const allMetricsAvailable = await getAllMetricsAvailable();
+      setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
@@ -124,8 +128,11 @@ const Company = () => {
     fetchLists();
   }, [companyId]);
 
+  
+
   useEffect(() => {
     const fetchData = async () => {
+      console.log('hereeee');
       if (selectedFramework) {
         console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
@@ -166,10 +173,16 @@ const Company = () => {
           setSliderValuesFixed(initialSliderValues);
 
           const initialSliderValuesIndicator = {};
-          Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
-            // const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.id === entry)?.weighting;
-            const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
-            initialSliderValuesIndicator[entry] = weighting;
+          // Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
+          //   const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+          //   initialSliderValuesIndicator[entry] = weighting;
+          // });
+          Object.entries(newSelectedIndicators).forEach(([key, arr]) => {
+            arr.forEach(entry => {
+              const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+              initialSliderValuesIndicator[`${key}-${entry}`] = weighting;
+              // console.log(`Key: ${key}, Entry: ${entry}, Weighting: ${weighting}`);
+            });
           });
           console.log(initialSliderValuesIndicator);
           setSliderValuesIndicator(initialSliderValuesIndicator);
@@ -179,6 +192,10 @@ const Company = () => {
     };
     fetchData();
   }, [selectedFramework]);
+
+  useEffect(() => {
+    console.log(metricNamesFixed);
+  }, [metricNamesFixed]);
 
   const addToRecentlyViewed = async (cId) => {
     if (!token) {
@@ -207,24 +224,28 @@ const Company = () => {
   const handleCloseReportModal = () => {
     setOpenReportModal(false);
   }
+
+  useEffect(() => {
+    console.log(metricNames);
+  }, [metricNames]);
   // useEffect(() => {
   // }, [allIndicators]);
  
-  // useEffect(() => {
-  //   console.log(sliderValues);
-  // }, [sliderValues]);
+  useEffect(() => {
+    console.log(sliderValues);
+  }, [sliderValues]);
 
-  // useEffect(() => {
-  //   console.log(selectedMetrics);
-  // }, [selectedMetrics]);
+  useEffect(() => {
+    console.log(selectedMetrics);
+  }, [selectedMetrics]);
 
-  // useEffect(() => {
-  //   console.log(selectedIndicators);
-  // }, [selectedIndicators]);
+  useEffect(() => {
+    console.log(selectedIndicators);
+  }, [selectedIndicators]);
 
-  // useEffect(() => {
-  //   console.log(allIndicators);
-  // }, [allIndicators]);  
+  useEffect(() => {
+    console.log(allIndicators);
+  }, [allIndicators]);  
 
   // useEffect(() => {
   //   console.log(lockedSlidersIndicators);
@@ -234,9 +255,9 @@ const Company = () => {
   //   console.log(errorE);
   // }, [errorE]);
 
-  // useEffect(() => {
-  //   console.log(sliderValuesIndicator);
-  // }, [sliderValuesIndicator]);
+  useEffect(() => {
+    console.log(sliderValuesIndicator);
+  }, [sliderValuesIndicator]);
 
   return (
     <Box>
@@ -270,9 +291,11 @@ const Company = () => {
             setSliderValues={setSliderValues}
             selectedFramework={selectedFramework}
             setCompareModalOpen={setCompareModalOpen}
+            allMetrics={allMetrics}
         />
         <Box component="main" sx={{ 
-          flexGrow: 1, 
+          // flexGrow: 1, 
+          width: '70vw',
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
@@ -294,7 +317,7 @@ const Company = () => {
             frameworkDisplay={frameworkDisplay}
             setFrameworkDisplay={setFrameworkDisplay}
           />
-          {frameworkDisplay == 'tabular' && <FrameworkTable
+          {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
             setSelectedYear={setSelectedYear} 
@@ -305,7 +328,7 @@ const Company = () => {
             metricNames={metricNames}
             allIndicators={allIndicators}
           />}
-          {frameworkDisplay == 'graphical' && <Visualisations/>}
+          {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework/>
         </Box>

@@ -19,7 +19,7 @@ class Indicators(Base):
       validate_strings=True,
     ))
     description: Mapped[str] = mapped_column(String(500), nullable=False)
-    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
     unit: Mapped[str] = mapped_column(String(100), nullable=False)
     pillar:  Mapped[Pillar] = mapped_column(Enum(
       *get_args(Pillar),
