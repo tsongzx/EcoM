@@ -823,13 +823,13 @@ async def get_framework_score(
             print("calculating metric score for framework")
             print(metric.metric_id)
             metric_value = await calculate_metric(framework_id, metric.metric_id, company_name, year, user, session)
-
             score += metric_value * metric.weighting
 
         category_weighting = getattr(framework, category, 0)
 
         total_score += score * category_weighting
     return total_score
+
 
 #***************************************************************
 #                        Indicator Apis
@@ -842,6 +842,17 @@ def get_indicators(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) :
+    """_summary_: retrieves indicators for a specific framework
+
+    Args:
+        framework_id (int): _description_
+        metric_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: list of indicators 
+    """    
     # get custom weights
     indicators = session.query(metrics_models.CustomMetricIndicators).filter_by(metric_id=metric_id,
                                                                    user_id=user.id,
@@ -849,6 +860,26 @@ def get_indicators(
     # if custom weights don't exist, use default
     if len(indicators) == 0:
         indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
+    return indicators
+  
+@app.get("/indicators/metric", tags=["Indicators"])
+def get_indicators_for_metric(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) :
+    """_summary_: retrieves indicators for a metric (not unique to a framework)
+
+    Args:
+        framework_id (int): _description_
+        metric_id (int): _description_
+        user (user_schemas.UserInDB, optional): _description_. Defaults to Depends(get_user).
+        session (Session, optional): _description_. Defaults to Depends(get_session).
+
+    Returns:
+        _type_: list of default indicators
+    """                                                                   
+    indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
     return indicators
 
 
