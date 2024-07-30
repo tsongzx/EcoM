@@ -35,13 +35,13 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
   const [expanded2, setExpanded2] = useState(false);
 
   useEffect(() => {
-		if (exitFramework === true) {
-			setSelectedFramework(null);
-      setMetricNames(null);
-			setSelectedMetrics([]);
-			setSelectedIndicators({});
-      setExitFramework(false);
-		}
+	if (exitFramework === true) {
+		setSelectedFramework(null);
+		setMetricNames(null);
+		setSelectedMetrics([]);
+		setSelectedIndicators({});
+		setExitFramework(false);
+	}
 
   }, [exitFramework]);
 
