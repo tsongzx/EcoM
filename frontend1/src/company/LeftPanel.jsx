@@ -8,6 +8,7 @@ import MetricIndicatorsCard from './MetricIndicatorsCard';
 import AdditionalMetrics from "./AdditionalMetrics";
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { getIndicatorFromMetric } from "../helper";
 
 const drawerWidth = 240;
 
@@ -39,11 +40,27 @@ const LeftPanel = ({
   }, [selectedMetrics]);
 
   const updateMetricName = async (newValue, newValue1, unselectedMetricId) => {
+    console.log(unselectedMetricId);
     console.log('Updating metric names:', newValue, newValue1);
     setMetricNames(newValue);
     setSelectedMetrics(newValue1);
     console.log('Metric names set:', newValue);
     console.log('Selected metrics set:', newValue1);
+    const unselectedIndicators = await getIndicatorFromMetric(unselectedMetricId);
+    console.log(unselectedIndicators);
+    console.log(allIndicators);
+    setAllIndicators((prevIndicators) => ({
+      ...prevIndicators,
+      [unselectedMetricId]: unselectedIndicators
+    }));
+    const indicatorIds = unselectedIndicators.map(indicator => indicator.indicator_id);
+    console.log(indicatorIds);
+
+    setSelectedIndicators((prevIndicators) => ({
+      ...prevIndicators,
+      [unselectedMetricId]: indicatorIds
+    }));
+   
   };
 
 

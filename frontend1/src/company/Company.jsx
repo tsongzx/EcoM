@@ -173,10 +173,16 @@ const Company = () => {
           setSliderValuesFixed(initialSliderValues);
 
           const initialSliderValuesIndicator = {};
-          Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
-            // const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.id === entry)?.weighting;
-            const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
-            initialSliderValuesIndicator[entry] = weighting;
+          // Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
+          //   const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+          //   initialSliderValuesIndicator[entry] = weighting;
+          // });
+          Object.entries(newSelectedIndicators).forEach(([key, arr]) => {
+            arr.forEach(entry => {
+              const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+              initialSliderValuesIndicator[`${key}-${entry}`] = weighting;
+              // console.log(`Key: ${key}, Entry: ${entry}, Weighting: ${weighting}`);
+            });
           });
           console.log(initialSliderValuesIndicator);
           setSliderValuesIndicator(initialSliderValuesIndicator);
@@ -225,9 +231,9 @@ const Company = () => {
   // useEffect(() => {
   // }, [allIndicators]);
  
-  // useEffect(() => {
-  //   console.log(sliderValues);
-  // }, [sliderValues]);
+  useEffect(() => {
+    console.log(sliderValues);
+  }, [sliderValues]);
 
   useEffect(() => {
     console.log(selectedMetrics);
@@ -249,9 +255,9 @@ const Company = () => {
   //   console.log(errorE);
   // }, [errorE]);
 
-  // useEffect(() => {
-  //   console.log(sliderValuesIndicator);
-  // }, [sliderValuesIndicator]);
+  useEffect(() => {
+    console.log(sliderValuesIndicator);
+  }, [sliderValuesIndicator]);
 
   return (
     <Box>

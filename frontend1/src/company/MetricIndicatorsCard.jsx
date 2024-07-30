@@ -69,11 +69,21 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let newLockedSlidersIndicators = {};
     let newSliderValuesIndicators = {};
 
-    const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key));
+    // const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key));
+    const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key.split('-')[1]));
 
+    // for (let key of keys) {
+    //   if (Object.values(selectedIndicators).some(arr => arr.includes(key))) {
+    //     newLockedSlidersIndicators[key] = lockedSlidersIndicators[key];
+    //   }
+    // }
+    
     for (let key of keys) {
-      if (Object.values(selectedIndicators).some(arr => arr.includes(key))) {
-        newLockedSlidersIndicators[key] = lockedSlidersIndicators[key];
+      for (let [selectedKey, arr] of Object.entries(selectedIndicators)) {
+        if (arr.includes(key)) {
+          newLockedSlidersIndicators[`${selectedKey}-${key}`] = lockedSlidersIndicators[`${selectedKey}-${key}`];
+          break; 
+        }
       }
     }
 
@@ -88,13 +98,19 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       let unlockedIndicators = 0;
       let totalWeighting = 0;
       arr.forEach(value => {
-        if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator[value]) {
-          console.log(sliderValuesIndicator[value]);
-          unlockedWeighting += sliderValuesIndicator[value];
+        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator[value]) {
+        if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator[`${key}-${value}`]) {
+          // console.log(sliderValuesIndicator[value]);
+          console.log(sliderValuesIndicator[`${key}-${value}`]);
+          // unlockedWeighting += sliderValuesIndicator[value];
+          unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
           unlockedIndicators += 1;
-        } else if (lockedSlidersIndicators.hasOwnProperty(value)) {
-          lockedWeighting += sliderValuesIndicator[value];
-          unlockedWeighting += sliderValuesIndicator[value];
+        // } else if (lockedSlidersIndicators.hasOwnProperty(value)) {
+        } else if (lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`)) {
+          // lockedWeighting += sliderValuesIndicator[value];
+          lockedWeighting += sliderValuesIndicator[`${key}-${value}`];
+          // unlockedWeighting += sliderValuesIndicator[value];
+          unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
         } else {
           unlockedIndicators += 1;
         }
@@ -102,17 +118,23 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
       console.log(unlockedWeighting);
       arr.forEach(value => {
-        if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator.hasOwnProperty(value)) {
-          newSliderValuesIndicators[value] = (1 - lockedWeighting) * sliderValuesIndicator[value] / (unlockedWeighting - lockedWeighting);
-        } else if (!lockedSlidersIndicators.hasOwnProperty(value) && !sliderValuesIndicator.hasOwnProperty(value)) {
-          newSliderValuesIndicators[value] = 0;
+        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator.hasOwnProperty(value)) {
+          if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
+          // newSliderValuesIndicators[value] = (1 - lockedWeighting) * sliderValuesIndicator[value] / (unlockedWeighting - lockedWeighting);
+          newSliderValuesIndicators[`${key}-${value}`] = (1 - lockedWeighting) * sliderValuesIndicator[`${key}-${value}`] / (unlockedWeighting - lockedWeighting);
+        // } else if (!lockedSlidersIndicators.hasOwnProperty(value) && !sliderValuesIndicator.hasOwnProperty(value)) {
+        } else if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && !sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
+          // newSliderValuesIndicators[value] = 0;
+          newSliderValuesIndicators[`${key}-${value}`] = 0;
         } else {
-          newSliderValuesIndicators[value] = sliderValuesIndicator[value];
+          // newSliderValuesIndicators[value] = sliderValuesIndicator[value];
+          newSliderValuesIndicators[`${key}-${value}`] = sliderValuesIndicator[`${key}-${value}`];
         }
       })
       unlockedWeighting = 0;
       lockedWeighting = 0;
     });
+    console.log(newSliderValuesIndicators);
 
     setSliderValuesIndicator(newSliderValuesIndicators);
 
@@ -279,6 +301,14 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     return description;
   }
 
+  useEffect(() => {
+    console.log(allIndicators);
+  }, [allIndicators]);
+
+  useEffect(() => {
+    console.log(selectedIndicators);
+  }, [selectedIndicators]);
+
 
   const resetToDefault = () => {
     console.log(metricNamesFixed);
@@ -295,7 +325,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   const renderMetricsByCategory = (category) => {
     if (!metricNames) return null;
-  
     const filteredMetrics = metricNames.filter(metric => metric.category === category);
     console.log(selectedMetrics);
     return (
@@ -400,26 +429,32 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                                 marginRight: '25px',
                                 marginTop: '5px',
                                 '& .MuiSlider-thumb': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-track': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-rail': {
-                                  color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
+                                  color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                               }}
-                              value={sliderValuesIndicator[indicator.indicator_id] || 0}
+                              // value={sliderValuesIndicator[indicator.indicator_id] || 0}
+                              value={sliderValuesIndicator[`${metric.id}-${indicator.indicator_id}`] || 0}
                               onChange={(event, newValue) => handleSliderChangeIndicators(indicator.indicator_id, newValue, metric.id)}
                               min={0}
                               max={1}
                               step={0.01}
                               valueLabelDisplay="auto"
                               valueLabelFormat={(value) => value.toFixed(6)}
-                              disabled={lockedSlidersIndicators[indicator.indicator_id]} 
+                              // disabled={lockedSlidersIndicators[indicator.indicator_id]} 
+                              disabled={lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`]} 
                             />
-                            <IconButton onClick={() => handleLockClickIndicator(indicator.indicator_id)} size="small">
-                              {lockedSlidersIndicators[indicator.indicator_id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
+                            <IconButton onClick={() => handleLockClickIndicator(metric.id, indicator.indicator_id)} size="small">
+                              {/* {lockedSlidersIndicators[indicator.indicator_id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />} */}
+                              {lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
                             </IconButton>
                           </div>
                         )}
@@ -473,7 +508,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     indicatorsOfConcern.forEach(indicator => {
       if (selectedIndicators[metricId].includes(indicator.indicator_id)) {
         console.log(indicator.weighting);
-        cumSum += sliderValuesIndicator[indicator.indicator_id];
+        // cumSum += sliderValuesIndicator[indicator.indicator_id];
+        cumSum += sliderValuesIndicator[`${metricId}-${indicator.indicator_id}`];
       }
     });
 
@@ -496,11 +532,13 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let indicatorsOfSameMetric = allIndicators[metricId];
     indicatorsOfSameMetric = indicatorsOfSameMetric
     .filter(indicator => indicator.indicator_id !== indicatorId)
-    .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
+    .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
+    // .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
     
     let lockedIndicators = allIndicators[metricId]
       .filter(indicator => indicator.indicator_id !== indicatorId)
-      .filter(indicator => lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
+      .filter(indicator => lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
+      // .filter(indicator => lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
 
     const additional = lockedIndicators.reduce((sum, indicator) => sum + indicator.weighting, 0);
 
@@ -524,10 +562,13 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     setSliderValuesIndicator(prevValues => {
       const updatedValues = {...prevValues};
       indicatorsOfSameMetric.forEach(item => {
-        updatedValues[item.indicator_id] = isNaN(item.weighting) ? 0 : item.weighting;
+        // updatedValues[item.indicator_id] = isNaN(item.weighting) ? 0 : item.weighting;
+        updatedValues[`${metricId}-${item.indicator_id}`] = isNaN(item.weighting) ? 0 : item.weighting;
+
       });
 
-      updatedValues[indicatorId] = newValue;
+      // updatedValues[indicatorId] = newValue;
+      updatedValues[`${metricId}-${indicatorId}`] = newValue;
       return updatedValues;
     });
 
@@ -593,13 +634,25 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   }
 
-  const handleLockClickIndicator = (id) => {
+  // const handleLockClickIndicator = (id) => {
+  //   setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
+  //     const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
+  //     if (newLockedSlidersIndicators[id]) {
+  //       delete newLockedSlidersIndicators[id];
+  //     } else {
+  //       newLockedSlidersIndicators[id] = true;
+  //     }
+  //     return newLockedSlidersIndicators;
+  //   });
+  // }
+
+  const handleLockClickIndicator = (metricId, indicatorId) => {
     setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
-      const newLockedSlidersIndicators = { ...prevLockedSlidersIndicators};
-      if (newLockedSlidersIndicators[id]) {
-        delete newLockedSlidersIndicators[id];
+      const newLockedSlidersIndicators = {...prevLockedSlidersIndicators};
+      if (newLockedSlidersIndicators[`${metricId}-${indicatorId}`]) {
+        delete newLockedSlidersIndicators[`${metricId}-${indicatorId}`];
       } else {
-        newLockedSlidersIndicators[id] = true;
+        newLockedSlidersIndicators[`${metricId}-${indicatorId}`] = true;
       }
       return newLockedSlidersIndicators;
     });
@@ -713,7 +766,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     for (const key in selectedIndicators) {
       let indicatorWeighting = 0;
-      selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[element]);
+      // selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[element]);
+      selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[`${key}-${element}`]);
       console.log(key);
       console.log(indicatorWeighting);
       if ((indicatorWeighting <= 0.99999) || (indicatorWeighting > 1.00001)) {
