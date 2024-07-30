@@ -26,7 +26,8 @@ from typing import List, Any
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-    
+import metrics
+
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
 client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
@@ -881,18 +882,6 @@ async def get_indicator(
 ):
     return session.query(metrics_models.Indicators).get(indicator_id)
 
-# @app.post("/indicators/info", tags=["Indicators"])
-# async def get_indicators_info_by_name(
-#     indicators: List[str],
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     info = session.query(metrics_models.Indicators).filter(metrics_models.Indicators.name.in_(indicators)).all()
-#     info_dict = {}
-#     for entry in info:
-#       info_dict[entry.name] = entry
-      
-#     return info_dict
 
 # ***************************************************************
 #                        Metric Apis
@@ -963,25 +952,25 @@ def modify_metric(
     # indicator weights is unique for a framework
     return []
 
-@app.get("/company/metric/indicators", tags=["Company"])
-def get_company_indicators_by_metric(
-    metric_id: int,
-    company_name: str,
-    year: int,
-    indicators: List[Any] = Depends(get_indicators),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    """_summary_: MAY NEED TO REMOVE YEAR FILTER
-    """    
-    indicator_names = [indicator.indicator_name for indicator in indicators]
-    values = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name == company_name,
-        company_models.CompanyData.indicator_year_int == year,
-        company_models.CompanyData.indicator_name.in_(indicator_names),
-    ).all()
+# @app.get("/company/metric/indicators", tags=["Company"])
+# def get_company_indicators_by_metric(
+#     metric_id: int,
+#     company_name: str,
+#     year: int,
+#     indicators: List[Any] = Depends(get_indicators),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     """_summary_: MAY NEED TO REMOVE YEAR FILTER
+#     """    
+#     indicator_names = [indicator.indicator_name for indicator in indicators]
+#     values = session.query(company_models.CompanyData).filter(
+#         company_models.CompanyData.company_name == company_name,
+#         company_models.CompanyData.indicator_year_int == year,
+#         company_models.CompanyData.indicator_name.in_(indicator_names),
+#     ).all()
     
-    return values
+#     return values 
 
 # fix to get by year and apply weighting!
 @app.get("/metric/score", tags=["Metrics"])
@@ -989,28 +978,27 @@ def get_company_indicators_by_metric(
 async def calculate_metric(
     metric_id: int,
     company_name: str,
+    framework_id: int,
     # year filter
     year: int,
+    indicators: Any = Depends(get_company_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    file_name = 'db/metrics.json'
-    # Open and read the JSON file - USE CACHING!?!?
-    with open(file_name, 'r') as file:
-        indicator_data = json.load(file)
-
+    
+    indicator_data = metrics.read_metrics_file()
     overall_score = 0  
     print("calculating metric")
-    indicators = get_indicators(metric_id, user, session)
-    
-    company_values = get_company_indicators_by_metric(metric_id, company_name, year, indicators, user, session)
-    
+    indicators = get_indicators(framework_id, metric_id, user, session)
+        
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    for value in company_values:
-        if value.indicator_value is None:
+    print(indicators.keys())
+    year_indicators = indicators[year]
+    for indicator_name, weight in weights.item():
+        if indicator_name not in year_indicators:
             # indicator does not exist for that company for that year
             continue
-        indicator_scaling = indicator_data[value.indicator_name]
+        indicator_scaling = indicator_data[indicator_name]
 
         lower = indicator_scaling["lower"]
         higher = indicator_scaling["higher"]
@@ -1019,26 +1007,15 @@ async def calculate_metric(
             scaled_score = 100
             continue
         elif indicator_scaling["indicator"] == "positive":
-            scaled_score = 100*(value.indicator_value - lower)/(higher - lower)
+            scaled_score = 100*(year_indicators[indicator_name] - lower)/(higher - lower)
         else:
-            scaled_score = 100*(higher - value.indicator_value)/(higher - lower)
+            scaled_score = 100*(higher - year_indicators[indicator_name])/(higher - lower)
         
-        overall_score += scaled_score * weights.get(value.indicator_name)
+        overall_score += scaled_score * weight
   
     return overall_score
 
 
-# @app.get("/metrics/category", tags=["Metrics"])
-# async def get_metrics_by_category(
-#     category: Category,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     """_summary_: TO DO: currently not one to to one mapping between
-#       metrics and categories so this is currently getting fixed
-#     """   
-#     # TO DO: GET ALL METRICS IN A CATEGORY!!
-#     return []
 #***************************************************************
 #                        Industry Apis
 # ***************************************************************
