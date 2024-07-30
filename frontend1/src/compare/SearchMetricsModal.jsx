@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Modal from '@mui/joy/Modal';
 import {ModalDialog, ModalClose} from '@mui/joy';
 import { styled } from '@mui/material/styles';
@@ -11,6 +11,7 @@ import { getAllMetrics } from "../helper";
 
 //metricsList gets passed in as [{metric_id, metricName}] ideally but we just have metricName rn
 const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
+    console.log('SearchMetricsModal is rendering');
     const [metrics, setMetrics] = useState([]);
     const [Emetrics, setE] = useState([]);
     const [Smetrics, setS] = useState([]);
@@ -18,8 +19,7 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
     const [value, setValue] = useState("1");
 
     useEffect(() => {
-      const setMetrics = async() => {
-        console.log('INSIDE THE METRICS MODAL');
+      const fetchMetrics = async() => {
         //fetch all the metrics available and sort them into their categories
         const allMetrics = await getAllMetrics();
         //this stuff could be cached HIGHKEY!!!
@@ -27,10 +27,12 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
         setS(allMetrics.S);
         setG(allMetrics.G);
       };
-      setMetrics();
+      console.log('INSIDE THE METRICS MODAL');
+      fetchMetrics();
     },[]);
 
     useEffect(() => {
+      console.log('metricsList is changing');
       setMetrics(metricsList);
     }, [metricsList]);
 
@@ -47,17 +49,27 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
       setValue(newValue);
     };
 
-    const handleCheckboxChange = (event, metricId, metricName) => {
-        //add to list metrics
+    // const handleCheckboxChange = (event, metricId, metricName) => {
+    //     //add to list metrics
+    //     if (event.target.checked) {
+    //         const updatedList = [...metrics, {metric_id: metricId, metric_name: metricName}];
+    //         setMetrics(updatedList);
+    //     } else {
+    //         //remove from metrics
+    //         const updatedList = metrics.filter(m => m.metric_id !== metricId);
+    //         setMetrics(updatedList);
+    //     }
+    // }
+
+    const handleCheckboxChange = useCallback((event, metricId, metricName, category) => {
+      setMetrics(prevMetrics => {
         if (event.target.checked) {
-            const updatedList = [...metrics, {metric_id: metricId, metric_name: metricName}];
-            setMetrics(updatedList);
+          return [...prevMetrics, { metric_id: metricId, metric_name: metricName, category}];
         } else {
-            //remove from metrics
-            const updatedList = metrics.filter(m => m.metric_id !== metricId);
-            setMetrics(updatedList);
+          return prevMetrics.filter(m => m.metric_id !== metricId);
         }
-    }
+      });
+    }, []);
 
     const AntTabs = styled(Tabs)({
         borderBottom: '1px solid #e8e8e8',
@@ -124,18 +136,18 @@ const SearchMetricsModal = ({isOpen, closeModal, metricsList}) => {
             <TabPanel value="1">
               <FormGroup>
                 {Emetrics.map((e) => (
-                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                    <FormControlLabel key={e.id} control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name, e.category)}/>} label={e.name} />
                 ))}
               </FormGroup>
             </TabPanel>
             <TabPanel value="2">
                 {Smetrics.map((e) => (
-                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                    <FormControlLabel key={e.id} control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name, e.category)}/>} label={e.name} />
                 ))}
             </TabPanel>
             <TabPanel value="3">
                 {Gmetrics.map((e) => (
-                    <FormControlLabel control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name)}/>} label={e.name} />
+                    <FormControlLabel key={e.id} control={<Checkbox disableRipple checked={metrics.some(m => m.metric_id === e.id)} onChange={(event) => handleCheckboxChange(event, e.id, e.name, e.category)}/>} label={e.name} />
                 ))}
             </TabPanel>
             </ModalContent>

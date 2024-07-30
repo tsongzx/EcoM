@@ -1,0 +1,51 @@
+.ESGInfo-container {
+    width: 100%;
+    padding: 50px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ESGInfo-container h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 10px;
+}
+
+
+
+.ESGInfo-container p {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.ESGInfo-title, .ESGReporting-container, .ESGScore-containers {
+    background-color: aliceblue;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-width: 400px;
+    padding: 10px 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.ESGCategory-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    background-color: orange;
+    margin-bottom: 10px;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.ESGCategoryImg{
+    width: 300px;
+    height: 300px;
+    margin-left: 0px;
+}
+
+.ESGCategory-Text {
+    flex: 1;
+    margin-left: 10px;
+}

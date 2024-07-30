@@ -375,7 +375,7 @@ export const getMetricForFramework = async(frameworkId) => {
 }
 
 export const getMetricName = async(metricId) => {
-    console.log('Getting Name for Metric Id: ', metricId);
+    //console.log('Getting Name for Metric Id: ', metricId);
     try {   
         const response = await axios.get(`http://127.0.0.1:8000/metric?metric_id=${metricId}`, 
         {
@@ -621,7 +621,7 @@ export const getAllMetrics = async() => {
 
     
 
-    caches.open('allMetrics').then()
+    //caches.open('allMetrics').then()
 
     // try {
     //     const response = await axios.get(`http://127.0.0.1:8000/metrics`,
@@ -642,7 +642,7 @@ export const getAllMetrics = async() => {
 // This function is used in the compare Industry
 // gets passed in metricList's objects
 // 
-// RETURNS {metricId, metricName, companies:[{companyId, score}]}
+// RETURNS {metricId, category, metricName, companies:[{companyId, score}]}
 // companyList consists of:
 // {
 //     id: company.value,
@@ -651,12 +651,12 @@ export const getAllMetrics = async() => {
 //     year: null,
 //     selected: false
 // }
-export const calculateGeneralMetricScore = async(metricId, metricName, companyList, year) => {
+export const calculateGeneralMetricScore = async(metricId, metricName, metricCategory, companyList, year) => {
   // get industries for metric
   const companies = companyList.map(c => ({
     companyId : c.id,
     score: 1,
   }));
   // return collected information, (in future maybe ESG score if framework and industry ranking)
-  return {metricId, metricName, companies};
+  return {metricId, metricName, category: metricCategory, companies};
 }

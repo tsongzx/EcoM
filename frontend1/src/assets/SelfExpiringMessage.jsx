@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './SelfExpiringMessage.css';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
-const SelfExpiringMessage = ({message}) => {
+const SelfExpiringMessage = ({message, onExpiry}) => {
     const [visible, setVisible] = useState(true);
     const [progress, setProgress] = useState(100);
-    const timeout = 5000;
+    const timeout = 3000;
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setVisible(false);
+            onExpiry();
         }, timeout);
 
         const progressInterval = setInterval(() => {
@@ -26,7 +28,8 @@ const SelfExpiringMessage = ({message}) => {
 
     return (
         <div className={`msg-container ${visible ? "visible" : "hidden"}`}>
-            <p>{message}</p>
+                <p className='selfexp-msgcontent'>{message}</p>
+            
             <div className="progress-bar-container">
                 <div 
                     className="progress-bar" 
