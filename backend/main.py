@@ -27,6 +27,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import metrics
+import asyncio
 
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
@@ -800,14 +801,12 @@ async def delete_framework(
 # calculate framework score
 @app.get("/framework/score/", tags=["Framework"])
 async def get_framework_score(
-    # is_official_framework: bool = Query(...), 
-    # framework_id: int = Query(...),
     framework_id: int,
     company_name: str,
     year: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-) -> int:
+) -> float:
     """_summary_: TO DO: USE BATCH PROCESSSING. ACCEPT MULTIPLE
     FRAMEWORKS / COMPANY_NAMES / YEARS AT ONCE
     """    
@@ -817,22 +816,24 @@ async def get_framework_score(
     
     for category in categories:
         metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
-        
+        print("calculating category score for framework")
+      
         score = 0
         for metric in metrics:
-            metric_value = await calculate_metric(metric.metric_id, company_name, year, user, session)
+            print("calculating metric score for framework")
+            print(metric.metric_id)
+            metric_value = await calculate_metric(framework_id, metric.metric_id, company_name, year, user, session)
 
             score += metric_value * metric.weighting
 
         category_weighting = getattr(framework, category, 0)
 
         total_score += score * category_weighting
-    return score
+    return total_score
 
 #***************************************************************
 #                        Indicator Apis
 # ***************************************************************
-
 
 @app.get("/indicators", tags=["Indicators"])
 def get_indicators(
@@ -850,6 +851,7 @@ def get_indicators(
         indicators = session.query(metrics_models.MetricIndicators).filter_by(metric_id=metric_id).all()
     return indicators
 
+
 @app.get("/indicators/all_by_id", tags=["Indicators"])
 async def get_all_indicators_dict_by_id(
     user: user_schemas.UserInDB = Depends(get_user),
@@ -862,6 +864,7 @@ async def get_all_indicators_dict_by_id(
       indicators_dict[entry.id] = entry
     return indicators_dict
 
+
 @app.get("/indicators/all_by_name", tags=["Indicators"])
 async def get_all_indicators_dict_by_name(
     user: user_schemas.UserInDB = Depends(get_user),
@@ -873,6 +876,7 @@ async def get_all_indicators_dict_by_name(
     for entry in indicators:
       indicators_dict[entry.name] = entry
     return indicators_dict
+
 
 @app.get("/indicator", tags=["Indicators"])
 async def get_indicator(
@@ -915,6 +919,7 @@ async def get_all_metrics(
         metrics_dict[metric.category].append(metric)
     return metrics_dict 
 
+
 @app.post("/metric/modify", tags=["Metrics"])
 def modify_metric(
     metric_id: int,
@@ -952,36 +957,13 @@ def modify_metric(
     # indicator weights is unique for a framework
     return []
 
-# @app.get("/company/metric/indicators", tags=["Company"])
-# def get_company_indicators_by_metric(
-#     metric_id: int,
-#     company_name: str,
-#     year: int,
-#     indicators: List[Any] = Depends(get_indicators),
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) :
-#     """_summary_: MAY NEED TO REMOVE YEAR FILTER
-#     """    
-#     indicator_names = [indicator.indicator_name for indicator in indicators]
-#     values = session.query(company_models.CompanyData).filter(
-#         company_models.CompanyData.company_name == company_name,
-#         company_models.CompanyData.indicator_year_int == year,
-#         company_models.CompanyData.indicator_name.in_(indicator_names),
-#     ).all()
-    
-#     return values 
 
-# fix to get by year and apply weighting!
 @app.get("/metric/score", tags=["Metrics"])
-# need to modify this to the metric for a given year!!!
 async def calculate_metric(
     metric_id: int,
     company_name: str,
     framework_id: int,
-    # year filter
     year: int,
-    indicators: Any = Depends(get_company_indicators),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
@@ -989,30 +971,37 @@ async def calculate_metric(
     indicator_data = metrics.read_metrics_file()
     overall_score = 0  
     print("calculating metric")
+    company_values = await get_company_indicators(company_name, user, session)
     indicators = get_indicators(framework_id, metric_id, user, session)
-        
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    print(indicators.keys())
-    year_indicators = indicators[year]
-    for indicator_name, weight in weights.item():
+    if year not in company_values:
+      return 0
+    year_indicators = company_values[year]
+    for indicator_name, weight in weights.items():
+        print(indicator_name)
+        print(f'printing weight {weight}')
         if indicator_name not in year_indicators:
             # indicator does not exist for that company for that year
+            print("skipping")
             continue
         indicator_scaling = indicator_data[indicator_name]
 
         lower = indicator_scaling["lower"]
         higher = indicator_scaling["higher"]
+        indicator_value = year_indicators[indicator_name].indicator_value
+        print(f'printing indicator value {indicator_value}')
         scaled_score = 0
         if higher == lower:
             scaled_score = 100
             continue
         elif indicator_scaling["indicator"] == "positive":
-            scaled_score = 100*(year_indicators[indicator_name] - lower)/(higher - lower)
+            scaled_score = 100*(indicator_value - lower)/(higher - lower)
         else:
-            scaled_score = 100*(higher - year_indicators[indicator_name])/(higher - lower)
+            scaled_score = 100*(higher - indicator_value)/(higher - lower)
+        print(f'printing scaled value {scaled_score}')
         
         overall_score += scaled_score * weight
-  
+        print(overall_score)
     return overall_score
 
 
@@ -1070,6 +1059,7 @@ async def get_companies_in_industry(
 
     return companies
   
+  
 @app.get("/industry/framework/average/", tags=["Industry"])
 async def get_framework_industry_average(
     industry: str,
@@ -1084,16 +1074,34 @@ async def get_framework_industry_average(
     TODO: BATCH PROCESSING
     """    
     # @GEOFF: CONSIDER BATCH PROCESSING
-    score = 0
-    for company in companies:
-        score += await get_framework_score(framework_id, company.company_name, year, user, session)
+    # score = 0
+    # for company in companies:
+    #     score += await get_framework_score(framework_id, company.company_name, year, user, session)
     
-    return score / len(companies) if companies else 0
+    # return score / len(companies) if companies else 0
+    if not companies:
+        return 0
+
+    tasks = [
+        get_framework_score(framework_id, company.company_name, year, user, session)
+        for company in companies
+    ]
+
+    # Run concurrently
+    scores = await asyncio.gather(*tasks)
+
+    # Calculate the total score
+    total_score = sum(scores)
+
+    # Return the average score
+    return total_score / len(companies)
+
 
 @app.get("/industry/metric/average/", tags=["Industry"])
 async def get_metric_industry_average(
     metric_id: int,
     year: int,
+    framework_id: int,
     companies: List[company_models.Company] = Depends(get_companies_in_industry),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -1105,9 +1113,10 @@ async def get_metric_industry_average(
     # @GEOFF: CONSIDER BATCH PROCESSING
     score = 0
     for company in companies:
-        score += await calculate_metric(metric_id, company.company_name, year, user, session)
+        score += await calculate_metric(metric_id, company.company_name, framework_id, year, user, session)
     
     return score / len(companies) if companies else 0
+  
   
 @app.get("/industry/indicator/average/", tags=["Industry"])
 async def get_indicator_industry_averages(
