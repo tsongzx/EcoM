@@ -3,10 +3,7 @@ import React, { PureComponent } from 'react';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 
 const BarChartStyled = ({data, title, unit}) => {
-  // console.log(data);
-  const renderLabel = () => {
-    return title
-  }
+
   return (
     <ResponsiveContainer width="100%" aspect={1.5}>
       {title && <Typography variant="h5" sx={{ textAlign: 'center', height: 'auto' }}>{title}</Typography>}
@@ -20,7 +17,6 @@ const BarChartStyled = ({data, title, unit}) => {
           left: 20,
           bottom: 5,
         }}
-        label={renderLabel}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis 
@@ -33,12 +29,17 @@ const BarChartStyled = ({data, title, unit}) => {
           }}
           
         />
-
-        <YAxis fontFamily={'Roboto, sans-serif'}>         
+        <YAxis tickCount={1} tickFormatter={
+            unit === "Yes/No" ?
+            (...allArgs)=>{ if(allArgs[0] ===0){ return "N" }else{ return "Y" }} : undefined
+          } 
+          fontFamily={'Roboto, sans-serif'}
+        >         
           <Label 
             value={unit} 
-            angle={270}
+            angle={-90}
             position="left"
+            textAnchor='middle'
             fontFamily={'Roboto, sans-serif'}
           />
         </YAxis>

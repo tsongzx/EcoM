@@ -27,7 +27,7 @@ const VisualisationsPanel = ({filter, graphValues, indicatorInfo}) => {
               <AccordionDetails>
                 <Stack direction="row">
                   <VisualisationCardInfo indicatorInfo={indicatorInfo[indicator]}></VisualisationCardInfo>
-                  <BarChartStyled data={graphValues[indicator]} title={indicator} unit={"Yes / No"} />
+                  <BarChartStyled data={graphValues[indicator]} title={indicator} unit={indicatorInfo[indicator].unit.trim()} />
                 </Stack>
               </AccordionDetails>
             </Accordion>
