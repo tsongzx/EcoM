@@ -3,6 +3,10 @@
     transition: display 0.5s ease-in-out; /* Smooth transition for fading */
     position: absolute;
     z-index: 900;
+    background-color: rgb(202, 177, 240);
+    border-radius: 10px;
+    padding: 5px 10px;
+    opacity: 80%;
   }
   
   /* Visible state */
@@ -23,7 +27,7 @@
   .progress-bar-container {
     position: relative;
     height: 5px;
-    background-color: #e0e0e0;
+    background-color: #692b78;
     margin-top: 10px;
   }
   
@@ -33,6 +37,12 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background-color: #76c7c0;
+    background-color: #e073ca;
     transition: width linear;
+  }
+
+  .selfexp-msgcontent{
+    margin-bottom: 3px;
+    margin-top: 3px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
   }

@@ -9,7 +9,7 @@ const ContextMenu = ({
     buttons,
     contextMenuRef
 }) => {
-    console.log('RENDERING A CONTEXT MENU AT ',positionX, ', ', positionY);
+    //console.log('RENDERING A CONTEXT MENU AT ',positionX, ', ', positionY);
     return (
         <menu style={{
             top: positionY + 2 + 'px',

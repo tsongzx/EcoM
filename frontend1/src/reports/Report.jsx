@@ -35,7 +35,7 @@ const Report = () => {
             {id: 4, type: "text", name: "fourthelement", isDisplayed: true},
             {id: 5, type: "text", name: "fifthelement", isDisplayed: true},
         ])
-    },[]);
+    },[companyId]);
     // name will be the string content, id is auto populated.
 
     // report container will go through the list of components everytime and check what kind of 
