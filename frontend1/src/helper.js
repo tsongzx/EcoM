@@ -433,7 +433,6 @@ export const getAllIndicators = async() => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-        console.log('Indicators for metric ', metricId);
         console.log(response.data);
         return response.data;
     } catch (error) {
@@ -661,12 +660,51 @@ export const getAllMetrics = async() => {
 //     year: null,
 //     selected: false
 // }
-export const calculateGeneralMetricScore = async(metricId, metricName, metricCategory, companyList, year) => {
+
+export const getMetricScore = async(metricId, companyName, year, frameworkId = undefined) => {
+  try {
+      let path = `metric_id=${metricId}&company_name=${companyName}&year=${year}`;
+      if (frameworkId !== undefined) {
+          path += `framework_id=${frameworkId}`
+      }
+      const response = await axios.get(`http://127.0.0.1:8000/metric/score?${path}`, 
+          { 
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(`Error calculating metric score: ${error}`)
+  }
+}
+
+// companyList has objects of form : {
+//   name,
+//   id
+// }
+// specific to a framework
+export const calculateMetricScore = async(metricId, frameworkId, companyList, year) => {
   // get industries for metric
   const companies = companyList.map(c => ({
     companyId : c.id,
-    score: 1,
+    score: getMetricScore(metricId, c.name, year, frameworkId),
   }));
+  // return collected information, (in future maybe ESG score if framework and industry ranking)
+  return {metricId, companies};
+}
+export const calculateGeneralMetricScore = async(metricId, metricName, metricCategory, companyList, year) => {
+  // get industries for metric
+  console.log("calculating"); 
+  console.log(companyList);
+  console.log(year);
+  
+  const companies = await Promise.all(companyList.map(async c => ({
+    companyId : c.id,
+    score: await getMetricScore(metricId, c.companyName, year),
+  })));
+
   // return collected information, (in future maybe ESG score if framework and industry ranking)
   return {metricId, metricName, category: metricCategory, companies};
 }
