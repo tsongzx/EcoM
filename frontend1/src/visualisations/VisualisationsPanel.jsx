@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import BarChartStyled from '../../utils/BarChartStyled';
+import BarChartStyled from './BarChartStyled';
 import { Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VisualisationCardInfo from './VisualisationCardInfo';
