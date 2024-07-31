@@ -665,7 +665,7 @@ export const getMetricScore = async(metricId, companyName, year, frameworkId = u
   try {
       let path = `metric_id=${metricId}&company_name=${companyName}&year=${year}`;
       if (frameworkId !== undefined) {
-          path += `framework_id=${frameworkId}`
+          path += `&framework_id=${frameworkId}`
       }
       const response = await axios.get(`http://127.0.0.1:8000/metric/score?${path}`, 
           { 
@@ -680,31 +680,44 @@ export const getMetricScore = async(metricId, companyName, year, frameworkId = u
   }
 }
 
+Number.prototype.countDecimals = function () {
+  if (Math.floor(this.valueOf()) === this.valueOf()) return 0;
+
+  var str = this.toString();
+  if (str.indexOf(".") !== -1 && str.indexOf("-") !== -1) {
+      return str.split("-")[1] || 0;
+  } else if (str.indexOf(".") !== -1) {
+      return str.split(".")[1].length || 0;
+  }
+  return str.split("-")[1] || 0;
+}
+
+export const roundMetricScore = async(metricId, companyName, year, frameworkId = undefined) => {
+  let metricScore = await getMetricScore(metricId, companyName, year, frameworkId);
+  console.log(metricScore);
+  // metricScore = metricScore.toPrecision(3);
+  // console.log(metricScore);
+  let formattedScore;
+  if (metricScore.countDecimals() > 3) {
+    formattedScore = metricScore.toExponential(3); 
+  } else {
+    formattedScore = metricScore.toPrecision(3); 
+  }
+
+  // Return the formatted score
+  return formattedScore;
+}
 // companyList has objects of form : {
 //   name,
 //   id
 // }
-// specific to a framework
-export const calculateMetricScore = async(metricId, frameworkId, companyList, year) => {
+export const calculateMetricScore = async(metricId, metricName, metricCategory, framework_id, companyList, year) => {
   // get industries for metric
-  const companies = companyList.map(c => ({
-    companyId : c.id,
-    score: getMetricScore(metricId, c.name, year, frameworkId),
-  }));
-  // return collected information, (in future maybe ESG score if framework and industry ranking)
-  return {metricId, companies};
-}
-export const calculateGeneralMetricScore = async(metricId, metricName, metricCategory, companyList, year) => {
-  // get industries for metric
-  console.log("calculating"); 
   console.log(companyList);
-  console.log(year);
-  
   const companies = await Promise.all(companyList.map(async c => ({
     companyId : c.id,
-    score: await getMetricScore(metricId, c.companyName, year),
+    score: await roundMetricScore(metricId, c.companyName, year, framework_id),
   })));
-
   // return collected information, (in future maybe ESG score if framework and industry ranking)
   return {metricId, metricName, category: metricCategory, companies};
 }
