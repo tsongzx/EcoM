@@ -4,7 +4,7 @@ import {MenuItem } from "@mui/material";
 import Select from 'react-select';
 
 //takes in a function that retuns which company id was send
-const CompanySearch = ({handleSelectedCompanyId}) => {
+const CompanySearch = ({handleSelectedCompanyId, props}) => {
     const [listOfCompanies, setListOfCompanies] = useState([]);
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
     return (
         <Select
             styles={{ 
-              container: (provided) => ({ ...provided, width: '50%' }),
+              container: (provided) => ({ ...provided, ...props }),
               menu: (provided) => ({ ...provided, zIndex: 1300 }),
             }}
             options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}

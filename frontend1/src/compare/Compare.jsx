@@ -20,6 +20,7 @@ import CircularLoader from '../utils/CircularLoader';
 import SelfExpiringMessage from '../assets/SelfExpiringMessage.jsx';
 import Button from '@mui/joy/Button';
 import GraphTableToggle from '../utils/GraphTableToggle.jsx';
+import Visualisation from './visualisations/Visualisation.jsx';
 
 const Compare = () => {
   const location = useLocation();
@@ -382,7 +383,7 @@ const Compare = () => {
         overflow: "hidden",
         overflowY: "scroll",
       }}>
-        <GraphTableToggle display={display} setDisplay={setDisplay}></GraphTableToggle>
+        <GraphTableToggle display={display} setDisplay={setDisplay} props={{position: 'absolute', bottom: 0, zIndex: '5'}}></GraphTableToggle>
         {display === 'tabular' ? (
         <Box>  
           <TableContainer className='compare-table-cont' style={{height: '75vh',}}>
@@ -463,7 +464,7 @@ const Compare = () => {
                   {/* Optional If there are less than 5 companies */}
                   {companies.length < 5 && (
                     <TableCell> 
-                      <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
+                      <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId} props={{width: '50%'}}/>
                     </TableCell>
                   )}
               </TableRow>
@@ -524,16 +525,20 @@ const Compare = () => {
                   ))}
                 </TableRow>
               ))}
-
-
             </Table>
           </TableContainer>
           <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
           <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
-          {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
         </Box>
       ) :
-        (<p>Visualisation Placeholder</p>)}
+      (
+        companies ? (
+          <Visualisation companies={companies} setCompanies={setCompanies} setMessage={setMessage}
+            setShowMessage={setShowMessage} handleDeleteFromTable={handleDeleteFromTable} handleClickCompanyName={handleClickCompanyName}/>
+        ) : (
+          <p>...loading</p>
+        )
+      )}
         
         <ContextMenu
           contextMenuRef={contextMenuRef}
@@ -555,6 +560,7 @@ const Compare = () => {
         }
         />
       </Box> 
+      {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
     </Box>
   );
 };
