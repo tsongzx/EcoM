@@ -1056,13 +1056,17 @@ async def calculate_metric(
     print("calculating metric")
     company_values = await get_company_indicators(company_name, user, session)
 
+    if year not in company_values:
+        return 0
+      
+    year_indicators = company_values[year]
     if framework_id:
       indicators = get_indicators_for_metric(metric_id, user, session)
     else:
       indicators = get_indicators(framework_id, metric_id, user, session)
       
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    return metrics.calculate_metric(year, company_values, weights)
+    return metrics.calculate_metric(year_indicators, weights)
 
 
 #***************************************************************
@@ -1344,6 +1348,38 @@ async def get_indicators_graph(
      
     return data_by_year
 
+#***************************************************************
+#                        Company view Scoring Apis
+# ***************************************************************
+@app.post("/company/metric/", tags=["Company scores"])
+async def calculate_metric_company_view(
+    company_indicators,
+    indicators,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    """_summary_: company_indicators should only be for the year
 
+    Returns:
+        _type_: _description_
+    """    
+    return metrics.calculate_metric(company_indicators, indicators)
 
+@app.post("/company/category/", tags=["Company scores"])
+async def calculate_category_score(
+    metrics,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    return sum(metric.score * metric.weight for metric in metrics)
 
+@app.post("/company/framework/", tags=["Company scores"])
+async def calculate_framework_score(
+    categories,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    return sum(category.score * category.weight for category in categories)
