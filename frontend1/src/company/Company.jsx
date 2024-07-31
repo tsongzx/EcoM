@@ -32,7 +32,7 @@ import LeftPanel from './LeftPanel.jsx';
 import FrameworkTable from './FrameworkTable';
 import CompanyHeader from './CompanyHeader.jsx';
 import CompanyBody from './CompanyBody.jsx';
-import GraphTableToggle from './GraphTableToggle.jsx';
+import GraphTableToggle from '../utils/GraphTableToggle.jsx';
 import Visualisations from './visualisations/Visualisations.jsx';
 
 
@@ -324,8 +324,8 @@ const Company = () => {
           />
           <CompanyBody companyId={companyId}/>
           <GraphTableToggle
-            frameworkDisplay={frameworkDisplay}
-            setFrameworkDisplay={setFrameworkDisplay}
+            display={frameworkDisplay}
+            setDisplay={setFrameworkDisplay}
           />
           {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
