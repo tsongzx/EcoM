@@ -17,6 +17,7 @@ import schemas.graph_schemas as graph_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
+import schemas.score_schemas as score_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -1353,8 +1354,9 @@ async def get_indicators_graph(
 # ***************************************************************
 @app.post("/company/metric/", tags=["Company scores"])
 async def calculate_metric_company_view(
-    company_indicators,
-    indicators,
+    # company_indicators: Dict[str, Any],
+    company_indicators: Dict[str, score_schemas.CompanyIndicator],
+    indicators: Dict[str, float],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) -> float:
@@ -1366,20 +1368,11 @@ async def calculate_metric_company_view(
     """    
     return metrics.calculate_metric(company_indicators, indicators)
 
-@app.post("/company/category/", tags=["Company scores"])
-async def calculate_category_score(
-    metrics,
+@app.post("/company/score/", tags=["Company scores"])
+async def find_weighted_average(
+    values: List[score_schemas.Value],
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ) -> float:
       
-    return sum(metric.score * metric.weight for metric in metrics)
-
-@app.post("/company/framework/", tags=["Company scores"])
-async def calculate_framework_score(
-    categories,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> float:
-      
-    return sum(category.score * category.weight for category in categories)
+    return sum(value.score * value.weighting for value in values)
