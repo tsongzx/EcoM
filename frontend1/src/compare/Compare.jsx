@@ -8,11 +8,12 @@ import {
   TableRow,
   TableCell,
   Typography,
-  Stack
+  Stack,
+  Box
 } from '@mui/material';
 import Select from 'react-select';
 import Navbar from '../Navbar';
-import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateGeneralMetricScore } from '../helper';
+import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateMetricScore } from '../helper';
 import ContextMenu from './ContextMenu';
 import SearchMetricsModal from './SearchMetricsModal';
 import CircularLoader from '../utils/CircularLoader';
@@ -31,8 +32,8 @@ const Compare = () => {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [defaultFramework, setDefaultFramework] = useState(null);
-  const [year, setYear] = useState(2024);
-  const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+  const years = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const [year, setYear] = useState(years[0]);
   const [open, setOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -168,6 +169,7 @@ const Compare = () => {
         .map(async m => ({
           metric_id: m.metric_id,
           metric_name: await getMetricName(m.metric_id),
+          framework_id: m.framework_id,
           category: m.category,
         }))
     );
@@ -182,7 +184,7 @@ const Compare = () => {
     setLoading(true);
     const metricsPromises = metricsList.map((m) => {
       console.log('mapping metric: ',m.metric_id, '/', metricsList.length);
-      return calculateGeneralMetricScore(m.metric_id, m.metric_name, m.category, companies, year);
+      return calculateMetricScore(m.metric_id, m.metric_name, m.category, m.framework_id, companies, year);
     });
 
     const newMetrics = await Promise.all(metricsPromises);
@@ -372,186 +374,191 @@ const Compare = () => {
 
   //render table cell if company is not null
   return (
-    <div>
-    <Navbar/>
-    {loading && <CircularLoader/>}    
-    <div>
-      <Button onClick={() => setShowTable(true)} className = {`togglecompareview-button ${showTable ? 'cmpvw-btnshownT' : ''}`} variant="outlined"> 
-        Table
-      </Button>
-      <Button onClick={() => setShowTable(false)} className = {`togglecompareview-button ${!showTable ? 'cmpvw-btnshownG' : ''}`} variant="outlined" >
-        Graph
-      </Button>
-    </div>
-    {showTable ? (<TableContainer className='compare-table-cont' style={{height: '75vh',}}>
-      <Table className='compare-table' style={{ tableLayout: 'fixed' }}>
-        {/* Header where Company controls are obtained */}
-        <TableHead className='compare-tableheader'>
-          <TableRow>
-            <TableCell>
-              <Typography variant="h6">Metrics</Typography>
-            </TableCell>
-            {/* Where the companies are rendered */}
-            {companies.map((company, index) => (
-              <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
-                <div>
-                    <div className='comparecompanyheadertitle'> 
-                      <Stack direction="row" justifyContent="space-between">
-                        <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
-                          className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
-                          <Typography variant="h6">{company.companyName}</Typography>
-                        </a> 
-                        <Button variant="text" sx={{padding: '0 4%'}} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
-                      </Stack>
+    <Box>
+      <Navbar/>
+      {loading && <CircularLoader/>}   
+      <Box component="main" sx={{
+        overflow: "hidden",
+        overflowY: "scroll",
+      }}>
+        <div>
+          <Button onClick={() => setShowTable(true)} className = {`togglecompareview-button ${showTable ? 'cmpvw-btnshownT' : ''}`} variant="outlined"> 
+            Table
+          </Button>
+          <Button onClick={() => setShowTable(false)} className = {`togglecompareview-button ${!showTable ? 'cmpvw-btnshownG' : ''}`} variant="outlined" >
+            Graph
+          </Button>
+        </div>
+        {showTable ? (<TableContainer className='compare-table-cont' style={{height: '75vh',}}>
+          <Table className='compare-table' style={{ tableLayout: 'fixed' }}>
+            {/* Header where Company controls are obtained */}
+            <TableHead className='compare-tableheader'>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="h6">Metrics</Typography>
+                </TableCell>
+                {/* Where the companies are rendered */}
+                {companies.map((company, index) => (
+                  <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
+                    <div>
+                        <div className='comparecompanyheadertitle'> 
+                          <Stack direction="row" justifyContent="space-between">
+                            <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
+                              className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
+                              <Typography variant="h6">{company.companyName}</Typography>
+                            </a> 
+                            <Button variant="text" sx={{padding: '0 4%'}} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
+                          </Stack>
+                        </div>
                     </div>
-                </div>
-              </TableCell>
+                  </TableCell>
+                ))}
+                {/* Optional If there are less than 5 companies */}
+                {companies.length < 5 && (
+                  <TableCell> 
+                    <Typography variant="h6">Add Company</Typography>
+                  </TableCell>
+                )}
+              </TableRow>
+            </TableHead>
+            
+            {/* This is the part that renders all the table components */}
+            {/* {metrics.map((metric, index) => (
+              <TableRow>
+                <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+                {metric.companies.map((company, index) => (
+                  <TableCell>
+                    {company.score}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))} */}
+
+            {/* for the select bars */}
+            <TableRow>
+                <TableCell>
+                    <Select
+                        styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                        options={years.map((year) => ({ value: year, label: year }))}
+                        label="Year"
+                        placeholder="Select Year"
+                        // value={year}
+                        value= {{label: year, value: year}}
+                        maxMenuHeight={100}
+                        onChange={(e) => setYear(e.value)}
+                    />
+                </TableCell>
+                {/* Where the companies are rendered */}
+                {companies.map((company, index) => (
+                  <TableCell key={index}>
+                    <div className='companyParamContainer'>
+                      <Select
+                        styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                        options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
+                        label="Framework"
+                        placeholder="Framework"
+                        maxMenuHeight={100}
+                        defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
+                        onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
+                      />
+                    </div>
+                  </TableCell>
+                ))}
+                {/* Optional If there are less than 5 companies */}
+                {companies.length < 5 && (
+                  <TableCell> 
+                    <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
+                  </TableCell>
+                )}
+            </TableRow>
+            
+            <TableRow>
+              <TableCell><Typography variant="h6">Environmental</Typography></TableCell>
+            </TableRow>
+            {/* This is the part that renders all the table components */}
+            {metrics.filter(m => m.category === 'E').map((metric, index) => (
+              <TableRow>
+                <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+                  <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                </TableCell>
+                {metric.companies.map((company, index) => (
+                  <TableCell sx={{
+                    textAlign: 'right' 
+                  }}>
+                    {company.score}
+                  </TableCell>
+                ))}
+              </TableRow>
             ))}
-            {/* Optional If there are less than 5 companies */}
-            {companies.length < 5 && (
-              <TableCell> 
-                <Typography variant="h6">Add Company</Typography>
-              </TableCell>
-            )}
-          </TableRow>
-        </TableHead>
+
+            <TableRow>
+              <TableCell><Typography variant="h6">Social</Typography></TableCell>
+            </TableRow>
+            {/* This is the part that renders all the table components */}
+            {metrics.filter(m => m.category === 'S').map((metric, index) => (
+              <TableRow>
+                <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+                  <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                </TableCell>
+                {metric.companies.map((company, index) => (
+                  <TableCell sx={{
+                    textAlign: 'right' 
+                  }}>
+                    {company.score}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+
+            <TableRow>
+              <TableCell><Typography variant="h6">Governance</Typography></TableCell>
+            </TableRow>
+            {/* This is the part that renders all the table components */}
+            {metrics.filter(m => m.category === 'G').map((metric, index) => (
+              <TableRow>
+                <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+                  <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                </TableCell>
+                {metric.companies.map((company, index) => (
+                  <TableCell sx={{
+                    textAlign: 'right' 
+                  }}>
+                    {company.score}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+
+
+          </Table>
+        </TableContainer>) :
+        (<p>Visualisation Placeholder</p>)}
         
-        {/* This is the part that renders all the table components */}
-        {/* {metrics.map((metric, index) => (
-          <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
-            {metric.companies.map((company, index) => (
-              <TableCell>
-                {company.score}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))} */}
-
-        {/* for the select bars */}
-        <TableRow>
-            <TableCell>
-                <Select
-                    styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                    options={years.map((year) => ({ value: year, label: year }))}
-                    label="Year"
-                    placeholder="Select Year"
-                    // value={year}
-                    value= {{label: year, value: year}}
-                    maxMenuHeight={100}
-                    onChange={(e) => setYear(e.value)}
-                />
-            </TableCell>
-            {/* Where the companies are rendered */}
-            {companies.map((company, index) => (
-              <TableCell key={index}>
-                <div className='companyParamContainer'>
-                  <Select
-                    styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                    options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
-                    label="Framework"
-                    placeholder="Framework"
-                    maxMenuHeight={100}
-                    defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
-                    onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
-                  />
-                </div>
-              </TableCell>
-            ))}
-            {/* Optional If there are less than 5 companies */}
-            {companies.length < 5 && (
-              <TableCell> 
-                <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
-              </TableCell>
-            )}
-        </TableRow>
-        
-        <TableRow>
-          <TableCell><Typography variant="h6">Environmental</Typography></TableCell>
-        </TableRow>
-        {/* This is the part that renders all the table components */}
-        {metrics.filter(m => m.category === 'E').map((metric, index) => (
-          <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
-            </TableCell>
-            {metric.companies.map((company, index) => (
-              <TableCell sx={{
-                textAlign: 'right' 
-              }}>
-                {company.score}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-
-        <TableRow>
-          <TableCell><Typography variant="h6">Social</Typography></TableCell>
-        </TableRow>
-        {/* This is the part that renders all the table components */}
-        {metrics.filter(m => m.category === 'S').map((metric, index) => (
-          <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
-            </TableCell>
-            {metric.companies.map((company, index) => (
-              <TableCell sx={{
-                textAlign: 'right' 
-              }}>
-                {company.score}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-
-        <TableRow>
-          <TableCell><Typography variant="h6">Governance</Typography></TableCell>
-        </TableRow>
-        {/* This is the part that renders all the table components */}
-        {metrics.filter(m => m.category === 'G').map((metric, index) => (
-          <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
-            </TableCell>
-            {metric.companies.map((company, index) => (
-              <TableCell sx={{
-                textAlign: 'right' 
-              }}>
-                {company.score}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-
-
-      </Table>
-    </TableContainer>) :
-    (<p>Visualisation Placeholder</p>)}
-    
-    <ContextMenu
-      contextMenuRef={contextMenuRef}
-      isToggled={contextMenu.toggled}
-      positionX={contextMenu.position.x}
-      positionY={contextMenu.position.y}
-      buttons={isSelectedCompany ? [
-        {
-          text: "delete",
-          onClick: () => handleDeleteFromTable(selectedCompany),
-        },
-      ] :
-      [
-        {
-          text: "delete metric",
-          onClick: () => deleteMetric(selectedCompany), // This is abit dodgy because its actually getting passed in a metricId
-        },
-      ]
-    }
-    />
-  
-    <button className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</button>
-    <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
-    {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
-    </div>
+        <ContextMenu
+          contextMenuRef={contextMenuRef}
+          isToggled={contextMenu.toggled}
+          positionX={contextMenu.position.x}
+          positionY={contextMenu.position.y}
+          buttons={isSelectedCompany ? [
+            {
+              text: "delete",
+              onClick: () => handleDeleteFromTable(selectedCompany),
+            },
+          ] :
+          [
+            {
+              text: "delete metric",
+              onClick: () => deleteMetric(selectedCompany), // This is abit dodgy because its actually getting passed in a metricId
+            },
+          ]
+        }
+        />
+      
+        <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
+        <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
+        {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
+      </Box> 
+    </Box>
   );
 };
 
