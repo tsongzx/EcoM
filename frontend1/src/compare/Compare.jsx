@@ -22,6 +22,7 @@ import Navbar from '../Navbar';
 import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateGeneralMetricScore } from '../helper';
 import ContextMenu from './ContextMenu';
 import SearchMetricsModal from './SearchMetricsModal';
+import CircularLoader from '../utils/CircularLoader';
 
 const Compare = () => {
   const location = useLocation();
@@ -39,6 +40,7 @@ const Compare = () => {
   const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
   const [open, setOpen] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const contextMenuRef = useRef(null);
   const [contextMenu, setContextMenu] = useState({
     position: {
@@ -72,17 +74,17 @@ const Compare = () => {
   }, []);
 
   //THE ONLY TIME WE UPDATE METRICS IS ON COMPANY CHANGE, FRAMEWORK CHANGE and MODAL CLOSE, and METRIC DELTE
-  useEffect(() => {
-    console.log('companies changed:', companies);
-    //update Everytime Companies change, then update metrics
-    updateMetrics();
-    ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
-  }, [companies]);
-  useEffect(() => {
-    console.log('frameworks changed:', frameworks);
-    updateMetrics();
-    //IF YEAR IS NONE CREATE DISAPPEARING MESSAGE
-  }, [frameworks]);
+  // useEffect(() => {
+  //   console.log('companies changed:', companies);
+  //   //update Everytime Companies change, then update metrics
+  //   updateMetrics();
+  //   ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
+  // }, [companies]);
+  // useEffect(() => {
+  //   console.log('frameworks changed:', frameworks);
+  //   updateMetrics();
+  //   //IF YEAR IS NONE CREATE DISAPPEARING MESSAGE
+  // }, [frameworks]);
   useEffect(() => {
     console.log('ContextMENU changed:', contextMenu, ' company selected at ', selectedCompany);
   }, [contextMenu, selectedCompany]);
@@ -91,6 +93,16 @@ const Compare = () => {
     console.log('metricsList changed so Imma change metrics!!!!');
     changeMetrics();
   },[metricsList]);
+  // useEffect(() => {
+  //   //everytime the metricsList changes, update the metrics to match
+  //   console.log('metricsList changed so Imma change metrics!!!!');
+  //   changeMetrics();
+  // },[year]);
+
+  useEffect(() => {
+    console.log('updating metrics:');
+    updateMetrics();
+  },[year, frameworks, companies]);
 
   useEffect(() => {
     console.log('METRICS CHANGED:');
@@ -137,6 +149,7 @@ const Compare = () => {
   
   // This is from the Adding tool (the modal)
   const changeMetrics = async () => {
+    setLoading(true);
     const metricsPromises = metricsList.map((m) => {
       console.log('mapping metric: ',m.metric_id, '/', metricsList.length);
       return calculateGeneralMetricScore(m.metric_id, m.metric_name, companies, year);
@@ -147,6 +160,7 @@ const Compare = () => {
     console.log(metricsList);
     console.log(newMetrics);
     setMetrics(newMetrics);
+    setLoading(false);
   }
 
   //add metric
@@ -324,6 +338,7 @@ const Compare = () => {
   return (
     <div>
     <Navbar/>
+    {loading && <CircularLoader/>}
     <TableContainer className='table'>
       <Table>
         {/* Header where Company controls are obtained */}
@@ -339,7 +354,7 @@ const Compare = () => {
                       // value={year}
                       // defaultValue= {year}
                       maxMenuHeight={100}
-                      onChange={(selectedOption) => setYear(selectedOption)}
+                      onChange={(e) => setYear(e.value)}
                     />
             </TableCell>
             {/* Where the companies are rendered */}
