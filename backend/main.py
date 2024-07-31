@@ -17,6 +17,7 @@ import schemas.graph_schemas as graph_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
+import schemas.score_schemas as score_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -1056,13 +1057,17 @@ async def calculate_metric(
     print("calculating metric")
     company_values = await get_company_indicators(company_name, user, session)
 
+    if year not in company_values:
+        return 0
+      
+    year_indicators = company_values[year]
     if framework_id:
       indicators = get_indicators_for_metric(metric_id, user, session)
     else:
       indicators = get_indicators(framework_id, metric_id, user, session)
       
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    return metrics.calculate_metric(year, company_values, weights)
+    return metrics.calculate_metric(year_indicators, weights)
 
 
 #***************************************************************
@@ -1344,6 +1349,30 @@ async def get_indicators_graph(
      
     return data_by_year
 
+#***************************************************************
+#                        Company view Scoring Apis
+# ***************************************************************
+@app.post("/company/metric/", tags=["Company scores"])
+async def calculate_metric_company_view(
+    # company_indicators: Dict[str, Any],
+    company_indicators: Dict[str, score_schemas.CompanyIndicator],
+    indicators: Dict[str, float],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    """_summary_: company_indicators should only be for the year
 
+    Returns:
+        _type_: _description_
+    """    
+    return metrics.calculate_metric(company_indicators, indicators)
 
-
+@app.post("/company/score/", tags=["Company scores"])
+async def find_weighted_average(
+    values: List[score_schemas.Value],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    return sum(value.score * value.weighting for value in values)
