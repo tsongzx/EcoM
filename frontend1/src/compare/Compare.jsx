@@ -389,18 +389,7 @@ const Compare = () => {
         <TableHead className='compare-tableheader'>
           <TableRow>
             <TableCell>
-              <Typography>Metrics</Typography>
-              {/* Put button for Metrics change here */}
-              <Select
-                      styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                      options={years.map((year) => ({ value: year, label: year }))}
-                      label="Year"
-                      placeholder="Select Year"
-                      // value={year}
-                      value= {{label: year, value: year}}
-                      maxMenuHeight={100}
-                      onChange={(e) => setYear(e.value)}
-                    />
+              <Typography variant="h6">Metrics</Typography>
             </TableCell>
             {/* Where the companies are rendered */}
             {companies.map((company, index) => (
@@ -410,30 +399,18 @@ const Compare = () => {
                       <Stack direction="row" justifyContent="space-between">
                         <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
                           className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
-                          <Typography>{company.companyName}</Typography>
+                          <Typography variant="h6">{company.companyName}</Typography>
                         </a> 
                         <Button variant="text" sx={{padding: '0 4%'}} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
                       </Stack>
                     </div>
-                  <div className='companyParamContainer'>
-                    <Select
-                      styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                      options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
-                      label="Framework"
-                      placeholder="Framework"
-                      maxMenuHeight={100}
-                      defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
-                      onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
-                    />
-                  </div>
                 </div>
               </TableCell>
             ))}
             {/* Optional If there are less than 5 companies */}
             {companies.length < 5 && (
               <TableCell> 
-                <Typography>Add New Company</Typography>
-                <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
+                <Typography variant="h6">Add Company</Typography>
               </TableCell>
             )}
           </TableRow>
@@ -451,6 +428,44 @@ const Compare = () => {
           </TableRow>
         ))} */}
 
+        {/* for the select bars */}
+        <TableRow>
+            <TableCell>
+                <Select
+                    styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                    options={years.map((year) => ({ value: year, label: year }))}
+                    label="Year"
+                    placeholder="Select Year"
+                    // value={year}
+                    value= {{label: year, value: year}}
+                    maxMenuHeight={100}
+                    onChange={(e) => setYear(e.value)}
+                />
+            </TableCell>
+            {/* Where the companies are rendered */}
+            {companies.map((company, index) => (
+              <TableCell key={index}>
+                <div className='companyParamContainer'>
+                  <Select
+                    styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                    options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
+                    label="Framework"
+                    placeholder="Framework"
+                    maxMenuHeight={100}
+                    defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
+                    onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
+                  />
+                </div>
+              </TableCell>
+            ))}
+            {/* Optional If there are less than 5 companies */}
+            {companies.length < 5 && (
+              <TableCell> 
+                <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
+              </TableCell>
+            )}
+        </TableRow>
+        
         <TableRow>
           <TableCell><Typography variant="h6">Environmental</Typography></TableCell>
         </TableRow>
