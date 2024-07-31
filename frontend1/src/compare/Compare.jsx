@@ -35,7 +35,7 @@ const Compare = () => {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [defaultFramework, setDefaultFramework] = useState(null);
-  const [year, setYear] = useState(null);
+  const [year, setYear] = useState(2024);
   const years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
   const [open, setOpen] = useState(false);
 
@@ -336,6 +336,8 @@ const Compare = () => {
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={years.map((year) => ({ value: year, label: year }))}
                       label="Year"
+                      // value={year}
+                      // defaultValue= {year}
                       maxMenuHeight={100}
                       onChange={(selectedOption) => setYear(selectedOption)}
                     />
