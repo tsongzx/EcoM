@@ -1,0 +1,109 @@
+                                                                                                                            esgScores
+maxAge                                                                                                                          86400
+totalEsg                                                                                                                        30.61
+environmentScore                                                                                                                  6.0
+socialScore                                                                                                                     15.39
+governanceScore                                                                                                                  9.22
+ratingYear                                                                                                                       2023
+ratingMonth                                                                                                                         9
+highestControversy                                                                                                                3.0
+peerCount                                                                                                                          55
+esgPerformance                                                                                                               OUT_PERF
+peerGroup                                                                                                                   Retailing
+relatedControversy                 [Employee Incidents, Social Supply Chain Incidents, Customer Incidents, Business Ethics Incidents]
+peerEsgScorePerformance                                                        {'min': 9.65, 'avg': 16.908909090909088, 'max': 30.61}
+peerGovernancePerformance                                                        {'min': 2.36, 'avg': 5.247872340425532, 'max': 9.22}
+peerSocialPerformance                                                            {'min': 4.0, 'avg': 8.324893617021274, 'max': 15.39}
+peerEnvironmentPerformance                                                      {'min': 0.08, 'avg': 2.9348936170212765, 'max': 7.32}
+peerHighestControversyPerformance                                                                {'min': 0.0, 'avg': 2.0, 'max': 5.0}
+percentile                                                                                                                      71.14
+environmentPercentile                                                                                                            None
+socialPercentile                                                                                                                 None
+governancePercentile                                                                                                             None
+adult                                                                                                                           False
+alcoholic                                                                                                                       False
+animalTesting                                                                                                                   False
+catholic                                                                                                                        False
+controversialWeapons                                                                                                            False
+smallArms                                                                                                                       False
+furLeather                                                                                                                      False
+gambling                                                                                                                        False
+gmo                                                                                                                             False
+militaryContract                                                                                                                False
+nuclear                                                                                                                         False
+pesticides                                                                                                                      False
+palmOil                                                                                                                         False
+coal                                                                                                                            False
+tobacco                                                                                                                         False                                                                                                                            esgScores
+maxAge                                                                                                                          86400
+totalEsg                                                                                                                        30.61
+environmentScore                                                                                                                  6.0
+socialScore                                                                                                                     15.39
+governanceScore                                                                                                                  9.22
+ratingYear                                                                                                                       2023
+ratingMonth                                                                                                                         9
+highestControversy                                                                                                                3.0
+peerCount                                                                                                                          55
+esgPerformance                                                                                                               OUT_PERF
+peerGroup                                                                                                                   Retailing
+relatedControversy                 [Employee Incidents, Social Supply Chain Incidents, Customer Incidents, Business Ethics Incidents]
+peerEsgScorePerformance                                                        {'min': 9.65, 'avg': 16.908909090909088, 'max': 30.61}
+peerGovernancePerformance                                                        {'min': 2.36, 'avg': 5.247872340425532, 'max': 9.22}
+peerSocialPerformance                                                            {'min': 4.0, 'avg': 8.324893617021274, 'max': 15.39}
+peerEnvironmentPerformance                                                      {'min': 0.08, 'avg': 2.9348936170212765, 'max': 7.32}
+peerHighestControversyPerformance                                                                {'min': 0.0, 'avg': 2.0, 'max': 5.0}
+percentile                                                                                                                      71.14
+environmentPercentile                                                                                                            None
+socialPercentile                                                                                                                 None
+governancePercentile                                                                                                             None
+adult                                                                                                                           False
+alcoholic                                                                                                                       False
+animalTesting                                                                                                                   False
+catholic                                                                                                                        False
+controversialWeapons                                                                                                            False
+smallArms                                                                                                                       False
+furLeather                                                                                                                      False
+gambling                                                                                                                        False
+gmo                                                                                                                             False
+militaryContract                                                                                                                False
+nuclear                                                                                                                         False
+pesticides                                                                                                                      False
+palmOil                                                                                                                         False
+coal                                                                                                                            False
+tobacco                                                                                                                         False                                                                                                                            esgScores
+maxAge                                                                                                                          86400
+totalEsg                                                                                                                        30.61
+environmentScore                                                                                                                  6.0
+socialScore                                                                                                                     15.39
+governanceScore                                                                                                                  9.22
+ratingYear                                                                                                                       2023
+ratingMonth                                                                                                                         9
+highestControversy                                                                                                                3.0
+peerCount                                                                                                                          55
+esgPerformance                                                                                                               OUT_PERF
+peerGroup                                                                                                                   Retailing
+relatedControversy                 [Employee Incidents, Social Supply Chain Incidents, Customer Incidents, Business Ethics Incidents]
+peerEsgScorePerformance                                                        {'min': 9.65, 'avg': 16.908909090909088, 'max': 30.61}
+peerGovernancePerformance                                                        {'min': 2.36, 'avg': 5.247872340425532, 'max': 9.22}
+peerSocialPerformance                                                            {'min': 4.0, 'avg': 8.324893617021274, 'max': 15.39}
+peerEnvironmentPerformance                                                      {'min': 0.08, 'avg': 2.9348936170212765, 'max': 7.32}
+peerHighestControversyPerformance                                                                {'min': 0.0, 'avg': 2.0, 'max': 5.0}
+percentile                                                                                                                      71.14
+environmentPercentile                                                                                                            None
+socialPercentile                                                                                                                 None
+governancePercentile                                                                                                             None
+adult                                                                                                                           False
+alcoholic                                                                                                                       False
+animalTesting                                                                                                                   False
+catholic                                                                                                                        False
+controversialWeapons                                                                                                            False
+smallArms                                                                                                                       False
+furLeather                                                                                                                      False
+gambling                                                                                                                        False
+gmo                                                                                                                             False
+militaryContract                                                                                                                False
+nuclear                                                                                                                         False
+pesticides                                                                                                                      False
+palmOil                                                                                                                         False
+coal                                                                                                                            False
+tobacco                                                                                                                         False
