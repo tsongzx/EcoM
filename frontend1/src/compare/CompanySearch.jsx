@@ -20,7 +20,6 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
           setHasMore(companiesAvailable.length > 0);
           setLoading(false);
         };
-    
         fetchAndSetCompanies();
       }, [page]);
 
@@ -50,15 +49,6 @@ const CompanySearch = ({handleSelectedCompanyId}) => {
             onMenuScrollToBottom={handleMenuScrollToBottom}
             label="Company"
         />
-        // listOfCompanies.map((company) => (
-        //     <Option
-        //       key={company.id}
-        //       value={company.id}
-        //     >
-        //       {company.company_name}
-        //     </Option>
-        //   ))}
-        // </Select>
     );
 }
 

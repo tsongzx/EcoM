@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import ESGInfo from './ESGInfo';
 
 const Home = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
@@ -193,6 +194,8 @@ const Home = () => {
           <img src={imageCat} alt='placeholderImage' />
 
         </div>
+
+        <ESGInfo/>
 
       </div>
     </div>

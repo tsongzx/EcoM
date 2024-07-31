@@ -62,7 +62,9 @@ const Profile = () => {
         console.log('handing updated password...');
         console.log(`old: ${password}, new: ${updatePassword}, confirmed: ${updatedConfirmPassword}`);
         if (password === '') {
+            console.log('No Password Inputted');
             setShowUpdatePassword(false);
+            setErrorMessage('');
         }
         else if (updatedPassword === password) {
             setErrorMessage('Cannot use previous password');
@@ -97,6 +99,7 @@ const Profile = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            console.log('SUCCESSFULLY UPDATED PASSWORD');
             setErrorMessage('');
             return response.data;
         } catch (error) {
@@ -152,7 +155,7 @@ const Profile = () => {
     return (
         <div className="profilePage">
             {showUpdateName 
-                ? (<div>
+                ? (<div className="pfpName-container">
                     <input id="pfpName" defaultValue={name} onChange={(event) => {setUpdatedName(event.target.value)}}/>
                     <button onClick={handleCloseUpdateName}>OK</button>
                 </div>) 

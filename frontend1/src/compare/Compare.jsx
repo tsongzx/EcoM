@@ -1,20 +1,12 @@
 import {React, useEffect, useState, useRef} from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CompanySearch from './CompanySearch';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import {
-  Collapse,
-  Card,
-  Grid,
   TableContainer,
   Table,
-  Paper,
   TableHead,
   TableRow,
   TableCell,
-  TableBody,
-  Tab,
   Typography
 } from '@mui/material';
 import Select from 'react-select';
@@ -22,6 +14,8 @@ import Navbar from '../Navbar';
 import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateGeneralMetricScore } from '../helper';
 import ContextMenu from './ContextMenu';
 import SearchMetricsModal from './SearchMetricsModal';
+import SelfExpiringMessage from '../assets/SelfExpiringMessage.jsx';
+import Button from '@mui/joy/Button';
 
 const Compare = () => {
   const location = useLocation();
@@ -49,6 +43,13 @@ const Compare = () => {
   const [isSelectedCompany, setIsSelectedCompany] = useState();
   const [selectedCompany, setSelectedCompany] = useState();
 
+  const [message, setMessage] = useState('');
+  const [showMessage, setShowMessage] = useState(false);
+  const [showTable, setShowTable] = useState(true);
+
+  const initialMount = useRef(true);
+  const [metricsUpdated, setMetricsUpdated] = useState(false);
+
   const setData = async () => {
     console.log('INSIDE INIT USE EFFECT');
     //get all the frameworks
@@ -67,20 +68,30 @@ const Compare = () => {
     setFrameworks(modifiedfws);
     setCompanies(companiesList);
   } 
+
   useEffect(() => {
-    setData();
+    setData().then(() => {
+      if (initialMount.current) {
+        updateMetrics();
+        initialMount.current = false;
+      }
+    });
   }, []);
 
   //THE ONLY TIME WE UPDATE METRICS IS ON COMPANY CHANGE, FRAMEWORK CHANGE and MODAL CLOSE, and METRIC DELTE
   useEffect(() => {
-    console.log('companies changed:', companies);
-    //update Everytime Companies change, then update metrics
-    updateMetrics();
+    if (!initialMount.current && metricsUpdated) {
+      console.log('companies changed:', companies);
+      //update Everytime Companies change, then update metrics
+      updateMetrics();
+    }
     ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
   }, [companies]);
   useEffect(() => {
-    console.log('frameworks changed:', frameworks);
-    updateMetrics();
+    if (!initialMount.current && metricsUpdated) {
+      console.log('frameworks changed:', frameworks);
+      updateMetrics();
+    }
     //IF YEAR IS NONE CREATE DISAPPEARING MESSAGE
   }, [frameworks]);
   useEffect(() => {
@@ -90,6 +101,7 @@ const Compare = () => {
     //everytime the metricsList changes, update the metrics to match
     console.log('metricsList changed so Imma change metrics!!!!');
     changeMetrics();
+    setMetricsUpdated(true);
   },[metricsList]);
 
   useEffect(() => {
@@ -99,9 +111,20 @@ const Compare = () => {
 
   //given the index that it was selected switch out the company ID at that index to become the new company ID
   const handleSelectedCompanyId = (companyId, companyName) => {
+    if (companies.some(i => i.id === companyId)) {
+      setMessage(`Company ${companyName} already added`);
+      setShowMessage(true);
+      return;
+    }
+
     console.log(`Adding company ${companyId} ${companyName}`);
     const newListOfCompanies = [...companies, {id: companyId, companyName, framework: 1, year: 2023, selected: false}];
     setCompanies(newListOfCompanies);
+
+    if (newListOfCompanies.length === 5) {
+      setMessage('You have reached the maximum number of comparisons');
+      setShowMessage(true);
+    }
   }
 
   //This function updates the metrics that are being used depending on the frameworks that are being selected
@@ -114,32 +137,37 @@ const Compare = () => {
   
     await Promise.all(companies.map(async (c) => {
       if (c.framework && !processedFrameworks.has(c.framework)) {
+        console.log('processing framework: ', c.framework);
         processedFrameworks.add(c.framework);
-  
+        
+        //get the metrics for each framework
         const frameworkMetrics = await getMetricForFramework(c.framework);
         console.log(frameworkMetrics);
         updatedMetrics.push(...frameworkMetrics);
       }
     }));
     
-    //gets a list of {metric_id, metric_name}
+    //gets a list of {metric_id, metric_name, category}
     const newMetrics = await Promise.all(
       updatedMetrics
-        .filter(m => !metricsList.some(i => i.metric_id === m.metric_id))
+        //.filter(m => !metricsList.some(i => i.metric_id === m.metric_id))
         .map(async m => ({
           metric_id: m.metric_id,
-          metric_name: await getMetricName(m.metric_id)
+          metric_name: await getMetricName(m.metric_id),
+          category: m.category,
         }))
     );
-
-    setMetricsList(prevMetricsList => [...prevMetricsList, ...newMetrics]);
+    console.log('STILL INSIDE updateMetrics:');
+    console.log(newMetrics);
+    console.log(metricsList);
+    setMetricsList(newMetrics);
   };
   
   // This is from the Adding tool (the modal)
   const changeMetrics = async () => {
     const metricsPromises = metricsList.map((m) => {
       console.log('mapping metric: ',m.metric_id, '/', metricsList.length);
-      return calculateGeneralMetricScore(m.metric_id, m.metric_name, companies, year);
+      return calculateGeneralMetricScore(m.metric_id, m.metric_name, m.category, companies, year);
     });
 
     const newMetrics = await Promise.all(metricsPromises);
@@ -175,7 +203,7 @@ const Compare = () => {
 
   const handleSelectedFramework = async (companyId, selectedOption) =>  {
     const foundC = companies.find(company => company.id === companyId);
-    if (foundC.framework == selectedOption) {
+    if (foundC.framework === selectedOption) {
       console.log(`Already has company ${companyId} with that framework: `, selectedOption);
       //CREATE DISAPPEARING MESSAGE FOR THIS
       //IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSAGE
@@ -317,17 +345,31 @@ const Compare = () => {
   }
 
   const handleToggleOpenModal = () => {
+    console.log('opening Modal...');
     setOpen(!open);
+  }
+
+  const handleMessageExpiry = () => {
+    console.log('Hiding Message');
+    setShowMessage(false);
   }
 
   //render table cell if company is not null
   return (
     <div>
     <Navbar/>
-    <TableContainer className='table'>
-      <Table>
+    <div>
+      <Button onClick={() => setShowTable(true)} className = {`togglecompareview-button ${showTable ? 'cmpvw-btnshownT' : ''}`} variant="outlined"> 
+        Table
+      </Button>
+      <Button onClick={() => setShowTable(false)} className = {`togglecompareview-button ${!showTable ? 'cmpvw-btnshownG' : ''}`} variant="outlined" >
+        Graph
+      </Button>
+    </div>
+    {showTable ? (<TableContainer className='compare-table-cont' style={{height: '75vh',}}>
+      <Table className='compare-table'>
         {/* Header where Company controls are obtained */}
-        <TableHead>
+        <TableHead className='compare-tableheader'>
           <TableRow>
             <TableCell>
               <Typography>Metrics</Typography>
@@ -336,6 +378,7 @@ const Compare = () => {
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={years.map((year) => ({ value: year, label: year }))}
                       label="Year"
+                      placeholder="Select Year"
                       // value={year}
                       // defaultValue= {year}
                       maxMenuHeight={100}
@@ -346,17 +389,23 @@ const Compare = () => {
             {companies.map((company, index) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                 <div>
-                  <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)} className={company.selected ? 'selected compare-anchor' : 'compare-anchor'} >{company.companyName}</a>
+                    <div className='comparecompanyheadertitle'> <a 
+                    onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
+                    className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
+                      {company.companyName}
+                    </a> 
+                    <button onClick={() => handleDeleteFromTable(company.id)}>X</button>
+                    </div>
                   <div className='companyParamContainer'>
                     <Select
                       styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                       options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
                       label="Framework"
+                      placeholder="Framework"
                       maxMenuHeight={100}
                       defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
                       onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
                     />
-                    {/* insert years filter here */}
                   </div>
                 </div>
               </TableCell>
@@ -372,7 +421,22 @@ const Compare = () => {
         </TableHead>
         
         {/* This is the part that renders all the table components */}
-        {metrics.map((metric, index) => (
+        {/* {metrics.map((metric, index) => (
+          <TableRow>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            {metric.companies.map((company, index) => (
+              <TableCell>
+                {company.score}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))} */}
+
+        <TableRow>
+          <TableCell>Environmental</TableCell>
+        </TableRow>
+        {/* This is the part that renders all the table components */}
+        {metrics.filter(m => m.category === 'E').map((metric, index) => (
           <TableRow>
             <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
             {metric.companies.map((company, index) => (
@@ -383,8 +447,40 @@ const Compare = () => {
           </TableRow>
         ))}
 
+        <TableRow>
+          <TableCell>Social</TableCell>
+        </TableRow>
+        {/* This is the part that renders all the table components */}
+        {metrics.filter(m => m.category === 'S').map((metric, index) => (
+          <TableRow>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            {metric.companies.map((company, index) => (
+              <TableCell>
+                {company.score}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+
+        <TableRow>
+          <TableCell>Governance</TableCell>
+        </TableRow>
+        {/* This is the part that renders all the table components */}
+        {metrics.filter(m => m.category === 'G').map((metric, index) => (
+          <TableRow>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            {metric.companies.map((company, index) => (
+              <TableCell>
+                {company.score}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+
+
       </Table>
-    </TableContainer>
+    </TableContainer>) :
+    (<p>Visualisation Placeholder</p>)}
     
     <ContextMenu
       contextMenuRef={contextMenuRef}
@@ -405,9 +501,10 @@ const Compare = () => {
       ]
     }
     />
-
-    <button onClick={handleToggleOpenModal}>Customise Metrics List</button>
+  
+    <button className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</button>
     <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
+    {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
     </div>
   );
 };

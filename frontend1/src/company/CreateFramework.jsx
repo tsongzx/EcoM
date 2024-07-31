@@ -10,6 +10,7 @@ import Accordion from '@mui/joy/Accordion';
 import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
+import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
 
 const CreateFramework = () => {
     const [Emetrics, setEMetrics] = useState([]);
@@ -21,6 +22,9 @@ const CreateFramework = () => {
     const [showAddName, setShowAddName] = useState(false);
     const [newFrameworkName, setNewFrameworkName] = useState('');
     const [description, setDescription] = useState('');
+
+    const [showMessage, setShowMessage] = useState(false);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const fetchMetrics = async () => {
@@ -78,7 +82,17 @@ const CreateFramework = () => {
       }));
     }
 
+    const handleCloseMessage = () => {
+      setShowMessage(false);
+    }
+
     const handleSubmitNewFramework = async () => {
+    if (newFrameworkName === null || newFrameworkName === '') {
+      setMessage('Please Enter a name for your new framework');
+      setShowMessage(true);
+      return;
+    }
+
     // do one for each E, S and G
     const chosenEMetrics = processMetrics(Emetrics);
     const chosenSMetrics = processMetrics(Smetrics);
@@ -110,6 +124,9 @@ const CreateFramework = () => {
               }});
               //if successful
               handleClose();
+              setMessage('successfully created framework');
+              setShowMessage(true);
+              setIsOpen(false);
               console.log('SUCCESSFULLY CREATED FRAMEWORK');
               return response.data;
         } catch (error) {
@@ -130,7 +147,18 @@ const CreateFramework = () => {
     return (
       <div style={{ marginTop: '100px'}}>
         <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
-        {isOpen && <div>
+        {isOpen && <div className="cfw-container">
+          <div className="cfw-esgdescriptor">
+            <p className="cfw-esgdescriptor-content" style={{
+              left:`calc(${value[0]}% / 2)`
+            }}>E</p>
+            <p className="cfw-esgdescriptor-content" style={{
+              left:`calc(${value[0]}% + (${value[1]}% - ${value[0]}%) / 2 - 15px)`
+            }}>S</p>
+            <p className="cfw-esgdescriptor-content" style={{
+              left:`calc(${value[1]}% + (100% - ${value[1]}%) / 2 - 23px)`
+            }}>G</p>
+          </div>
           <Slider 
             value = {value}
             onChange={handleChangeSlider}
@@ -141,39 +169,45 @@ const CreateFramework = () => {
             <Accordion>
             <AccordionSummary>Environmental</AccordionSummary>
             <AccordionDetails>
-              {Emetrics.map((metric, index) => (
-                <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
-                  key={index} 
-                  onClick={() => handleEButtonClick(index)}>
-                  {metric.name ? metric.name : '...'}
-                </button>
-              ))}
+              <div className='cfwbtn-container'>
+                {Emetrics.map((metric, index) => (
+                  <button className = {`cfw-button ${metric.isIncluded ? 'cfw-button-includedE' : 'cfw-button-not-included'}`}
+                    key={index} 
+                    onClick={() => handleEButtonClick(index)}>
+                    {metric.name ? metric.name : '...'}
+                  </button>
+                ))}
+              </div>
             </AccordionDetails>
             </Accordion>
 
             <Accordion>
             <AccordionSummary>Social</AccordionSummary>
             <AccordionDetails>
-              {Smetrics.map((metric, index) => (
-                <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
-                  key={index} 
-                  onClick={() => handleSButtonClick(index)}>
-                  {metric.name ? metric.name : '...'}
-                </button>
-              ))}
+              <div className='cfwbtn-container'>
+                {Smetrics.map((metric, index) => (
+                  <button className = {`cfw-button ${metric.isIncluded ? 'cfw-button-includedS' : 'cfw-button-not-included'}`}
+                    key={index} 
+                    onClick={() => handleSButtonClick(index)}>
+                    {metric.name ? metric.name : '...'}
+                  </button>
+                ))}
+              </div>
             </AccordionDetails>
             </Accordion>
 
             <Accordion>
             <AccordionSummary>Governance</AccordionSummary>
             <AccordionDetails>
-              {Gmetrics.map((metric, index) => (
-                <button className = {`button ${metric.isIncluded ? 'included' : 'not-included'}`}
-                  key={index} 
-                  onClick={() => handleGButtonClick(index)}>
-                  {metric.name ? metric.name : '...'}
-                </button>
-              ))}
+              <div className='cfwbtn-container'>
+                {Gmetrics.map((metric, index) => (
+                  <button className = {`cfw-button ${metric.isIncluded ? 'cfw-button-includedG' : 'cfw-button-not-included'}`}
+                    key={index} 
+                    onClick={() => handleGButtonClick(index)}>
+                    {metric.name ? metric.name : '...'}
+                  </button>
+                ))}
+              </div>
             </AccordionDetails>
             </Accordion>
           </AccordionGroup>
@@ -185,6 +219,7 @@ const CreateFramework = () => {
                 <button onClick={() => handleSubmitNewFramework()}>save</button>
             </div>)}
         </div>}
+        {showMessage && <SelfExpiringMessage message={message} onExpiry={handleCloseMessage} />}
       </div>
     )
 }
