@@ -1,3 +1,4 @@
+import asyncio
 from urllib.parse import urljoin
 from sklearn.linear_model import LinearRegression
 from fastapi import Depends, FastAPI, HTTPException, status, Query
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas.user_schemas as user_schemas
 import schemas.list_schemas as list_schemas
+import schemas.graph_schemas as graph_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
@@ -25,13 +27,14 @@ from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
 from config import Config
-from typing import List, Any, Dict
+from typing import List, Any, Dict, Optional, Union
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import requests
 from bs4 import BeautifulSoup
 import liveData
+import metrics 
     
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
@@ -1040,63 +1043,28 @@ def get_company_indicators_by_metric(
     
     return values
 
+
 @app.get("/metric/score", tags=["Metrics"])
 async def calculate_metric(
     metric_id: int,
     company_name: str,
-    framework_id: int,
     year: int,
+    framework_id: Optional[Union[int, None]] = None,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    
-    indicator_data = metrics.read_metrics_file()
-    overall_score = 0  
     print("calculating metric")
     company_values = await get_company_indicators(company_name, user, session)
-    indicators = get_indicators(framework_id, metric_id, user, session)
+
+    if framework_id:
+      indicators = get_indicators_for_metric(metric_id, user, session)
+    else:
+      indicators = get_indicators(framework_id, metric_id, user, session)
+      
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    if year not in company_values:
-      return 0
-    year_indicators = company_values[year]
-    for indicator_name, weight in weights.items():
-        print(indicator_name)
-        print(f'printing weight {weight}')
-        if indicator_name not in year_indicators:
-            # indicator does not exist for that company for that year
-            print("skipping")
-            continue
-        indicator_scaling = indicator_data[indicator_name]
+    return metrics.calculate_metric(year, company_values, weights)
 
-        lower = indicator_scaling["lower"]
-        higher = indicator_scaling["higher"]
-        indicator_value = year_indicators[indicator_name].indicator_value
-        print(f'printing indicator value {indicator_value}')
-        scaled_score = 0
-        if higher == lower:
-            scaled_score = 100
-            continue
-        elif indicator_scaling["indicator"] == "positive":
-            scaled_score = 100*(indicator_value - lower)/(higher - lower)
-        else:
-            scaled_score = 100*(higher - indicator_value)/(higher - lower)
-        print(f'printing scaled value {scaled_score}')
-        
-        overall_score += scaled_score * weight
-        print(overall_score)
-    return overall_score
 
-# @app.get("/metrics/category", tags=["Metrics"])
-# async def get_metrics_by_category(
-#     category: Category,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     """_summary_: TO DO: currently not one to to one mapping between
-#       metrics and categories so this is currently getting fixed
-#     """   
-#     # TO DO: GET ALL METRICS IN A CATEGORY!!
-#     return []
 #***************************************************************
 #                        Industry Apis
 # ***************************************************************
