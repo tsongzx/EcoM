@@ -7,7 +7,8 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  Typography
+  Typography,
+  Stack
 } from '@mui/material';
 import Select from 'react-select';
 import Navbar from '../Navbar';
@@ -383,7 +384,7 @@ const Compare = () => {
       </Button>
     </div>
     {showTable ? (<TableContainer className='compare-table-cont' style={{height: '75vh',}}>
-      <Table className='compare-table'>
+      <Table className='compare-table' style={{ tableLayout: 'fixed' }}>
         {/* Header where Company controls are obtained */}
         <TableHead className='compare-tableheader'>
           <TableRow>
@@ -396,7 +397,7 @@ const Compare = () => {
                       label="Year"
                       placeholder="Select Year"
                       // value={year}
-                      // defaultValue= {year}
+                      value= {{label: year, value: year}}
                       maxMenuHeight={100}
                       onChange={(e) => setYear(e.value)}
                     />
@@ -405,12 +406,14 @@ const Compare = () => {
             {companies.map((company, index) => (
               <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                 <div>
-                    <div className='comparecompanyheadertitle'> <a 
-                    onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
-                    className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
-                      {company.companyName}
-                    </a> 
-                    <button onClick={() => handleDeleteFromTable(company.id)}>X</button>
+                    <div className='comparecompanyheadertitle'> 
+                      <Stack direction="row" justifyContent="space-between">
+                        <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
+                          className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
+                          <Typography>{company.companyName}</Typography>
+                        </a> 
+                        <Button variant="text" sx={{padding: '0 4%'}} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
+                      </Stack>
                     </div>
                   <div className='companyParamContainer'>
                     <Select
@@ -449,14 +452,16 @@ const Compare = () => {
         ))} */}
 
         <TableRow>
-          <TableCell>Environmental</TableCell>
+          <TableCell><Typography variant="h6">Environmental</Typography></TableCell>
         </TableRow>
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'E').map((metric, index) => (
           <TableRow>
             <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
             {metric.companies.map((company, index) => (
-              <TableCell>
+              <TableCell sx={{
+                textAlign: 'right' 
+              }}>
                 {company.score}
               </TableCell>
             ))}
@@ -464,14 +469,16 @@ const Compare = () => {
         ))}
 
         <TableRow>
-          <TableCell>Social</TableCell>
+          <TableCell><Typography variant="h6">Social</Typography></TableCell>
         </TableRow>
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'S').map((metric, index) => (
           <TableRow>
             <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
             {metric.companies.map((company, index) => (
-              <TableCell>
+              <TableCell sx={{
+                textAlign: 'right' 
+              }}>
                 {company.score}
               </TableCell>
             ))}
@@ -479,14 +486,16 @@ const Compare = () => {
         ))}
 
         <TableRow>
-          <TableCell>Governance</TableCell>
+          <TableCell><Typography variant="h6">Governance</Typography></TableCell>
         </TableRow>
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'G').map((metric, index) => (
           <TableRow>
             <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
             {metric.companies.map((company, index) => (
-              <TableCell>
+              <TableCell sx={{
+                textAlign: 'right' 
+              }}>
                 {company.score}
               </TableCell>
             ))}

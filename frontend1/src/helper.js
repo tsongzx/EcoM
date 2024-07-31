@@ -680,6 +680,33 @@ export const getMetricScore = async(metricId, companyName, year, frameworkId = u
   }
 }
 
+Number.prototype.countDecimals = function () {
+  if (Math.floor(this.valueOf()) === this.valueOf()) return 0;
+
+  var str = this.toString();
+  if (str.indexOf(".") !== -1 && str.indexOf("-") !== -1) {
+      return str.split("-")[1] || 0;
+  } else if (str.indexOf(".") !== -1) {
+      return str.split(".")[1].length || 0;
+  }
+  return str.split("-")[1] || 0;
+}
+
+export const roundMetricScore = async(metricId, companyName, year, frameworkId = undefined) => {
+  let metricScore = await getMetricScore(metricId, companyName, year, frameworkId);
+  console.log(metricScore);
+  // metricScore = metricScore.toPrecision(3);
+  // console.log(metricScore);
+  let formattedScore;
+  if (metricScore.countDecimals() > 3) {
+    formattedScore = metricScore.toExponential(3); 
+  } else {
+    formattedScore = metricScore.toPrecision(3); 
+  }
+
+  // Return the formatted score
+  return formattedScore;
+}
 // companyList has objects of form : {
 //   name,
 //   id
@@ -687,10 +714,10 @@ export const getMetricScore = async(metricId, companyName, year, frameworkId = u
 // specific to a framework
 export const calculateMetricScore = async(metricId, frameworkId, companyList, year) => {
   // get industries for metric
-  const companies = companyList.map(c => ({
+  const companies = await Promise.all(companyList.map(async c => ({
     companyId : c.id,
-    score: getMetricScore(metricId, c.name, year, frameworkId),
-  }));
+    score: await roundMetricScore(metricId, c.name, year, frameworkId),
+  })));
   // return collected information, (in future maybe ESG score if framework and industry ranking)
   return {metricId, companies};
 }
@@ -702,7 +729,7 @@ export const calculateGeneralMetricScore = async(metricId, metricName, metricCat
   
   const companies = await Promise.all(companyList.map(async c => ({
     companyId : c.id,
-    score: await getMetricScore(metricId, c.companyName, year),
+    score: await roundMetricScore(metricId, c.companyName, year),
   })));
 
   // return collected information, (in future maybe ESG score if framework and industry ranking)

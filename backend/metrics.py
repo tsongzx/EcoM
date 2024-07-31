@@ -40,4 +40,5 @@ def calculate_metric(year, company_values, weights):
       
       overall_score += scaled_score * weight
       print(overall_score)
+      
   return overall_score

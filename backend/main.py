@@ -1052,7 +1052,7 @@ async def calculate_metric(
     framework_id: Optional[Union[int, None]] = None,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-):
+) -> float:
     print("calculating metric")
     company_values = await get_company_indicators(company_name, user, session)
 
