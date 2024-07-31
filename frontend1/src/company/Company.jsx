@@ -33,7 +33,7 @@ import FrameworkTable from './FrameworkTable';
 import CompanyHeader from './CompanyHeader.jsx';
 import CompanyBody from './CompanyBody.jsx';
 import GraphTableToggle from '../utils/GraphTableToggle.jsx';
-import Visualisations from './visualisations/Visualisations.jsx';
+import Visualisations from './Visualisations.jsx';
 
 
 const Company = () => {
