@@ -959,16 +959,16 @@ async def get_indicator(
 # ***************************************************************
 
 
-@app.get("/metric", response_model=str, tags=["Metrics"])
-async def get_metric_name(
-    metric_id: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> str:
-    metric = session.query(metrics_models.Metrics).filter_by(
-        id=metric_id).first()
+# @app.get("/metric", response_model=str, tags=["Metrics"])
+# async def get_metric_name(
+#     metric_id: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     metric = session.query(metrics_models.Metrics).filter_by(
+#         id=metric_id).first()
 
-    return metric.name
+#     return {'name': metric.name}
 
 
 @app.get("/metrics", tags=["Metrics"])
@@ -1324,9 +1324,9 @@ async def articles(
 #                        Visualisation Apis
 # ***************************************************************
 
-@app.post("/graph/indicators/line", tags=["Graph"])
+@app.get("/graph/indicators/line", tags=["Graph"])
 async def get_indicators_line_graph(
-    companies: List[str],
+    companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
@@ -1352,9 +1352,9 @@ async def get_indicators_line_graph(
     return data_by_company
 
 
-@app.post("/graph/indicators/bar", tags=["Graph"])
+@app.get("/graph/indicators/bar", tags=["Graph"])
 async def get_indicators_bar_graph(
-    companies: List[str],
+    companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
