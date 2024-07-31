@@ -433,7 +433,6 @@ export const getAllIndicators = async() => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-        console.log('Indicators for metric ', metricId);
         console.log(response.data);
         return response.data;
     } catch (error) {
@@ -699,5 +698,20 @@ export const getIndicatorFromMetric = async(metricId) => {
             return response.data;
     } catch (error) {
         console.log(`Error getting industry: ${error}`)
+    }
+}
+
+export const webscrapeLinks = async(link) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/articles?URL=${link}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log('error webscraping link ', link);
     }
 }
