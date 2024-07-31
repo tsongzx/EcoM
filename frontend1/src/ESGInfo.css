@@ -48,4 +48,47 @@
 .ESGCategory-Text {
     flex: 1;
     margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+
+.ESGScore-ext-raise-button:hover,
+.ESGScore-ext-raise-button:focus {
+  box-shadow: 0 0.5em 0.5em -0.4em #ffc279; 
+  transform: translateY(-0.25em);
+}
+
+.ESGScore-ext-raise-button {
+  --color: #ffa260;
+  --hover: #ffc279; 
+  background: none;
+  border: 2px solid;
+  font: inherit;
+  line-height: 1;
+  margin: 0.5em;
+  padding: 1em 2em;
+  color: var(--color);
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+.ESGScore-ext-raise-button:hover,
+.ESGScore-ext-raise-button:focus { 
+  border-color: var(--hover);
+  color: #fff;
+}
+
+.ESGScore-externalLinks-container {
+  color: #fff;
+  background: hsl(227, 10%, 10%);
+  font: 300 1em 'Fira Sans', sans-serif;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+}
+h1 {
+  font-weight: 400;
 }
