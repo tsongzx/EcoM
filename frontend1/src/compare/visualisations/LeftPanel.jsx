@@ -3,8 +3,12 @@ import { Box, Paper, Stack } from '@mui/material';
 import {React, useEffect, useState, useRef} from 'react';
 import AddCompany from './AddCompany';
 import ClearIcon from '@mui/icons-material/Clear';
+import DisplayToggle from './DisplayToggle';
+import Select from 'react-select';
 
-const LeftPanel = ({companies, setCompanies, setMessage, setShowMessage, handleDeleteFromTable, handleClickCompanyName}) => {
+const LeftPanel = ({companies, setCompanies, setMessage, setShowMessage, handleDeleteFromTable, handleClickCompanyName, 
+  display, setDisplay, frameworks, framework, setFramework
+}) => {
  
   console.log(companies);
   console.log(companies[0]);
@@ -17,9 +21,24 @@ const LeftPanel = ({companies, setCompanies, setMessage, setShowMessage, handleD
         overflowY: "scroll",
         justifyContent: "space-evenly"
       }}>
+        <Box sx={{height: "10%"}}>
+          <DisplayToggle display={display} setDisplay={setDisplay}></DisplayToggle>
+          {display === 'framework' && 
+            <div className='companyParamContainer'>
+                <Select
+                  styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                  options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
+                  label="Framework"
+                  placeholder="Framework"
+                  maxMenuHeight={100}
+                  // defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
+                  onChange={(e) => (e) => setFramework(e.value)}
+                />
+            </div>}
+        </Box>
        {Array.from({ length: 5 }).map((_, index) => 
         <Paper key={index} sx={{
-          height: "20%",
+          height: "18%",
           display: "flex",
           justifyContent:"center",
           alignItems:"center",

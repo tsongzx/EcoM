@@ -534,7 +534,9 @@ const Compare = () => {
       (
         companies ? (
           <Visualisation companies={companies} setCompanies={setCompanies} setMessage={setMessage}
-            setShowMessage={setShowMessage} handleDeleteFromTable={handleDeleteFromTable} handleClickCompanyName={handleClickCompanyName}/>
+            setShowMessage={setShowMessage} handleDeleteFromTable={handleDeleteFromTable} handleClickCompanyName={handleClickCompanyName}
+            frameworks={frameworks}
+          />
         ) : (
           <p>...loading</p>
         )

@@ -15,7 +15,7 @@ import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateM
 import LeftPanel from './LeftPanel.jsx';
 import VisualisationsTab from '../../visualisations/VisualisationsTab.jsx';
 
-const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, handleDeleteFromTable, handleClickCompanyName}) => {
+const Visualisation = ({companies, frameworks, setCompanies, setMessage, setShowMessage, handleDeleteFromTable, handleClickCompanyName}) => {
   // const [companyMap, setCompanyMap] = useState(companies.reduce((map, company) => {
   //   map[company.id] = company.companyName;
   //   return map;
@@ -26,6 +26,9 @@ const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, han
   const [selectedYears, setSelectedYears] = useState([]);  
   const [indicatorInfo, setIndicatorInfo] = useState({});
     
+  const [display, setDisplay] = useState('indicators');
+  const [framework, setFramework] = useState('');
+
   useEffect(() => {
     const getIndicatorInfo = async() => {
       const info = await getIndicatorsInfoByName();
@@ -76,7 +79,8 @@ const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, han
       }}>
         <LeftPanel companies={companies} setCompanies={setCompanies} setMessage={setMessage}
           setShowMessage={setShowMessage} handleDeleteFromTable={handleDeleteFromTable}
-          handleClickCompanyName={handleClickCompanyName}></LeftPanel>
+          handleClickCompanyName={handleClickCompanyName} display={display} setDisplay={setDisplay} framework={framework}
+          setFramework={setFramework} frameworks={frameworks}></LeftPanel>
         <Box component="main" sx={{ 
           // flexGrow: 1, 
           width: '70vw',
@@ -84,10 +88,11 @@ const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, han
           overflow: "hidden",
           overflowY: "scroll",
         }}>
-          { isDataReady() ?
+          { isDataReady() && display === 'indicators' ?
           (<VisualisationsTab indicatorInfo={indicatorInfo} graphValues={graphValues}
             categories={companies.map(company => company.companyName)}
           ></VisualisationsTab>) : (<Box>...loading</Box>)}
+          {display === 'framework' && <p>...metric graphs...</p>}
         </Box>
       </Box>
     </Box>
