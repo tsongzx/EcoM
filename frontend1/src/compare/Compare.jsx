@@ -457,7 +457,9 @@ const Compare = () => {
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'E').map((metric, index) => (
           <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+            </TableCell>
             {metric.companies.map((company, index) => (
               <TableCell sx={{
                 textAlign: 'right' 
@@ -474,7 +476,9 @@ const Compare = () => {
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'S').map((metric, index) => (
           <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+            </TableCell>
             {metric.companies.map((company, index) => (
               <TableCell sx={{
                 textAlign: 'right' 
@@ -491,7 +495,9 @@ const Compare = () => {
         {/* This is the part that renders all the table components */}
         {metrics.filter(m => m.category === 'G').map((metric, index) => (
           <TableRow>
-            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>{metric.metricName}</TableCell>
+            <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
+              <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+            </TableCell>
             {metric.companies.map((company, index) => (
               <TableCell sx={{
                 textAlign: 'right' 
