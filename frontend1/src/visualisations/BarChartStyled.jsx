@@ -2,12 +2,22 @@ import { Typography } from '@mui/material';
 import React, { PureComponent } from 'react';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
 
-const BarChartStyled = ({data, title, unit}) => {
+const BarChartStyled = ({data, title, unit, categories}) => {
 
   console.log(data);
   console.log(unit);
   const yesNoTickFormatter = (tick) => (tick === 0 ? "N" : "Y");
 
+  const getColor = (index) => {
+    const colors = ['#8884d8', '#da27e6', '#9913ad', '#9457ff', '#3af082'];
+    return colors[index % colors.length];
+  };
+  
+  // const getActiveColor = (index) => {
+  //   const colors = ['pink', '#D4A5D7', '#d19ad9', '#ffc658'];
+  //   return colors[index % colors.length];
+  // };
+  
   return (
     <ResponsiveContainer width="100%" aspect={1.5}>
       {title && <Typography variant="h5" sx={{ textAlign: 'center', height: 'auto' }}>{title}</Typography>}
@@ -50,11 +60,15 @@ const BarChartStyled = ({data, title, unit}) => {
         </YAxis>
         <Tooltip />
         <Legend />
-        <Bar dataKey="value" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />} />
+        {categories.map((category, index) => (
+          <Bar key={index} dataKey={category} fill={getColor(index)} activeBar={<Rectangle fill="pink" stroke="blue" />}/>
+        ))}
+        {/* <Bar dataKey="value" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />}/> */}
         {/* <Bar dataKey="uv" fill="#82ca9d" activeBar={<Rectangle fill="gold" stroke="purple" />} /> */}
       </BarChart>
     </ResponsiveContainer>
   );
 }
 
+// year, companyName: value, companyB: value, ...
 export default BarChartStyled;

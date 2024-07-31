@@ -1,6 +1,4 @@
 import {React, useEffect, useState, useRef} from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import CompanySearch from '../CompanySearch.jsx';
 import {
   TableContainer,
   Table,
@@ -13,21 +11,61 @@ import {
 } from '@mui/material';
 import Select from 'react-select';
 import Navbar from '../../Navbar.jsx';
-import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateMetricScore } from '../../helper.js';
-import ContextMenu from '../ContextMenu.jsx';
-import SearchMetricsModal from '../SearchMetricsModal.jsx';
-import CircularLoader from '../../utils/CircularLoader.jsx';
-import SelfExpiringMessage from '../../assets/SelfExpiringMessage.jsx';
-import Button from '@mui/joy/Button';
-import GraphTableToggle from '../../utils/GraphTableToggle.jsx';
+import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateMetricScore, getIndicatorBarGraph, getIndicatorsInfoByName } from '../../helper.js';
 import LeftPanel from './LeftPanel.jsx';
+import VisualisationsTab from '../../visualisations/VisualisationsTab.jsx';
 
 const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, handleDeleteFromTable, handleClickCompanyName}) => {
-
   // const [companyMap, setCompanyMap] = useState(companies.reduce((map, company) => {
   //   map[company.id] = company.companyName;
   //   return map;
   // }, {}));
+  const [indicatorDict, setIndicatorDict] = useState({});
+  const [graphValues, setGraphValues] = useState({});
+
+  const [selectedYears, setSelectedYears] = useState([]);  
+  const [indicatorInfo, setIndicatorInfo] = useState({});
+    
+  useEffect(() => {
+    const getIndicatorInfo = async() => {
+      const info = await getIndicatorsInfoByName();
+      console.log(info);
+      setIndicatorInfo(info);
+    }
+    getIndicatorInfo();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const companyList = companies.map(company => company.companyName);
+      const indicatorDict = await getIndicatorBarGraph(companyList);
+      setIndicatorDict(indicatorDict);  
+      console.log(indicatorDict);
+    }
+    fetchData();
+  }, [companies, selectedYears]);
+  
+  useEffect(() => {
+    let graph = {};
+    Object.keys(indicatorDict).map((indicator) => {
+      graph[indicator] = []
+      Object.keys(indicatorDict[indicator]).map((year) => {
+        graph[indicator] = [...graph[indicator], indicatorDict[indicator][year]];
+      });
+    })
+    // console.log(graph);
+    setGraphValues(graph);
+  }, [indicatorDict])
+
+  const isDataReady = () => {
+    // Ensure both graphValues and indicatorInfo are objects and have data
+    return (
+      graphValues &&
+      indicatorInfo &&
+      Object.keys(graphValues).length > 0 &&
+      Object.keys(indicatorInfo).length > 0
+    );
+  };
 
   return (
     <Box>
@@ -46,7 +84,10 @@ const Visualisation = ({companies, setCompanies, setMessage, setShowMessage, han
           overflow: "hidden",
           overflowY: "scroll",
         }}>
-          
+          { isDataReady() ?
+          (<VisualisationsTab indicatorInfo={indicatorInfo} graphValues={graphValues}
+            categories={companies.map(company => company.companyName)}
+          ></VisualisationsTab>) : (<Box>...loading</Box>)}
         </Box>
       </Box>
     </Box>

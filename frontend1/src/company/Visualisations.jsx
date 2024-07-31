@@ -39,8 +39,8 @@ const Visualisations = ({companyIndicators, companyName}) => {
         graph_data[indicator_name].push({
           indicator: indicator_name,
           year: year,
-          value: indicator_data.indicator_value,
-          company: companyName,
+          [companyName]: indicator_data.indicator_value,
+          // company: companyName,
         });
       }
     }
@@ -70,7 +70,7 @@ const Visualisations = ({companyIndicators, companyName}) => {
   return (
     <>
       { isDataReady() ?
-      (<VisualisationsTab indicatorInfo={indicatorInfo} graphValues={graphValues}></VisualisationsTab>) : (<Box>...loading</Box>)}
+      (<VisualisationsTab indicatorInfo={indicatorInfo} graphValues={graphValues} categories={[companyName]}></VisualisationsTab>) : (<Box>...loading</Box>)}
     </>
   );
 }
