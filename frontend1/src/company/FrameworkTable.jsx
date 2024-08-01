@@ -18,6 +18,7 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear, 
   companyName, availableYears, selectedFramework, selectedIndicators, metricNames, allIndicators,
+  metricScores
 }) => {
   const [tableCollapsed, setTableCollapsed] = useState(true);
   {console.log('Selected Framework:', selectedFramework)};
@@ -25,6 +26,8 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   useEffect(() => {
     console.log(selectedFramework);
   }, [selectedFramework]);
+
+  console.log(metricScores);
 
   const findIndicatorValue = (indicatorName) => {
     if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
@@ -53,7 +56,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
             ))}
           </div>
         </div>
-        {selectedFramework && (
+        {/* {selectedFramework && (
           <Grid container justifyContent="center">
             <TableContainer component={Paper} style={{ border: '1px solid #ddd', width: '90%' }}>
               <Table>
@@ -98,8 +101,63 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
               </Table>
             </TableContainer>
           </Grid>
+        )} */}
+        {selectedFramework && (
+          <Grid container justifyContent="center">
+            <TableContainer component={Paper} style={{ border: '1px solid #ddd', width: '90%' }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
+                    <TableCell style={{ borderRight: '1px solid #ddd' }}>Score</TableCell>
+                    <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator</TableCell>
+                    <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.entries(selectedIndicators).map(([metricId, indicatorIds]) => {
+                    const metricName = metricNames.find(m => m.id === Number(metricId))?.name || 'Unknown Metric';
+                    const score = metricScores[metricId]?.score ?? '';
+                    const indicators = allIndicators[metricId] || [];
+                    return (
+                      indicatorIds.map((indicatorId, index) => {
+                        const indicator = indicators.find(ind => ind.indicator_id === indicatorId);
+                        return (
+                          <TableRow key={`${metricId}-${indicatorId}`}>
+                            {index === 0 && (
+                              <>
+                                <TableCell
+                                  rowSpan={indicatorIds.length}
+                                  style={{ borderRight: '1px solid #ddd' }}
+                                >
+                                  {metricName}
+                                </TableCell>
+                                <TableCell
+                                  rowSpan={indicatorIds.length}
+                                  style={{ borderRight: '1px solid #ddd' }}
+                                >
+                                  {score}
+                                </TableCell>
+                              </>
+                            )}
+                            <TableCell style={{ borderRight: '1px solid #ddd' }}>
+                              {indicator ? indicator.indicator_name : ' '}
+                            </TableCell>
+                            <TableCell style={{ borderBottom: '1px solid #ddd' }}>
+                              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                                {indicator ? findIndicatorValue(indicator.indicator_name) : ' '}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Grid>
         )}
-
         {!selectedFramework && (
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
             {selectedYear && indicatorsCompany[selectedYear] && (

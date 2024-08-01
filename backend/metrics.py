@@ -7,12 +7,9 @@ def read_metrics_file():
   with open(file_name, 'r') as file:
       return json.load(file)
     
-def calculate_metric(year, company_values, weights):
+def calculate_metric(year_indicators, weights):
   indicator_data = read_metrics_file()
-
-  if year not in company_values:
-      return 0
-  year_indicators = company_values[year]
+  
   overall_score = 0
   
   for indicator_name, weight in weights.items():
@@ -40,4 +37,5 @@ def calculate_metric(year, company_values, weights):
       
       overall_score += scaled_score * weight
       print(overall_score)
+      
   return overall_score

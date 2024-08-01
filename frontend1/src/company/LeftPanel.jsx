@@ -10,8 +10,6 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getIndicatorFromMetric } from "../helper";
 
-const drawerWidth = 240;
-
 const LeftPanel = ({
   setSelectedFramework,
   officialFrameworks,
@@ -21,7 +19,8 @@ const LeftPanel = ({
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
   setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
   setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
-  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed
+  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
+  frameworkScore, setFrameworkScore
 }) => {
   const navigate = useNavigate();
 
@@ -120,6 +119,11 @@ const LeftPanel = ({
             sliderValuesIndicator={sliderValuesIndicator}
             setSliderValuesIndicator={setSliderValuesIndicator}
             setSliderValues={setSliderValues}
+            eScore={eScore}
+            sScore={sScore}
+            gScore={gScore}
+            frameworkScore={frameworkScore}
+            setFrameworkScore={setFrameworkScore}
           />
           <AdditionalMetrics
             selectedIndicators={selectedIndicators}
@@ -149,48 +153,7 @@ const LeftPanel = ({
             setExitFramework={setExitFramework}
           />
         </div>
-    </Box>
-    // <Drawer
-    //   sx={{
-        
-    //     width: drawerWidth,
-    //     flexShrink: 0,
-    //     '& .MuiDrawer-paper': {
-    //       width: drawerWidth,
-    //       boxSizing: 'border-box',
-    //     },
-    //   }}
-    //   variant="permanent"
-    //   anchor="left"
-    // >
-    //   {/* <Toolbar />
-    //   <Divider /> */}
-    //   <List>
-    //     {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-    //       <ListItem key={text} disablePadding>
-    //         <ListItemButton>
-    //           <ListItemIcon>
-    //             {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-    //           </ListItemIcon>
-    //           <ListItemText primary={text} />
-    //         </ListItemButton>
-    //       </ListItem>
-    //     ))}
-    //   </List>
-    //   <Divider />
-    //   <List>
-    //     {['All mail', 'Trash', 'Spam'].map((text, index) => (
-    //       <ListItem key={text} disablePadding>
-    //         <ListItemButton>
-    //           <ListItemIcon>
-    //             {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-    //           </ListItemIcon>
-    //           <ListItemText primary={text} />
-    //         </ListItemButton>
-    //       </ListItem>
-    //     ))}
-    //   </List>
-    // </Drawer> 
+    </Box> 
   );
 }
 

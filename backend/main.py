@@ -17,6 +17,7 @@ import schemas.graph_schemas as graph_schemas
 import schemas.framework_schemas as framework_schemas
 import schemas.metric_schemas as metric_schemas
 import schemas.chat_schemas as chat_schemas
+import schemas.score_schemas as score_schemas
 import models.company_models as company_models
 import models.framework_models as framework_models
 import models.list_models as list_models
@@ -958,16 +959,16 @@ async def get_indicator(
 # ***************************************************************
 
 
-@app.get("/metric", response_model=str, tags=["Metrics"])
-async def get_metric_name(
-    metric_id: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> str:
-    metric = session.query(metrics_models.Metrics).filter_by(
-        id=metric_id).first()
+# @app.get("/metric", response_model=str, tags=["Metrics"])
+# async def get_metric_name(
+#     metric_id: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     metric = session.query(metrics_models.Metrics).filter_by(
+#         id=metric_id).first()
 
-    return metric.name
+#     return {'name': metric.name}
 
 
 @app.get("/metrics", tags=["Metrics"])
@@ -1052,17 +1053,21 @@ async def calculate_metric(
     framework_id: Optional[Union[int, None]] = None,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-):
+) -> float:
     print("calculating metric")
     company_values = await get_company_indicators(company_name, user, session)
 
+    if year not in company_values:
+        return 0
+      
+    year_indicators = company_values[year]
     if framework_id:
       indicators = get_indicators_for_metric(metric_id, user, session)
     else:
       indicators = get_indicators(framework_id, metric_id, user, session)
       
     weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-    return metrics.calculate_metric(year, company_values, weights)
+    return metrics.calculate_metric(year_indicators, weights)
 
 
 #***************************************************************
@@ -1319,31 +1324,87 @@ async def articles(
 #                        Visualisation Apis
 # ***************************************************************
 
-@app.post("/graph/indicators/", tags=["Graph"])
-async def get_indicators_graph(
-    indicators: List[str],
-    companies: List[str],
+@app.get("/graph/indicators/line", tags=["Graph"])
+async def get_indicators_line_graph(
+    companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    data_by_year = {}
+    data_by_company = {}
     
     company_data = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name.in_(companies),
-        company_models.CompanyData.indicator_name.in_(indicators),
-    ).all()
+        company_models.CompanyData.company_name.in_(companies)).all()
 
     for entry in company_data:
-      if entry.indicator_year_int not in data_by_year:
-        data_by_year[entry.indicator_year_int] = []
+      if entry.company_name not in data_by_company:
+        data_by_company[entry.company_name] = {}
+        
+      if entry.indicator_name not in data_by_company[entry.company_name]:
+        data_by_company[entry.company_name][entry.indicator_name] = []
       
       data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
                                                 year=entry.indicator_year_int,
-                                                company=entry.company_name)
-      data_by_year[entry.indicator_year].append(data_point)
+                                                company=entry.company_name,
+                                                value=entry.indicator_value)
+
+      data_by_company[entry.company_name][entry.indicator_name].append(data_point)
      
-    return data_by_year
+    return data_by_company
 
 
+@app.get("/graph/indicators/bar", tags=["Graph"])
+async def get_indicators_bar_graph(
+    companies:  List[str] = Query(..., description="List of company names"),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    data_by_indicator = {}
+    
+    company_data = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name.in_(companies)).all()
 
+    for entry in company_data:
+      if entry.indicator_name not in data_by_indicator:
+        data_by_indicator[entry.indicator_name] = {}
+      
+      if entry.indicator_year_int not in data_by_indicator[entry.indicator_name]:
+        data_by_indicator[entry.indicator_name][entry.indicator_year_int] = {
+          'indicator': entry.indicator_name, 
+          'year': entry.indicator_year_int
+        }
+      
+      # add company value 
+      data_by_indicator[entry.indicator_name][entry.indicator_year_int][entry.company_name] = entry.indicator_value
+      # data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
+      #                                           year=entry.indicator_year_int,
+      #                                           company=entry.company_name)
+      # data_by_indicator[entry.indicator_name][entry.indicator_year_int].append(data_point)
+     
+    return data_by_indicator
+#***************************************************************
+#                        Company view Scoring Apis
+# ***************************************************************
+@app.post("/company/metric/", tags=["Company scores"])
+async def calculate_metric_company_view(
+    # company_indicators: Dict[str, Any],
+    company_indicators: Dict[str, score_schemas.CompanyIndicator],
+    indicators: Dict[str, float],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    """_summary_: company_indicators should only be for the year
 
+    Returns:
+        _type_: _description_
+    """    
+    return metrics.calculate_metric(company_indicators, indicators)
+
+@app.post("/company/score/", tags=["Company scores"])
+async def find_weighted_average(
+    values: List[score_schemas.Value],
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+      
+    return sum(value.score * value.weighting for value in values)
