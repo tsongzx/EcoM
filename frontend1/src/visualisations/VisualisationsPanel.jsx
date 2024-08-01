@@ -4,7 +4,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/mater
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VisualisationCardInfo from './VisualisationCardInfo';
 
-const VisualisationsPanel = ({filter, graphValues, indicatorInfo}) => {
+const VisualisationsPanel = ({filter, graphValues, indicatorInfo, categories}) => {
   return (
     <>
       {/* {graphValues ? <BarChartStyled data={graphValues['HUMAN_RIGHTS_VIOLATION_PAI']}/> : <p>Loading...</p>} */}
@@ -28,7 +28,7 @@ const VisualisationsPanel = ({filter, graphValues, indicatorInfo}) => {
               <AccordionDetails>
                 <Stack direction="row">
                   <VisualisationCardInfo indicatorInfo={indicatorInfo[indicator]}></VisualisationCardInfo>
-                  <BarChartStyled data={graphValues[indicator]} title={indicator} unit={indicatorInfo[indicator].unit.trim()} />
+                  <BarChartStyled data={graphValues[indicator]} title={indicator} unit={indicatorInfo[indicator].unit.trim()} categories={categories}/>
                 </Stack>
               </AccordionDetails>
             </Accordion>

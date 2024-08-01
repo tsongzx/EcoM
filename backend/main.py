@@ -959,16 +959,16 @@ async def get_indicator(
 # ***************************************************************
 
 
-@app.get("/metric", response_model=str, tags=["Metrics"])
-async def get_metric_name(
-    metric_id: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> str:
-    metric = session.query(metrics_models.Metrics).filter_by(
-        id=metric_id).first()
+# @app.get("/metric", response_model=str, tags=["Metrics"])
+# async def get_metric_name(
+#     metric_id: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     metric = session.query(metrics_models.Metrics).filter_by(
+#         id=metric_id).first()
 
-    return metric.name
+#     return {'name': metric.name}
 
 
 @app.get("/metrics", tags=["Metrics"])
@@ -1324,31 +1324,63 @@ async def articles(
 #                        Visualisation Apis
 # ***************************************************************
 
-@app.post("/graph/indicators/", tags=["Graph"])
-async def get_indicators_graph(
-    indicators: List[str],
-    companies: List[str],
+@app.get("/graph/indicators/line", tags=["Graph"])
+async def get_indicators_line_graph(
+    companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    data_by_year = {}
+    data_by_company = {}
     
     company_data = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name.in_(companies),
-        company_models.CompanyData.indicator_name.in_(indicators),
-    ).all()
+        company_models.CompanyData.company_name.in_(companies)).all()
 
     for entry in company_data:
-      if entry.indicator_year_int not in data_by_year:
-        data_by_year[entry.indicator_year_int] = []
+      if entry.company_name not in data_by_company:
+        data_by_company[entry.company_name] = {}
+        
+      if entry.indicator_name not in data_by_company[entry.company_name]:
+        data_by_company[entry.company_name][entry.indicator_name] = []
       
       data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
                                                 year=entry.indicator_year_int,
-                                                company=entry.company_name)
-      data_by_year[entry.indicator_year].append(data_point)
-     
-    return data_by_year
+                                                company=entry.company_name,
+                                                value=entry.indicator_value)
 
+      data_by_company[entry.company_name][entry.indicator_name].append(data_point)
+     
+    return data_by_company
+
+
+@app.get("/graph/indicators/bar", tags=["Graph"])
+async def get_indicators_bar_graph(
+    companies:  List[str] = Query(..., description="List of company names"),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    data_by_indicator = {}
+    
+    company_data = session.query(company_models.CompanyData).filter(
+        company_models.CompanyData.company_name.in_(companies)).all()
+
+    for entry in company_data:
+      if entry.indicator_name not in data_by_indicator:
+        data_by_indicator[entry.indicator_name] = {}
+      
+      if entry.indicator_year_int not in data_by_indicator[entry.indicator_name]:
+        data_by_indicator[entry.indicator_name][entry.indicator_year_int] = {
+          'indicator': entry.indicator_name, 
+          'year': entry.indicator_year_int
+        }
+      
+      # add company value 
+      data_by_indicator[entry.indicator_name][entry.indicator_year_int][entry.company_name] = entry.indicator_value
+      # data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
+      #                                           year=entry.indicator_year_int,
+      #                                           company=entry.company_name)
+      # data_by_indicator[entry.indicator_name][entry.indicator_year_int].append(data_point)
+     
+    return data_by_indicator
 #***************************************************************
 #                        Company view Scoring Apis
 # ***************************************************************

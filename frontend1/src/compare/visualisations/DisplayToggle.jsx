@@ -3,14 +3,12 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Box } from '@mui/material';
 
-const GraphTableToggle = ({frameworkDisplay, setFrameworkDisplay}) => {
-  const handleChange = (event, newFrameworkDisplay) => {
+const DisplayToggle = ({display, setDisplay, props}) => {
+  const handleChange = (event, newDisplay) => {
     // console.log(event.target.innerText);
-    console.log(newFrameworkDisplay);
-    // setFrameworkDisplay(event.target.innerText);
-    setFrameworkDisplay(newFrameworkDisplay);
-    console.log(frameworkDisplay);
-    
+    console.log(newDisplay);
+    setDisplay(newDisplay);
+    console.log(newDisplay);
   };
   return (
     <Box
@@ -18,20 +16,21 @@ const GraphTableToggle = ({frameworkDisplay, setFrameworkDisplay}) => {
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
-        paddingBottom: '1.5vh'
+        paddingBottom: '1.5vh',
+        ...props
       }}
     >
       <ToggleButtonGroup
       color="primary"
-      value={frameworkDisplay}
+      value={display}
       exclusive
       onChange={handleChange}
       aria-label="Display"
     >
-      <ToggleButton value="tabular">TABULAR</ToggleButton>
-      <ToggleButton value="graphical">GRAPHICAL</ToggleButton>
+      <ToggleButton value="framework">Framework</ToggleButton>
+      <ToggleButton value="indicators">Indicators</ToggleButton>
     </ToggleButtonGroup>
     </Box>
   );
 }
-export default GraphTableToggle;
+export default DisplayToggle;

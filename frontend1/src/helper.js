@@ -752,3 +752,48 @@ export const getIndicatorFromMetric = async(metricId) => {
         console.log(`Error getting industry: ${error}`)
     }
 }
+
+export const getIndicatorLineGraph = async(companies) => {
+  try {
+          if (companies.length === 0) {
+            return {};
+          }
+          console.log(companies);
+          const queryString = companies.map(company => `companies=${company}`).join('&');
+          const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+
+          const response = await axios.get(path,           {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(`Error getting industry: ${error}`)
+  }
+}
+
+
+export const getIndicatorBarGraph = async(companies) => {
+  try {
+      if (companies.length === 0) {
+        return {};
+      }
+      console.log(companies);
+      const queryString = companies.map(company => `companies=${company}`).join('&');
+      const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+
+      const response = await axios.get(path, 
+          {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(error);
+      console.log(`Error getting industry: ${error}`)
+  }
+}
