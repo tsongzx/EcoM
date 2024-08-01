@@ -969,6 +969,16 @@ async def get_indicator(
 #         id=metric_id).first()
 
 #     return {'name': metric.name}
+@app.get("/metric", tags=["Metrics"])
+async def get_metric_name(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    metric = session.query(metrics_models.Metrics).filter_by(
+        id=metric_id).first()
+
+    return {"name": metric.name}
 
 
 @app.get("/metrics", tags=["Metrics"])

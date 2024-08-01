@@ -383,7 +383,7 @@ export const getMetricName = async(metricId) => {
             }
         });
 
-        return response.data;
+        return response.data.name;
     } catch (error) {
         console.log(`Error getting metric: ${error}`);
     }

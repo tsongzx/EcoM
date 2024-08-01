@@ -20,7 +20,8 @@ const LeftPanel = ({
   setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
   setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
   setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
-  frameworkScore, setFrameworkScore
+  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
+  seteScore, setsScore, setgScore, findCategoricalMetrics
 }) => {
   const navigate = useNavigate();
 
@@ -124,6 +125,13 @@ const LeftPanel = ({
             gScore={gScore}
             frameworkScore={frameworkScore}
             setFrameworkScore={setFrameworkScore}
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setMetricScores={setMetricScores}
+            seteScore={seteScore}
+            setsScore={setsScore}
+            setgScore={setgScore}
+            findCategoricalMetrics={findCategoricalMetrics}
           />
           <AdditionalMetrics
             selectedIndicators={selectedIndicators}

@@ -173,11 +173,13 @@ const Company = () => {
       if (selectedFramework) {
         console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
+        console.log(metrics);
         if (metrics) {
           const nameOfMetrics = [];
           const metricIds = [];
           for (const item of Object.values(metrics)) {
             const name = await getMetricName(item.metric_id);
+            console.log(name);
             nameOfMetrics.push({ id: item.metric_id, name: name, category: item.category, weighting: item.weighting });
             metricIds.push(item.metric_id);
           }
@@ -248,6 +250,7 @@ const Company = () => {
           return acc;
         }, {});
 
+        console.log(newObj);
         let correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
         console.log(correspondingScore);
         
@@ -415,6 +418,13 @@ const Company = () => {
             gScore={gScore}
             frameworkScore={frameworkScore}
             setFrameworkScore={setFrameworkScore}
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setMetricScores={setMetricScores}
+            seteScore={seteScore}
+            setsScore={setsScore}
+            setgScore={setgScore}
+            findCategoricalMetrics={findCategoricalMetrics}
         />
         <Box component="main" sx={{ 
           // flexGrow: 1, 
