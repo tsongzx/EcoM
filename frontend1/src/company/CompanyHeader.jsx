@@ -11,8 +11,11 @@ import {
   deleteFromFavourites
 } from '../helper.js';
 const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, isInFavs, 
-  setIsInFavs, companyName, selectedFramework, selectedYear
+  setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany,
+  sliderValuesIndicator, selectedMetrics
 }) => {
+
+  console.log(indicatorsCompany);
   const navigate = useNavigate();
 
   const openWatchlistModal = () => {

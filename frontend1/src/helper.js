@@ -753,6 +753,42 @@ export const getIndicatorFromMetric = async(metricId) => {
     }
 }
 
+export const getMetricScoreByYear = async(companyIndicatorsByYear, indicatorWeights) => {
+    try {
+        const response = await axios.post(`http://127.0.0.1:8000/company/metric/`,
+          {
+            company_indicators: companyIndicatorsByYear,
+            indicators: indicatorWeights
+          },
+          {headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
+        }});
+        //if successful
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export const companyScoreGeneral = async(scoreAndWeighting) => {
+    console.log(scoreAndWeighting);
+    try {
+        const response = await axios.post(`http://127.0.0.1:8000/company/score/`,
+          {
+            values: scoreAndWeighting
+          },
+          {headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Cookies.get('authToken')}`
+        }});
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const getIndicatorLineGraph = async(companies) => {
   try {
           if (companies.length === 0) {

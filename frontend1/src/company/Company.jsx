@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -22,7 +22,10 @@ import {
   getIndicatorInfo,
   getFavouritesList,
   getAllIndicators,
-  getAllMetricsAvailable
+  getAllMetricsAvailable,
+  getMetricScoreByYear,
+  getIndicatorFromMetric,
+  companyScoreGeneral
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -66,15 +69,48 @@ const Company = () => {
   const [selectedMetricsFixed, setSelectedMetricsFixed] = useState(null);
   const [allIndicatorsFixed, setAllIndicatorsFixed] = useState(null);
   const [selectedIndicatorsFixed, setSelectedIndicatorsFixed] = useState(null);
+  const [metricScores, setMetricScores] = useState({});
+  const [eScore, seteScore] = useState(null);
+  const [sScore, setsScore] = useState(null);
+  const [gScore, setgScore] = useState(null);
+  const [frameworkScore, setFrameworkScore] = useState(null);
+  
 
   const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
   // useEffect(() => {
   //   console.log(lockedSliders);
   // }, [lockedSliders]);
+  const [indicatorWeightMapping, setIndicatorWeightMapping] = useState({});
+
+  const latestSliderValuesIndicatorRef = useRef(sliderValuesIndicator);
+  const metricNamesRef = useRef();
+
+  useEffect(() => {
+    metricNamesRef.current = metricNames;
+  }, [metricNames]);
+
+  useEffect(() => {
+    latestSliderValuesIndicatorRef.current = sliderValuesIndicator;
+  }, [sliderValuesIndicator]);
 
   useEffect(() => {
     console.log(allIndicatorsInfo);
   }, [allIndicatorsInfo]);
+
+  useEffect(() => {
+    console.log(eScore);
+  }, [eScore]);
+
+
+  useEffect(() => {
+    console.log(sScore);
+  }, [sScore]);
+
+
+  useEffect(() => {
+    console.log(gScore);
+  }, [gScore]);
+
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
@@ -83,6 +119,7 @@ const Company = () => {
       const allIndicators1 = await getAllIndicators();
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
+      console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
       setAvailableYears(years);
@@ -95,9 +132,8 @@ const Company = () => {
     fetchCompanyIndicators(companyName);
   }, []);
 
-  // useEffect(() => {
-  //   console.log(metricNames);
-  // }, [metricNames]);
+
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -189,12 +225,84 @@ const Company = () => {
           setSliderValuesIndicator(initialSliderValuesIndicator);
           setSliderValuesIndicatorFixed(initialSliderValuesIndicator);
         }
+
       }
+
     };
     if (selectedFramework) {
       fetchData();
     }
   }, [selectedFramework]);
+
+  useEffect(() => {
+    const runScore = async() => {
+      let metricScoreMock = {};
+      for (let idMetric of selectedMetrics) {
+        console.log(selectedMetrics.length);
+        // const indicatorsInfo = allIndicators[idMetric];
+        const indicatorsInfo = await getIndicatorFromMetric(idMetric);
+        console.log(`${idMetric} - ${indicatorsInfo}`);
+
+        const newObj = indicatorsInfo.reduce((acc, indicator) => {
+          acc[indicator.indicator_name] = indicator.weighting;
+          return acc;
+        }, {});
+
+        let correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+        console.log(correspondingScore);
+        
+        let obj1 = {};
+        obj1["score"] = correspondingScore;
+        metricScoreMock[idMetric] = obj1;
+      }
+
+      setMetricScores(metricScoreMock);
+      const filteredEMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'E');
+      seteScore(filteredEMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
+      const filteredSMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'S');
+      setsScore(filteredSMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
+      const filteredGMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'G');
+      setgScore(filteredGMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
+    }
+
+    if (selectedMetrics.length > 0 && selectedFramework && indicatorsCompany && selectedYear !== '' && Object.keys(allIndicators).length !== 0 && metricNames && metricNames.length > 0) {
+      runScore();
+    }
+  }, [indicatorsCompany, selectedFramework, selectedMetrics, selectedYear, allIndicators, metricNames]);
+
+  useEffect(() => {
+    console.log(indicatorWeightMapping);
+  }, [indicatorWeightMapping]);
+
+  useEffect(() => {
+    console.log(metricScores);
+  }, [metricScores]);
+  
+  const findCategoricalMetrics = (metricScoreMock, metricNames, category) => {
+    const eMetrics = metricNames.filter(metric => metric.category === category);
+    let metricScoreMockReduced = Object.entries(metricScoreMock).reduce((acc, [key, value]) => {
+      const metric = eMetrics.find(m => m.id === parseInt(key));
+      if (metric) {
+        acc[key] = {
+          ...value,
+          weighting: metric.weighting
+        };
+      }
+      return acc;
+    }, {});
+
+    metricScoreMockReduced =  Object.values(metricScoreMockReduced);
+    metricScoreMockReduced = metricScoreMockReduced.map(item => ({
+      score: parseFloat(item.score),
+      weighting: parseFloat(item.weighting)
+    }));
+    console.log(metricScoreMockReduced);
+    return metricScoreMockReduced;
+
+  }
 
   useEffect(() => {
     console.log(metricNamesFixed);
@@ -302,6 +410,11 @@ const Company = () => {
             setSelectedMetricsFixed={setSelectedMetricsFixed}
             setAllIndicatorsFixed={setAllIndicatorsFixed}
             setSelectedIndicatorsFixed={setSelectedIndicatorsFixed}
+            eScore={eScore}
+            sScore={sScore}
+            gScore={gScore}
+            frameworkScore={frameworkScore}
+            setFrameworkScore={setFrameworkScore}
         />
         <Box component="main" sx={{ 
           // flexGrow: 1, 
@@ -321,6 +434,9 @@ const Company = () => {
             companyName={companyName}
             selectedFramework={selectedFramework}
             selectedYear={selectedYear}
+            indicatorsCompany={indicatorsCompany}
+            sliderValuesIndicator={sliderValuesIndicator}
+            selectedMetrics={selectedMetrics}
           />
           <CompanyBody companyId={companyId}/>
           <GraphTableToggle
@@ -337,6 +453,7 @@ const Company = () => {
             selectedIndicators={selectedIndicators}
             metricNames={metricNames}
             allIndicators={allIndicators}
+            metricScores={metricScores}
           />}
           {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>

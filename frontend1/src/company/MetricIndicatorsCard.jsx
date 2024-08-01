@@ -29,7 +29,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues
+  setSliderValuesIndicator, setSliderValues, eScore, sScore, gScore, frameworkScore, setFrameworkScore
 }) => {
   const [lockedSliders, setLockedSliders] = useState({});
   const [lockedSlidersIndicators, setLockedSlidersIndicators] = useState({}); 
@@ -62,9 +62,10 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [modalWeightingError, setModalWeightingError] = useState('');
   const [changed, setChanged] = useState(false);
 
-  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
-
-  console.log('MetricIndicatorsCard Props:', { selectedIndicators, selectedMetrics });
+  useEffect(() => {
+    const frameworkScore = eScore * pillarWeighting['E'] + sScore * pillarWeighting['S'] + gScore * pillarWeighting['G'];
+    setFrameworkScore(frameworkScore);
+  }, [eScore, sScore, gScore]);
 
   useEffect(() => {
     console.log(triggerSource);
@@ -223,11 +224,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
       if (!lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
         if (category === 'E') {
-          newSliderValues[entry] = (1- lockedE) * sliderValues[entry] / (totalE - lockedE);
+          console.log(`${(1- lockedE)} ${sliderValues[entry]} ${totalE} ${lockedE}`);
+          newSliderValues[entry] = isNaN((1- lockedE) * sliderValues[entry] / (totalE - lockedE)) ? 0 : (1- lockedE) * sliderValues[entry] / (totalE - lockedE);
         } else if (category === 'S') {
-          newSliderValues[entry] = (1- lockedS) * sliderValues[entry] / (totalS - lockedS);
+          newSliderValues[entry] = isNaN((1- lockedS) * sliderValues[entry] / (totalS - lockedS)) ? 0 : (1- lockedS) * sliderValues[entry] / (totalS - lockedS);
         } else {
-          newSliderValues[entry] = (1- lockedG) * sliderValues[entry] / (totalG - lockedG);
+          newSliderValues[entry] = isNaN((1- lockedG) * sliderValues[entry] / (totalG - lockedG)) ? 0 : (1- lockedG) * sliderValues[entry] / (totalG - lockedG);
         }
       } else if (!lockedSliders.hasOwnProperty(entry) && !sliderValues.hasOwnProperty(entry)) {
         newSliderValues[entry] = 0;
@@ -700,7 +702,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     } else {
       filteredMetrics.forEach(item => {
           console.log(item.weighting);
-          item.weighting = remainingWeight * (sliderValues[item.id] / totalWeighting)
+          item.weighting = isNaN(remainingWeight * (sliderValues[item.id] / totalWeighting)) ? 0 : remainingWeight * (sliderValues[item.id] / totalWeighting)
         }
       );
     }
@@ -723,6 +725,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your metric weightings add up to 1.');
+      return;
     } 
     
     let eWeighting = 0;
@@ -732,6 +735,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     for (const key in sliderValues) {
       let category = metricNames.find(indicator => indicator.id === parseInt(key)).category;
       let weighting = sliderValues[parseInt(key)];
+      console.log(weighting);
 
       category === 'E' ? eWeighting += weighting : category === 'S' ? sWeighting += weighting : gWeighting += weighting;
     }
@@ -745,12 +749,15 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     if (!eOK) {
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your environmental metric weightings add up to 1.');
+      return;
     } else if (!sOK) {
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your social metric weightings add up to 1.');
+      return;
     } else if (!gOK) {
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your governance metric weightings add up to 1.');
+      return;
     }
 
     for (const key in selectedIndicators) {
@@ -763,9 +770,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         let metricNameInvolved = metricNames.find(item => item.id === parseInt(key)).name;
         setModalWeightingOpen(true);
         setModalWeightingError(`Please ensure your selected indicators for ${metricNameInvolved} add up to 1.`);  
+        return;
       }
     }
-    
 
     console.log(sliderValuesIndicator);
   }
@@ -812,6 +819,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Environmental</h3>
+                {eScore !== null && (
+                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${eScore})`}</h6>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -833,6 +843,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Social</h3>
+                {sScore !== null && (
+                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${sScore})`}</h6>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -854,6 +867,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Governance</h3>
+                {gScore !== null && (
+                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${gScore})`}</h6>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -872,6 +888,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               {renderMetricsByCategory('G')}
               {`${errorG}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorG}</div>}
             </div>
+            {frameworkScore !== null && (
+              <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Overall Framework Score: ${frameworkScore})`}</h6>
+            )}
           </div>
           <Dialog maxWidth="xs" fullWidth open={modalOpen} onClose={() => setModalOpen(false)}>
             <DialogTitle style={{ display: 'flex', justifyContent: 'center' }}>
