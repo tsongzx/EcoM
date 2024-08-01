@@ -969,6 +969,16 @@ async def get_indicator(
 #         id=metric_id).first()
 
 #     return {'name': metric.name}
+@app.get("/metric", tags=["Metrics"])
+async def get_metric_name(
+    metric_id: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    metric = session.query(metrics_models.Metrics).filter_by(
+        id=metric_id).first()
+
+    return {"name": metric.name}
 
 
 @app.get("/metrics", tags=["Metrics"])
@@ -1309,12 +1319,12 @@ def access_articles(URL: str) -> List[Dict[str, str]]:
 @app.get("/articles", tags=["Articles"])
 async def articles(
     URL: str,
-    token: str = Depends(oauth2_scheme),
-    session: Session = Depends(get_session)
+    # token: str = Depends(oauth2_scheme),
+    # session: Session = Depends(get_session)
 ) -> List[Dict[str, str]]:
 
-    token_data = await is_authenticated(session, token)
-    user = get_user_using_id(session, id=token_data.userId)
+    # token_data = await is_authenticated(session, token)
+    # user = get_user_using_id(session, id=token_data.userId)
 
     return access_articles(URL)
 

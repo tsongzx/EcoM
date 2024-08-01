@@ -25,11 +25,14 @@ import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { getMetricScoreByYear } from '../helper';
+
 const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, eScore, sScore, gScore, frameworkScore, setFrameworkScore
+  setSliderValuesIndicator, setSliderValues, eScore, sScore, gScore, frameworkScore, setFrameworkScore,
+  indicatorsCompany, selectedYear, setMetricScores, seteScore, setgScore, setsScore, findCategoricalMetrics
 }) => {
   const [lockedSliders, setLockedSliders] = useState({});
   const [lockedSlidersIndicators, setLockedSlidersIndicators] = useState({}); 
@@ -72,15 +75,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let newLockedSlidersIndicators = {};
     let newSliderValuesIndicators = {};
 
-    // const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key));
     const keys = Object.keys(lockedSlidersIndicators).map(key => Number(key.split('-')[1]));
 
-    // for (let key of keys) {
-    //   if (Object.values(selectedIndicators).some(arr => arr.includes(key))) {
-    //     newLockedSlidersIndicators[key] = lockedSlidersIndicators[key];
-    //   }
-    // }
-    
     for (let key of keys) {
       for (let [selectedKey, arr] of Object.entries(selectedIndicators)) {
         if (arr.includes(key)) {
@@ -101,18 +97,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       let unlockedIndicators = 0;
       let totalWeighting = 0;
       arr.forEach(value => {
-        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator[value]) {
         if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator[`${key}-${value}`]) {
-          // console.log(sliderValuesIndicator[value]);
           console.log(sliderValuesIndicator[`${key}-${value}`]);
-          // unlockedWeighting += sliderValuesIndicator[value];
           unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
           unlockedIndicators += 1;
-        // } else if (lockedSlidersIndicators.hasOwnProperty(value)) {
         } else if (lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`)) {
-          // lockedWeighting += sliderValuesIndicator[value];
           lockedWeighting += sliderValuesIndicator[`${key}-${value}`];
-          // unlockedWeighting += sliderValuesIndicator[value];
           unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
         } else {
           unlockedIndicators += 1;
@@ -121,16 +111,11 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
       console.log(unlockedWeighting);
       arr.forEach(value => {
-        // if (!lockedSlidersIndicators.hasOwnProperty(value) && sliderValuesIndicator.hasOwnProperty(value)) {
           if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
-          // newSliderValuesIndicators[value] = (1 - lockedWeighting) * sliderValuesIndicator[value] / (unlockedWeighting - lockedWeighting);
           newSliderValuesIndicators[`${key}-${value}`] = (1 - lockedWeighting) * sliderValuesIndicator[`${key}-${value}`] / (unlockedWeighting - lockedWeighting);
-        // } else if (!lockedSlidersIndicators.hasOwnProperty(value) && !sliderValuesIndicator.hasOwnProperty(value)) {
         } else if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && !sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
-          // newSliderValuesIndicators[value] = 0;
           newSliderValuesIndicators[`${key}-${value}`] = 0;
         } else {
-          // newSliderValuesIndicators[value] = sliderValuesIndicator[value];
           newSliderValuesIndicators[`${key}-${value}`] = sliderValuesIndicator[`${key}-${value}`];
         }
       })
@@ -141,6 +126,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     setSliderValuesIndicator(newSliderValuesIndicators);
 
+    let newArray = selectedMetrics.filter(value => selectedIndicators.hasOwnProperty(value));
+    setSelectedMetrics(newArray);
+
     if (triggerSource === true) {
       setSliderValuesIndicator(sliderValuesIndicatorFixed);
       setTriggerSource(false);
@@ -150,7 +138,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   }, [selectedIndicators, triggerSource]);
 
   useEffect(() => {
-
+    console.log(selectedMetrics);
     console.log('here111');
     let newLockedSliders = {};
     let newSliderValues = {};
@@ -240,6 +228,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
 
     setSliderValues(newSliderValues);
+
+    
+
     
     if (triggerSource === true) {
       console.log('here');
@@ -732,19 +723,32 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let sWeighting = 0;
     let gWeighting = 0;
 
+    let eLength = 0;
+    let sLength = 0;
+    let gLength = 0;
+
     for (const key in sliderValues) {
       let category = metricNames.find(indicator => indicator.id === parseInt(key)).category;
       let weighting = sliderValues[parseInt(key)];
       console.log(weighting);
 
-      category === 'E' ? eWeighting += weighting : category === 'S' ? sWeighting += weighting : gWeighting += weighting;
+      if (category === 'E') {
+        eLength += 1;
+        eWeighting += weighting;
+      } else if (category === 'S') {
+          sLength += 1;
+          sWeighting += weighting;
+      } else if (category === 'G') {
+          gLength += 1;
+          gWeighting += weighting;
+      }    
     }
 
     console.log(eWeighting);
 
-    const eOK = (eWeighting >= 0.99999 && eWeighting <= 1.00001);
-    const sOK = (sWeighting >= 0.99999 && sWeighting <= 1.00001);
-    const gOK = (gWeighting >= 0.99999 && gWeighting <= 1.00001);
+    const eOK = ((eWeighting >= 0.99999 && eWeighting <= 1.00001 && eLength > 0) || (eLength === 0));
+    const sOK = ((sWeighting >= 0.99999 && sWeighting <= 1.00001 && sLength > 0) || (sLength === 0));
+    const gOK = ((gWeighting >= 0.99999 && gWeighting <= 1.00001 && gLength > 0) || (gLength === 0));
 
     if (!eOK) {
       setModalWeightingOpen(true);
@@ -775,6 +779,35 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
 
     console.log(sliderValuesIndicator);
+    getAdjustedFrameworkScore();
+  }
+
+  const getAdjustedFrameworkScore = async() => {
+    let metricScoreMock = {};
+    for (let idMetric of selectedMetrics) {
+      let indicatorsOfMetric = selectedIndicators[idMetric];
+      let newObj = {};
+      for (let idIndicator of indicatorsOfMetric) {
+        let indicatorObject = allIndicators[idMetric].find(item => item.indicator_id === idIndicator);
+        newObj[indicatorObject.indicator_name] = sliderValuesIndicator[`${idMetric}-${idIndicator}`];
+      }
+
+      let correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+      console.log(correspondingScore);
+      let obj1 = {};
+      obj1["score"] = correspondingScore;
+      metricScoreMock[idMetric] = obj1;
+    }
+    setMetricScores(metricScoreMock);
+    const filteredEMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'E');
+    seteScore(filteredEMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
+    const filteredSMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'S');
+    setsScore(filteredSMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
+    const filteredGMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'G');
+    setgScore(filteredGMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
+
   }
 
   const handleCloseCheckModal = () => {
