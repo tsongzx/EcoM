@@ -1309,12 +1309,12 @@ def access_articles(URL: str) -> List[Dict[str, str]]:
 @app.get("/articles", tags=["Articles"])
 async def articles(
     URL: str,
-    token: str = Depends(oauth2_scheme),
-    session: Session = Depends(get_session)
+    # token: str = Depends(oauth2_scheme),
+    # session: Session = Depends(get_session)
 ) -> List[Dict[str, str]]:
 
-    token_data = await is_authenticated(session, token)
-    user = get_user_using_id(session, id=token_data.userId)
+    # token_data = await is_authenticated(session, token)
+    # user = get_user_using_id(session, id=token_data.userId)
 
     return access_articles(URL)
 
