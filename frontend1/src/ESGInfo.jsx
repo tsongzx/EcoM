@@ -1,14 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import environmentImage from './assets/environmental.jpg';
 import socialImage from './assets/social.jpg';
 import governanceImage from './assets/governance.jpg';
 import './ESGInfo.css';
+import { webscrapeLinks } from "./helper";
 
 const ESGInfo = () => {
   const [E, setE] = useState(false);
   const [S, setS] = useState(false);
   const [G, setG] = useState(false);
+  const [links, setLinks] = useState([]);
 
+  useEffect(()=> {
+    const doWebscrape = async() => {
+      const response = await webscrapeLinks('https://www.pwc.com.au/environment-social-governance.html');
+      setLinks(response);
+      return;
+    }
+    doWebscrape();
+  },[]);
 
   return (
     <div className="ESGInfo-container">
@@ -79,11 +89,17 @@ const ESGInfo = () => {
         <p>ESG scores can be looked at as ESG risk indicators. They are generated based upon a company's performance across their numerous environmental, social, and governance metrics. Put simply, ESG scores are a numerical value to help simplify the ESG risk and performance rating of a company for comparative purposes. These ESG scores are complicated though because score providers, ratings agencies, and rankers evaluate different criteria to determine scores. Some request information from companies via surveys or questionnaires, others review public disclosures, and some do a combination. ESG scores are important because they provide a baseline for evaluating a company’s ESG risk, but without broad and standardized reporting frameworks (and regulations to enforce accurate and complete reporting), ESG scores are only as accurate as the data that companies have chosen to disclose—or what can be found online. Nevertheless, investors are using these scores to help evaluate where to direct their money in the absence of standardized disclosures</p>
       </div>
 
+      <h1>Want to check out more?</h1>
       <div className="ESGScore-externalLinks-container">
+        
         {/* each consits of {title, link} */}
-        <button className="ESGScore-ext-raise-button">
-          test
-        </button>
+        {links.map(l => (
+          <a href={l.link}>
+            <button className="ESGScore-ext-raise-button">
+              {l.title}
+            </button>
+          </a>
+        ))}
       </div>
     </div>
   );

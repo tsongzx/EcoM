@@ -448,7 +448,7 @@ const Company = () => {
             sliderValuesIndicator={sliderValuesIndicator}
             selectedMetrics={selectedMetrics}
           />
-          <CompanyBody companyId={companyId}/>
+          <CompanyBody companyId={companyId} companyName={companyName}/>
           <GraphTableToggle
             display={frameworkDisplay}
             setDisplay={setFrameworkDisplay}

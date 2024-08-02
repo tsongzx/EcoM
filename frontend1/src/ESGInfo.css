@@ -33,7 +33,7 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: orange;
+    background-color: rgb(8, 0, 255);
     margin-bottom: 10px;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -55,13 +55,13 @@
 
 .ESGScore-ext-raise-button:hover,
 .ESGScore-ext-raise-button:focus {
-  box-shadow: 0 0.5em 0.5em -0.4em #ffc279; 
+  box-shadow: 0 0.5em 0.5em -0.4em #8979ff; 
   transform: translateY(-0.25em);
 }
 
 .ESGScore-ext-raise-button {
-  --color: #ffa260;
-  --hover: #ffc279; 
+  --color: #8d60ff;
+  --hover: #d279ff; 
   background: none;
   border: 2px solid;
   font: inherit;
@@ -76,7 +76,7 @@
 .ESGScore-ext-raise-button:hover,
 .ESGScore-ext-raise-button:focus { 
   border-color: var(--hover);
-  color: #fff;
+  color: #f6b8de;
 }
 
 .ESGScore-externalLinks-container {

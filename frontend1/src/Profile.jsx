@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import Input from '@mui/joy/Input';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from '@mui/joy/Button';
+import pfp from './assets/default_pfp.jpg';
+import SelfExpiringMessage from "./assets/SelfExpiringMessage";
 /**
  * 
  */
@@ -15,8 +21,10 @@ const Profile = () => {
     const [updatedConfirmPassword, setUpdatedConfirmPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [email, setEmail] = useState('');
-
+    const [fontSize, setFontSize] = useState('1.5em');
     const token = Cookies.get('authToken');
+    const [showMessage, setShowMessage] = useState(false);
+    const [message, setMessage] = useState('');
 
     // const nameInput = document.getElementById('pfpName');
     // const oldPInput = document.getElementById('pfpOPass');
@@ -35,6 +43,17 @@ const Profile = () => {
         }
         setData();
     },[]);
+
+    useEffect(() => {
+        if (name.length < 10) {
+            setFontSize('2em');
+        } 
+        else if (name.length < 15) {
+            setFontSize('1.5em');
+        } else {
+            setFontSize('1.1em');
+        }
+    }, [name]);
 
     const getUserInfo = async () => {
         try {
@@ -79,6 +98,8 @@ const Profile = () => {
             //push changes to backend
             updatePassword(password, updatedPassword, updatedConfirmPassword);
             setShowUpdatePassword(false);
+            setMessage('Successfully Updated Password');
+            setShowMessage(true);
         }
         //reset password values
         setPassword('');
@@ -151,33 +172,49 @@ const Profile = () => {
             
         } 
     }
+
+    const handleShowPassword = () => {
+        setShowUpdatePassword(!showUpdatePassword);
+        setShowUpdateName(false);
+    }
+
+    const handleShowName = () => {
+        setShowUpdatePassword(false);
+        setShowUpdateName(!showUpdateName);
+    }
     // 5) User can Choose the theme too
     return (
         <div className="profilePage">
+            <img className='profilepfp-image' src={pfp} alt='Some people'/>
             {showUpdateName 
                 ? (<div className="pfpName-container">
-                    <input id="pfpName" defaultValue={name} onChange={(event) => {setUpdatedName(event.target.value)}}/>
-                    <button onClick={handleCloseUpdateName}>OK</button>
+                    <Input id="pfpName" defaultValue={name} onChange={(event) => {setUpdatedName(event.target.value)}}/>
+                    <span>
+                        <Button onClick={() => setShowUpdateName(false)} size="sm" variant="plain"><CloseIcon/></Button>
+                        <Button onClick={handleCloseUpdateName} size="sm" variant="plain"><DoneIcon/></Button>
+                    </span>
                 </div>) 
-                : (<div>
-                    <p>{name}</p>
-                    <button onClick={() => {setShowUpdateName(true)}}>edit</button>
+                : (<div className="pfpName-display">
+                    <h1 style={{fontSize: fontSize}}>{name}</h1>
+                    <Button onClick={handleShowName} size="sm" variant="outlined">edit</Button>
                 </div>)}
                 {showUpdatePassword 
-                ? (<div>
-                    <input id="pfpOPass" type="password" placeholder="old password" onChange={(event) => {setPassword(event.target.value)}}/>
-                    <input id="pfpNPass" type="password" placeholder="new password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
-                    <input id="pfpCPass" type="password" placeholder="confirm password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
-                    <button onClick={handleUpdatePassword}>OK</button>
+                ? (<div className="pfp-password-container">
+                    <Input id="pfpOPass" type="password" placeholder="old password" onChange={(event) => {setPassword(event.target.value)}}/>
+                    <Input id="pfpNPass" type="password" placeholder="new password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
+                    <Input id="pfpCPass" type="password" placeholder="confirm password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
+                    <Button onClick={() => setShowUpdatePassword(false)} size="sm" variant="plain"><CloseIcon/></Button>
+                    <Button onClick={handleUpdatePassword} size="sm" variant="plain"><DoneIcon/></Button>
                 </div>) 
                 : (<div>
-                    <button onClick={() => {setShowUpdatePassword(true)}}>Update Password</button>
+                    <Button onClick={handleShowPassword} size="sm" variant="outlined">Update Password</Button>
                 </div>)}
                 <p>{email}</p>
                 <p>{errorMessage}</p>
                 <div className="profilePageLists">
 
                 </div>
+                {showMessage && <SelfExpiringMessage message={message} onExpiry={() => setShowMessage(false)}/>}
         </div>
     )
 }
