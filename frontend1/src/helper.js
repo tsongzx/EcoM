@@ -851,21 +851,21 @@ export const getIndicatorBarGraph = async(companies) => {
   }
 }
 
-export const getDetailedCompanyInformation = async(companyName) => {
+export const getDetailedCompanyInformation = async(companyCode) => {
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyName}`, 
+        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode}`, 
             {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
                 }, 
                 params: {
-                    company_code: companyName
+                    company_code: companyCode
                 }
             } 
         );
           //if successful
-          console.log('Successfully fetched company Information for ', companyName);
+          console.log('Successfully fetched company Information for ', companyCode);
           console.log(response.data);
           return response.data;
     } catch (error) {
@@ -874,22 +874,22 @@ export const getDetailedCompanyInformation = async(companyName) => {
     }
 }
 
-export const getCompanyHistory = async(companyName, period) => {
+export const getCompanyHistory = async(companyCode, period) => {
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyName},${period}`, 
+        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode},${period}`, 
             {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
                 }, 
                 params: {
-                    company_code: companyName,
+                    company_code: companyCode,
                     period: period
                 }
             } 
         );
           //if successful
-          console.log('Successfully fetched history for ', companyName);
+          console.log('Successfully fetched history for ', companyCode);
           console.log(response.data);
           return response.data;
     } catch (error) {
@@ -898,21 +898,21 @@ export const getCompanyHistory = async(companyName, period) => {
     }
 }
 
-export const getCompanySustainability = async(companyName) => {
+export const getCompanySustainability = async(companyCode) => {
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/company/sustainability/${companyName}`, 
+        const response = await axios.get(`http://127.0.0.1:8000/company/sustainability/${companyCode}`, 
             {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
                 }, 
                 params: {
-                    company_code: companyName,
+                    company_code: companyCode,
                 }
             } 
         );
           //if successful
-          console.log('Successfully fetched sustainability status for ', companyName);
+          console.log('Successfully fetched sustainability status for ', companyCode);
           console.log(response.data);
           return response.data;
     } catch (error) {

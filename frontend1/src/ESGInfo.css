@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .ESGInfo-container {
     width: 100%;
     padding: 50px 0px;
@@ -15,7 +17,7 @@
 
 
 .ESGInfo-container p {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: Inter;
 }
 
 .ESGInfo-title, .ESGReporting-container, .ESGScore-containers {
