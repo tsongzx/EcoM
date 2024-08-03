@@ -844,6 +844,10 @@ export const getIndicatorBarGraph = async(companies) => {
   }
 }
 
+export const mapToTicker = async() => {
+    
+}
+
 export const getDetailedCompanyInformation = async(companyCode) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode}`, 
