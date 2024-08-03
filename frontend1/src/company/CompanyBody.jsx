@@ -9,9 +9,39 @@ import Recommendations from './Recommendations.jsx';
 import StockAreaChartVisualisation from '../visualisations/StockAreaChartVisualisation.jsx';
 import Button from '@mui/joy/Button';
 import './company_css/CompanyBody.css'
+import { getPrediction } from '../helper.js';
 
-const CompanyBody = ({companyId, companyName}) => {
+const CompanyBody = ({companyId,
+  setSelectedFramework,
+  officialFrameworks,
+  selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
+  allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
+  sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
+  selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
+  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
+  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
+  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
+  seteScore, setsScore, setgScore, findCategoricalMetrics, companyName
+}) => {
   const [period, setPeriod] = useState('1d');
+
+  const aiPredict = async () => {
+    for (let key in selectedIndicators) {
+      let array = selectedIndicators[key];
+      for (const element of array) {
+        let objOfInterest = Object.values(allIndicatorsInfo).find(obj => obj.id === element);
+  
+        if (objOfInterest) {
+          let indicatorName = objOfInterest.name;
+          let metricUnit = objOfInterest.unit;
+          let score = await getPrediction(indicatorName, metricUnit, companyName);
+          console.log(score);
+        }
+
+      }
+    }
+  }
 
   return (
     <Box>
@@ -37,7 +67,7 @@ const CompanyBody = ({companyId, companyName}) => {
           <Recommendations companyId={companyId}/>
         </Stack>
         <Stack direction="row">
-          <Button>AI Predict</Button>
+          <Button onClick={aiPredict}>AI Predict</Button>
         </Stack>
       </Box>
     </Box>

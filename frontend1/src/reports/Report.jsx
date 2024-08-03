@@ -9,7 +9,7 @@ import Navbar from "../Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
 import SimpleLineChart from "../SimpleLineChart";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
 
 /**
@@ -126,7 +126,6 @@ const getCompanyMetaInformation = async () => {
             <div className="reportContainer">
                 <div className="reportContent">
                     {/* components.map goes here, currently just some placeholder code*/}
-                    
                 </div>
 
 

@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem,
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList } from './helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList, deleteList } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
@@ -41,12 +41,6 @@ const Dashboard = () => {
   useEffect(() => {
     setIndustryAndCompany();
   }, [selectedIndustry]);
-
-  // useEffect(() => {
-  //   if (selectedCompany !== null) {
-  //     navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, { state: { companyId: selectedCompany.id, companyName: selectedCompany.company_name } });
-  //   }
-  // }, [selectedCompany, navigate]);
 
   useEffect(() => {
     console.log(page);
@@ -96,6 +90,10 @@ const Dashboard = () => {
   }, [page]);
 
   useEffect(() => {
+    console.log(lists);
+  }, [lists]);
+
+  useEffect(() => {
     console.log(recents);
     getRecentlyViewedCompanyNames(recents);
   }, [recents]);
@@ -129,7 +127,8 @@ const Dashboard = () => {
 
   const handleDeleteList = (listId) => {
     // Implement logic to delete the list
-    console.log(`Delete list ${listId}`);
+    deleteList(listId);
+
   };
 
   const handleEllipsisClick = (event) => {
@@ -159,6 +158,7 @@ const Dashboard = () => {
   const handleListClick = (list) => {
     setSelectedList(list); 
     setIsListModalOpen(true); 
+    console.log(list);
   };
 
   const handleClick = () => {
@@ -251,12 +251,12 @@ const Dashboard = () => {
               <Grid 
                 style={{ cursor: 'pointer' }} 
                 item xs={12} 
-                // key={}
+                key={f.company_id}
                 onClick={() => dashboardToCompany(f.company_id)}
               >
             <Card>
               <CardContent>
-                <Typography variant="h6">{companyNames[index]}</Typography>z
+                <Typography variant="h6">{companyNames[index]}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -266,35 +266,36 @@ const Dashboard = () => {
         <div id='listcontainer'>
           My Lists
           <Grid container spacing={2}>
-                  {Array.isArray(lists) && lists.map((list) => (
-                    <Grid item xs={2} key={list.id} style={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden' }} 
-                      onClick={() => handleListClick(list)} // Pass the list to handleListClick
+            {Array.isArray(lists) && lists.map((list) => (
+              <Grid item xs={2} key={list.id} style={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden' }} 
+              >
+                <Card>
+                  <CardContent style={{ position: 'relative' }}>
+                    <div onClick={() => handleListClick(list)}>
+                      <Typography variant="h6">{list.list_name}</Typography>
+                    </div>
+                    <IconButton
+                      aria-haspopup="true"
+                      onClick={(event) => handleEllipsisClick(event)}
+                      style={{ position: 'absolute', top: 0, right: 0 }}
                     >
-                      <Card>
-                        <CardContent style={{ position: 'relative' }}>
-                          <Typography variant="h6">{list.list_name}</Typography>
-                          <IconButton
-                            aria-haspopup="true"
-                            onClick={(event) => handleEllipsisClick(event)}
-                            style={{ position: 'absolute', top: 0, right: 0 }}
-                          >
-                            <MoreHorizIcon />
-                          </IconButton>
-                          <Menu
-                            anchorEl={anchorElement}
-                            open={Boolean(anchorElement)}
-                            onClose={handleCloseMenu}
-                          >
-                            <MenuItem onClick={() => handleDeleteList(list.id)}>Delete the list</MenuItem>
-                          </Menu>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-                </Grid>
+                      <MoreHorizIcon />
+                    </IconButton>
+                    <Menu
+                      anchorEl={anchorElement}
+                      open={Boolean(anchorElement)}
+                      onClose={handleCloseMenu}
+                    >
+                      <MenuItem onClick={() => handleDeleteList(list.id)}>Delete the list</MenuItem>
+                    </Menu>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
         </div>
       </div>
-      {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} />}
+      {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany}/>}
       <ChatFeature/>
     </>
   );

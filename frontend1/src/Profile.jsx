@@ -203,8 +203,10 @@ const Profile = () => {
                     <Input id="pfpOPass" type="password" placeholder="old password" onChange={(event) => {setPassword(event.target.value)}}/>
                     <Input id="pfpNPass" type="password" placeholder="new password" onChange={(event) => {setUpdatedPassword(event.target.value)}}/>
                     <Input id="pfpCPass" type="password" placeholder="confirm password" onChange={(event) => {setUpdatedConfirmPassword(event.target.value)}}/>
-                    <Button onClick={() => setShowUpdatePassword(false)} size="sm" variant="plain"><CloseIcon/></Button>
-                    <Button onClick={handleUpdatePassword} size="sm" variant="plain"><DoneIcon/></Button>
+                    <span>
+                        <Button onClick={() => setShowUpdatePassword(false)} size="sm" variant="plain"><CloseIcon/></Button>
+                        <Button onClick={handleUpdatePassword} size="sm" variant="plain"><DoneIcon/></Button>
+                    </span>
                 </div>) 
                 : (<div>
                     <Button onClick={handleShowPassword} size="sm" variant="outlined">Update Password</Button>

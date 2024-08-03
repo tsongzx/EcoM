@@ -114,6 +114,7 @@ const Company = () => {
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
+      console.log(companyName);
       const allMetricsAvailable = await getAllMetricsAvailable();
       setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
@@ -122,9 +123,11 @@ const Company = () => {
       console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
+      console.log(years);
+      years.push('Predicted');
       setAvailableYears(years);
       if (years.length > 0) {
-        setSelectedYear(years[years.length - 1]); 
+        setSelectedYear(years[years.length - 2]); 
       }
       
     };
@@ -133,7 +136,9 @@ const Company = () => {
   }, []);
 
 
-  
+  useEffect(() => {
+    console.log(availableYears);
+  }, [availableYears]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -146,6 +151,7 @@ const Company = () => {
       // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
+      console.log(availableOfficialFramework);
       setOfficialFrameworks(availableOfficialFramework);
     };
     fetchData();
@@ -251,7 +257,12 @@ const Company = () => {
         }, {});
 
         console.log(newObj);
-        let correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+        let correspondingScore;
+        if (selectedYear !== 'Predicted') {
+          correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+        } else {
+          correspondingScore = 0;
+        }        
         console.log(correspondingScore);
         
         let obj1 = {};
@@ -448,7 +459,53 @@ const Company = () => {
             sliderValuesIndicator={sliderValuesIndicator}
             selectedMetrics={selectedMetrics}
           />
-          <CompanyBody companyId={companyId} companyName={companyName}/>
+          <CompanyBody 
+            companyId={companyId}
+            setSelectedFramework={setSelectedFramework}
+            officialFrameworks={officialFrameworks}
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            selectedFramework={selectedFramework}
+            setCompareModalOpen={setCompareModalOpen}
+            allMetrics={allMetrics}
+            setSliderValuesFixed={setSliderValuesFixed}
+            setSliderValuesIndicatorFixed={setSliderValuesIndicatorFixed}
+            setFrameworkDisplay={setFrameworkDisplay}
+            setMetricNamesFixed={setMetricNamesFixed}
+            setSelectedMetricsFixed={setSelectedMetricsFixed}
+            setAllIndicatorsFixed={setAllIndicatorsFixed}
+            setSelectedIndicatorsFixed={setSelectedIndicatorsFixed}
+            eScore={eScore}
+            sScore={sScore}
+            gScore={gScore}
+            frameworkScore={frameworkScore}
+            setFrameworkScore={setFrameworkScore}
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setMetricScores={setMetricScores}
+            seteScore={seteScore}
+            setsScore={setsScore}
+            setgScore={setgScore}
+            findCategoricalMetrics={findCategoricalMetrics}
+            companyName={companyName}
+          />
           <GraphTableToggle
             display={frameworkDisplay}
             setDisplay={setFrameworkDisplay}
@@ -464,10 +521,56 @@ const Company = () => {
             metricNames={metricNames}
             allIndicators={allIndicators}
             metricScores={metricScores}
+            allIndicatorsInfo={allIndicatorsInfo}
           />}
           {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
           <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
-          <CreateFramework/>
+          <CreateFramework
+            setSelectedFramework={setSelectedFramework}
+            officialFrameworks={officialFrameworks}
+            selectedIndicators={selectedIndicators}
+            selectedMetrics={selectedMetrics}
+            metricNames={metricNames}
+            setSelectedIndicators={setSelectedIndicators}
+            setSelectedMetrics={setSelectedMetrics}
+            allIndicators={allIndicators}
+            allIndicatorsInfo={allIndicatorsInfo}
+            setMetricNames={setMetricNames}
+            setAllIndicators={setAllIndicators}
+            sliderValues={sliderValues}
+            sliderValuesFixed={sliderValuesFixed}
+            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+            metricNamesFixed={metricNamesFixed}
+            selectedMetricsFixed={selectedMetricsFixed}
+            allIndicatorsFixed={allIndicatorsFixed}
+            selectedIndicatorsFixed={selectedIndicatorsFixed}
+            sliderValuesIndicator={sliderValuesIndicator}
+            setSliderValuesIndicator={setSliderValuesIndicator}
+            setSliderValues={setSliderValues}
+            selectedFramework={selectedFramework}
+            setCompareModalOpen={setCompareModalOpen}
+            allMetrics={allMetrics}
+            setSliderValuesFixed={setSliderValuesFixed}
+            setSliderValuesIndicatorFixed={setSliderValuesIndicatorFixed}
+            setFrameworkDisplay={setFrameworkDisplay}
+            setMetricNamesFixed={setMetricNamesFixed}
+            setSelectedMetricsFixed={setSelectedMetricsFixed}
+            setAllIndicatorsFixed={setAllIndicatorsFixed}
+            setSelectedIndicatorsFixed={setSelectedIndicatorsFixed}
+            eScore={eScore}
+            sScore={sScore}
+            gScore={gScore}
+            frameworkScore={frameworkScore}
+            setFrameworkScore={setFrameworkScore}
+            indicatorsCompany={indicatorsCompany}
+            selectedYear={selectedYear}
+            setMetricScores={setMetricScores}
+            seteScore={seteScore}
+            setsScore={setsScore}
+            setgScore={setgScore}
+            findCategoricalMetrics={findCategoricalMetrics}
+            setOfficialFrameworks={setOfficialFrameworks}
+          />
         </Box>
       </Box>
     </Box>
