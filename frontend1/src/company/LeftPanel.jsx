@@ -132,6 +132,8 @@ const LeftPanel = ({
             setsScore={setsScore}
             setgScore={setgScore}
             findCategoricalMetrics={findCategoricalMetrics}
+            officialFrameworks={officialFrameworks}
+            selectedFramework={selectedFramework}
           />
           <AdditionalMetrics
             selectedIndicators={selectedIndicators}

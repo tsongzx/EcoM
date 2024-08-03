@@ -116,9 +116,6 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
-                }, 
-                params: {
-                    company_id: companyId
                 }
             } 
         );
@@ -212,11 +209,7 @@ export const removeCompanyFromList = async(listId, companyId) => {
     console.log('deleting CompanyId: ', companyId, 'from LIST: ', listId);
     console.log(Cookies.get('authToken'));
     try {
-        const response = await axios.delete('http://127.0.0.1:8000/list/company', {
-            params: {
-                list_id: listId,
-                company_id: companyId
-            },
+        const response = await axios.delete(`http://127.0.0.1:8000/list/company?list_id=${listId}&company_id=${companyId}`, {
             headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${Cookies.get('authToken')}`
@@ -833,3 +826,55 @@ export const getIndicatorBarGraph = async(companies) => {
       console.log(`Error getting industry: ${error}`)
   }
 }
+
+export const getPrediction = async(indicatorName, metricUnit, companyName) => {
+    try {
+
+            const path = `http://127.0.0.1:8000/predictive?indicator=${indicatorName}&metric_unit=${metricUnit}&company_name=${companyName}`;
+  
+            const response = await axios.get(path,           {           
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
+  }
+
+  export const getCompaniesInList = async(listId) => {
+    try {
+    const response = await axios.get(`http://127.0.0.1:8000/list?list_id=${listId}`, 
+        {           
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${Cookies.get('authToken')}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.log(`Error getting industry: ${error}`)
+    }
+  }
+
+  export const deleteList = async(listId) => {
+    console.log(listId);
+    try {
+        const response = await axios.delete(`http://127.0.0.1:8000/list?list_id=${listId}`, 
+            {    
+                       
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.log(`Error getting industry: ${error}`)
+        }
+}
+
+
+

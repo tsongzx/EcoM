@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import './company_css/CreateFramework.css'
 import { TextField } from "@mui/material";
-import { getUserId, getAllMetrics } from "../helper.js";
+import { getUserId, getAllMetrics, getOfficialFrameworks } from "../helper.js";
 import Textarea from '@mui/joy/Textarea';
 import AccordionGroup from '@mui/joy/AccordionGroup';
 import Accordion from '@mui/joy/Accordion';
@@ -12,7 +12,18 @@ import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
 import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
 
-const CreateFramework = () => {
+const CreateFramework = ({setSelectedFramework,
+  officialFrameworks,
+  selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
+  allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
+  sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
+  selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
+  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
+  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
+  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
+  seteScore, setsScore, setgScore, findCategoricalMetrics, setOfficialFrameworks}) => {
+
     const [Emetrics, setEMetrics] = useState([]);
     const [Smetrics, setSMetrics] = useState([]);
     const [Gmetrics, setGMetrics] = useState([]);
@@ -22,6 +33,7 @@ const CreateFramework = () => {
     const [showAddName, setShowAddName] = useState(false);
     const [newFrameworkName, setNewFrameworkName] = useState('');
     const [description, setDescription] = useState('');
+    const [tempState, setTempState] = useState(null);
 
     const [showMessage, setShowMessage] = useState(false);
     const [message, setMessage] = useState('');
@@ -86,53 +98,74 @@ const CreateFramework = () => {
       setShowMessage(false);
     }
 
+    useEffect(() => {
+      console.log(newFrameworkName);
+    }, [newFrameworkName]);
+
     const handleSubmitNewFramework = async () => {
-    if (newFrameworkName === null || newFrameworkName === '') {
-      setMessage('Please Enter a name for your new framework');
-      setShowMessage(true);
-      return;
-    }
+      if (newFrameworkName === null || newFrameworkName === '') {
+        setMessage('Please Enter a name for your new framework');
+        setShowMessage(true);
+        return;
+      }
 
-    // do one for each E, S and G
-    const chosenEMetrics = processMetrics(Emetrics);
-    const chosenSMetrics = processMetrics(Smetrics);
-    const chosenGMetrics = processMetrics(Gmetrics);
+      // do one for each E, S and G
+      const chosenEMetrics = processMetrics(Emetrics);
+      const chosenSMetrics = processMetrics(Smetrics);
+      const chosenGMetrics = processMetrics(Gmetrics);
 
-    // Combine all chosen metrics
-    const chosenMetrics = [...chosenEMetrics, ...chosenSMetrics, ...chosenGMetrics];
+      // Combine all chosen metrics
+      const chosenMetrics = [...chosenEMetrics, ...chosenSMetrics, ...chosenGMetrics];
 
-    console.log(`Submitting Framework: ${newFrameworkName} with metrics:`);
-    console.log(chosenMetrics);
-
-        try {
-            const response = await axios.post(`http://127.0.0.1:8000/framework/create/`,
-                {
-                    details: {
-                        framework_name: newFrameworkName,
-                        description: description,
-                    },
-                    category_weightings: {
-                        E: (Math.min(...value) / 100),
-                        S: (value[1] - value[0]) / 100,
-                        G: (100 - value[1]) / 100,
-                    },
-                    metrics: chosenMetrics,
-                },
-                {headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${Cookies.get('authToken')}`
-              }});
-              //if successful
-              handleClose();
-              setMessage('successfully created framework');
-              setShowMessage(true);
-              setIsOpen(false);
-              console.log('SUCCESSFULLY CREATED FRAMEWORK');
-              return response.data;
-        } catch (error) {
-            console.log(error);
-        }
+      console.log(`Submitting Framework: ${newFrameworkName} with metrics:`);
+      console.log(chosenMetrics);
+      let a;
+          try {
+              const response = await axios.post(`http://127.0.0.1:8000/framework/create/`,
+                  {
+                      details: {
+                          framework_name: newFrameworkName,
+                          description: description,
+                      },
+                      category_weightings: {
+                          E: (Math.min(...value) / 100),
+                          S: (value[1] - value[0]) / 100,
+                          G: (100 - value[1]) / 100,
+                      },
+                      metrics: chosenMetrics,
+                  },
+                  {headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }});
+                //if successful
+                handleClose();
+                setMessage('successfully created framework');
+                setShowMessage(true);
+                setIsOpen(false);
+                console.log('SUCCESSFULLY CREATED FRAMEWORK');
+                a = response.data;
+                setTempState(a);
+                return response.data;
+          } catch (error) {
+              console.log(error);
+          }
+        
     };
+
+    useEffect(() => {
+
+      const asyncFunction = async() => {
+        let b = await getOfficialFrameworks();
+        setOfficialFrameworks(b);
+        setSelectedFramework(tempState);
+      }
+
+      asyncFunction();
+
+    }, [tempState]);
+
+    
 
     const handleClose = () => {
         setShowAddName(false);
