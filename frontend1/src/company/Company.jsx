@@ -25,7 +25,8 @@ import {
   getAllMetricsAvailable,
   getMetricScoreByYear,
   getIndicatorFromMetric,
-  companyScoreGeneral
+  companyScoreGeneral,
+  getCompanyFromRecentlyViewed
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -42,9 +43,11 @@ import Visualisations from './Visualisations.jsx';
 const Company = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
-  const stateCompanyName = location.state?.companyName;
-  const displayCompanyName = companyName || stateCompanyName;
+  // const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
+  const { companyId: initialCompanyId, companyName: initialCompanyName, initialFramework, selectedIndustry } = location.state || {};
+  const [companyName, setCompanyName] = useState(initialCompanyName);
+  const stateCompanyName1 = location.state?.companyName;
+  const displayCompanyName = companyName || stateCompanyName1;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [reportModal, setOpenReportModal] = useState(false);
@@ -74,6 +77,26 @@ const Company = () => {
   const [sScore, setsScore] = useState(null);
   const [gScore, setgScore] = useState(null);
   const [frameworkScore, setFrameworkScore] = useState(null);
+  const [companyId1, setCompanyId1] = useState(null);
+  const [companyName1, setCompanyName1] = useState(null);
+
+  const [companyId, setCompanyId] = useState(initialCompanyId);
+
+  useEffect(() => {
+    if (initialCompanyId) {
+      setCompanyId(initialCompanyId); 
+    } else {
+      const asyncGetId = async () => {
+        let url = window.location.href;
+        let companyIdActual = url.split("/");
+        setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
+        const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+        setCompanyName(name.company_name);
+        console.log(name);
+      }
+      asyncGetId();
+    }
+  }, [initialCompanyId]);
   
 
   const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
@@ -114,7 +137,6 @@ const Company = () => {
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
-      console.log(companyName);
       const allMetricsAvailable = await getAllMetricsAvailable();
       setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
@@ -129,10 +151,37 @@ const Company = () => {
       if (years.length > 0) {
         setSelectedYear(years[years.length - 2]); 
       }
-      
     };
 
-    fetchCompanyIndicators(companyName);
+    const alternativeFetch = async () => {
+      let url = window.location.href;
+      let companyIdActual = url.split("/");
+      setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
+      const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+      setCompanyName(name.company_name);
+
+      const allMetricsAvailable = await getAllMetricsAvailable();
+      setAllMetrics(allMetricsAvailable);
+      const allIndicators1 = await getAllIndicators();
+      setAllIndicatorsInfo(allIndicators1);
+      const companyIndicators = await getIndicatorInfo(name.company_name);
+      console.log(companyIndicators);
+      setIndicatorsCompany(companyIndicators);
+      const years = Object.keys(companyIndicators);
+      console.log(years);
+      years.push('Predicted');
+      setAvailableYears(years);
+      if (years.length > 0) {
+        setSelectedYear(years[years.length - 2]); 
+      }
+    }
+
+    if (companyId && companyName) {
+      fetchCompanyIndicators(companyName);
+    } else {
+      alternativeFetch();
+    }
+    
   }, []);
 
 
@@ -143,18 +192,13 @@ const Company = () => {
   useEffect(() => {
     const fetchData = async () => {
       await addToRecentlyViewed(companyId);
-      // const recentList = await ();
-      // if (Array.isArray(recentList) && recentList.includes(companyId)) {
-      //   console.log('company is in Favourites/ watchlist');
-      // } else {
-      //   console.log('company is NOT IN Favourites/ watchlist');
-      // }
 
       const availableOfficialFramework = await getOfficialFrameworks();
       console.log(availableOfficialFramework);
       setOfficialFrameworks(availableOfficialFramework);
+
     };
-    fetchData();
+
 
     const fetchLists = async () => {
       const favsList = await getFavouritesList();
@@ -168,7 +212,14 @@ const Company = () => {
         setIsInFavs(false);
       }
     }
-    fetchLists();
+    if (companyId) {
+      fetchData();
+      fetchLists();
+    }
+  }, [companyId]);
+
+  useEffect(() => {
+    console.log(companyId);
   }, [companyId]);
 
   
@@ -524,7 +575,7 @@ const Company = () => {
             allIndicatorsInfo={allIndicatorsInfo}
           />}
           {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
-          <CompareModal companyId={companyId} companyName={displayCompanyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
+          <CompareModal companyId={companyId} companyName={companyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework
             setSelectedFramework={setSelectedFramework}
             officialFrameworks={officialFrameworks}
