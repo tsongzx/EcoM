@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -22,12 +22,17 @@ const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetri
 }) => {
   const [expanded, setExpanded] = useState(false);
 
+  useEffect(() => {
+    console.log(selectedFramework);
+  }, [selectedFramework]);
+
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
   const handleFrameworkChange = async (event) => {
     const frameworkId = Number(event.target.value);
+    console.log(frameworkId);
     setSelectedFramework(frameworkId);
 
     const metrics = await getMetricForFramework(frameworkId);

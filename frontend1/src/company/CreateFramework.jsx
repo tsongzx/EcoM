@@ -33,7 +33,7 @@ const CreateFramework = ({setSelectedFramework,
     const [showAddName, setShowAddName] = useState(false);
     const [newFrameworkName, setNewFrameworkName] = useState('');
     const [description, setDescription] = useState('');
-    const [tempState, setTempState] = useState(null);
+    // const [tempState, setTempState] = useState(null);
 
     const [showMessage, setShowMessage] = useState(false);
     const [message, setMessage] = useState('');
@@ -145,7 +145,7 @@ const CreateFramework = ({setSelectedFramework,
                 setIsOpen(false);
                 console.log('SUCCESSFULLY CREATED FRAMEWORK');
                 a = response.data;
-                setTempState(a);
+                // setTempState(a);
                 return response.data;
           } catch (error) {
               console.log(error);
@@ -153,17 +153,18 @@ const CreateFramework = ({setSelectedFramework,
         
     };
 
-    useEffect(() => {
+    // useEffect(() => {
 
-      const asyncFunction = async() => {
-        let b = await getOfficialFrameworks();
-        setOfficialFrameworks(b);
-        setSelectedFramework(tempState);
-      }
+    //   const asyncFunction = async() => {
+    //     console.log(tempState);
+    //     let b = await getOfficialFrameworks();
+    //     setOfficialFrameworks(b);
+    //     setSelectedFramework(tempState);
+    //   }
 
-      asyncFunction();
+    //   asyncFunction();
 
-    }, [tempState]);
+    // }, [tempState]);
 
     
 

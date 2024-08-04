@@ -36,6 +36,7 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
 
   useEffect(() => {
 	if (exitFramework === true) {
+		console.log('I went here');
 		setSelectedFramework(null);
 		setMetricNames(null);
 		setSelectedMetrics([]);

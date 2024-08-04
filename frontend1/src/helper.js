@@ -747,6 +747,8 @@ export const getIndicatorFromMetric = async(metricId) => {
 }
 
 export const getMetricScoreByYear = async(companyIndicatorsByYear, indicatorWeights) => {
+    console.log(companyIndicatorsByYear);
+    console.log(indicatorWeights);
     try {
         const response = await axios.post(`http://127.0.0.1:8000/company/metric/`,
           {
@@ -898,6 +900,30 @@ export const getPrediction = async(indicatorName, metricUnit, companyName) => {
             console.log(`Error getting industry: ${error}`)
         }
 }
+
+export const putFrameworkModifyMetrics = async (frameworkId, metrics, categoryWeightings) => {
+    try {
+        const response = await axios.put(
+            `http://127.0.0.1:8000/framework/modify_metrics/?framework_id=${frameworkId}`,
+            {
+                metrics: metrics,
+                category_weightings: categoryWeightings
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(`Error modifying metrics: ${error}`);
+        throw error; // Optionally rethrow the error if you want to handle it further up the call chain
+    }
+};
+
+
 
 
 
