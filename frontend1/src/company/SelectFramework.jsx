@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   FormControl,
   FormLabel,
@@ -27,7 +27,7 @@ const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetri
   };
 
   const handleFrameworkChange = async (event) => {
-    const frameworkId = Number(event.target.value) + 1;
+    const frameworkId = Number(event.target.value);
     setSelectedFramework(frameworkId);
 
     const metrics = await getMetricForFramework(frameworkId);
@@ -77,12 +77,12 @@ const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetri
           <RadioGroup
             aria-labelledby="select-framework-radio-buttons-group"
             name="select-framework-radio-buttons-group"
-            value={selectedFramework ? String(selectedFramework - 1) : ''}
+            value={selectedFramework ? String(selectedFramework) : ''}
             onChange={handleFrameworkChange}
           >
             {officialFrameworks &&
               Object.entries(officialFrameworks).map(([key, framework]) => (
-                <FormControlLabel key={key} value={key} control={<Radio />} label={<span style={{ fontSize: '17px' }}>{framework.framework_name}</span>} />
+                <FormControlLabel key={key} value={framework.id} control={<Radio />} label={<span style={{ fontSize: '17px' }}>{framework.framework_name}</span>} />
               ))}
           </RadioGroup>
         </Collapse>

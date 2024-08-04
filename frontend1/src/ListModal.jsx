@@ -1,33 +1,63 @@
-import {React, useState, useEffect} from 'react';
-import { Modal, Typography, Grid, Paper, Card, CardContent, Button } from '@mui/material';
-import { fetchCompaniesInList, getCompanyFromRecentlyViewed } from './helper';
+import React, { useState, useEffect } from 'react';
+import { Modal, Typography, Grid, Paper, Card, CardContent, Button, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
+import { fetchCompaniesInList, getCompanyFromRecentlyViewed, removeCompanyFromList } from './helper';
+import { useNavigate } from 'react-router-dom';
 
-const ListModal = ({ isOpen, onClose, list }) => {
-
-  const [companiesInList, setCompaniesInList] = useState({});
+const ListModal = ({ isOpen, onClose, list, setSelectedCompany }) => {
+  const navigate = useNavigate();
+  const [companiesInList, setCompaniesInList] = useState([]);
+  const [companyNames, setCompanyNames] = useState({});
 
   useEffect(() => {
-    const someFunction = async() => {
-      console.log(list);
-      const companies = await fetchCompaniesInList(list.id);
-      setCompaniesInList(companies);
-    }
-    someFunction();
+    const fetchCompanies = async () => {
+      if (list && list.id) {
+        const companies = await fetchCompaniesInList(list.id);
+        console.log(companies);
+        setCompaniesInList(companies);
+      }
+    };
+    fetchCompanies();
   }, []);
 
   useEffect(() => {
-    const someFunction = async() => {
-      let companyNames = [];
-      for (let company of Object.keys(companiesInList)) {
-        const company1 = companiesInList[company];
-        const companyInfo = await getCompanyFromRecentlyViewed(company1);
-        companyNames.push(companyInfo);
+    const getCompanyNames = async() => {
+      const newCompanyNames = {};
+      for (let id of companiesInList) {
+        const companyInterest = await getCompanyFromRecentlyViewed(id);
+        newCompanyNames[id] = companyInterest.company_name;
       }
-      console.log(companyNames);
+      setCompanyNames(newCompanyNames);
     }
-    someFunction();
+    if (companiesInList.length > 0) {
+      getCompanyNames();
+    }
+    
   }, [companiesInList]);
 
+  const handleDelete = (companyId) => {
+    let newCompaniesInList = [];
+    for (let element of companiesInList) {
+      if (element !== companyId) {
+        newCompaniesInList.push(element);
+      }
+    }
+    console.log(list.id);
+    removeCompanyFromList(list.id, companyId);
+    setCompaniesInList(newCompaniesInList);
+  };
+
+  const goToCompany = (companyId) => {
+    setSelectedCompany(companyId);
+    navigate(`/company/${encodeURIComponent(companyId)}`, 
+    { state: { 
+      companyId: companyId,
+      companyName: companiesInList[companyId],
+      initialFramework: null
+      } 
+    });
+
+  }
 
   return (
     <Modal
@@ -37,22 +67,39 @@ const ListModal = ({ isOpen, onClose, list }) => {
       aria-describedby="modal-modal-description"
     >
       <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
-        <Paper style={{ padding: '20px', maxWidth: '80%', maxHeight: '80%', overflow: 'auto' }}>
-          <Typography variant="h6" gutterBottom>
-            Companies in {list.list_name}
-          </Typography>
-          <Button onClick={onClose} style={{ marginBottom: '10px' }}>Close</Button>
-          {/* <Grid container spacing={2}>
-            {list.companies.map(company => (
-              <Grid item xs={12} key={company.id}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="body1">{company.company_name}</Typography>
-                  </CardContent>
-                </Card>
+        <Paper 
+          style={{ 
+            padding: '20px', 
+            maxWidth: '600px', // restrict the max width
+            width: '100%',     // allow it to take full width on smaller screens
+            maxHeight: '80%', 
+            overflow: 'auto' 
+          }}
+        >
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center'}}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
+              Companies in {list?.list_name}
+            </Typography>
+          </div>
+          <Grid style={{ marginTop: "20px"}} container spacing={2}>
+            {companiesInList.map((companyId) => (
+              <Grid item xs={12} key={companyId}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                  <Card style={{ width: '80%'}}>
+                    <CardContent style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => goToCompany(companyId)}>
+                      <Typography variant="body1">
+                        {companyNames[companyId] || ''}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                  <IconButton onClick={() => handleDelete(companyId)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
               </Grid>
             ))}
-          </Grid> */}
+          </Grid>
+          <Button onClick={onClose} style={{ marginTop: '10px' }}>Close</Button>
         </Paper>
       </Grid>
     </Modal>

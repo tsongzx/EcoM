@@ -30,7 +30,10 @@ const Recommendations = ({companyId}) => {
                 setReccs(newReccs);
             }
         }
-        initialiseRecommendations(companyId);
+        if (companyId) {
+            initialiseRecommendations(companyId);
+        }
+        
     },[companyId]);
 
     const navigate = useNavigate();

@@ -32,7 +32,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
   setSliderValuesIndicator, setSliderValues, eScore, sScore, gScore, frameworkScore, setFrameworkScore,
-  indicatorsCompany, selectedYear, setMetricScores, seteScore, setgScore, setsScore, findCategoricalMetrics
+  indicatorsCompany, selectedYear, setMetricScores, seteScore, setgScore, setsScore, findCategoricalMetrics, officialFrameworks,
+  selectedFramework
 }) => {
   const [lockedSliders, setLockedSliders] = useState({});
   const [lockedSlidersIndicators, setLockedSlidersIndicators] = useState({}); 
@@ -53,7 +54,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [errorMetrics, setErrorMetrics] = useState({});
   const [errorPillarModal, setErrorPillarModal] = useState('');
 
-  const [pillarWeighting, setPillarWeighting] = useState({ E: 0.333333, S: 0.333333, G: 0.333333 });
+  const [pillarWeighting, setPillarWeighting] = useState({});
   // const [editMode, setEditMode] = useState({ E: false, S: false, G: false });
 
   const [modalE, setModalE] = useState(pillarWeighting['E']);
@@ -64,6 +65,19 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [modalWeightingOpen, setModalWeightingOpen] = useState(false);
   const [modalWeightingError, setModalWeightingError] = useState('');
   const [changed, setChanged] = useState(false);
+
+  useEffect(() => {
+    if (selectedFramework) {
+      let newObj = {};
+      console.log(officialFrameworks);
+      const foundFramework = officialFrameworks.find(obj => obj.id === selectedFramework) || { E: 0, S: 0, G: 0 };
+
+      newObj['E'] = foundFramework.E || 0;
+      newObj['S'] = foundFramework.S || 0;
+      newObj['G'] = foundFramework.G || 0;
+      setPillarWeighting(newObj);
+    }
+  }, [selectedFramework]);
 
   useEffect(() => {
     const frameworkScore = eScore * pillarWeighting['E'] + sScore * pillarWeighting['S'] + gScore * pillarWeighting['G'];
@@ -792,7 +806,14 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         newObj[indicatorObject.indicator_name] = sliderValuesIndicator[`${idMetric}-${idIndicator}`];
       }
 
-      let correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+
+      let correspondingScore;
+      if (selectedYear !== 'Predicted') {
+        correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+      } else {
+        correspondingScore = 0;
+      }
+      
       console.log(correspondingScore);
       let obj1 = {};
       obj1["score"] = correspondingScore;
@@ -922,7 +943,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               {`${errorG}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorG}</div>}
             </div>
             {frameworkScore !== null && (
-              <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Overall Framework Score: ${frameworkScore})`}</h6>
+              <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`Overall Framework Score: ${isNaN(frameworkScore) ? '' : frameworkScore}`}</h6>
             )}
           </div>
           <Dialog maxWidth="xs" fullWidth open={modalOpen} onClose={() => setModalOpen(false)}>
