@@ -503,7 +503,7 @@ async def add_to_recently_viewed(
 # ***************************************************************
 
 @app.get("/company", tags=["company"])
-async def get_all_company(
+async def get_company_by_batch(
     page: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -511,6 +511,15 @@ async def get_all_company(
     offset = page * 20
     companyData = session.query(
         company_models.Company).offset(offset).limit(20).all()
+    return companyData
+  
+@app.get("/company/all", tags=["company"])
+async def get_all_company(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(
+        company_models.Company).all()
     return companyData
 
 @app.get("/company/{company_id}", tags=["company"])
