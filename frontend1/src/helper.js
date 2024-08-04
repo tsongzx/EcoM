@@ -747,6 +747,8 @@ export const getIndicatorFromMetric = async(metricId) => {
 }
 
 export const getMetricScoreByYear = async(companyIndicatorsByYear, indicatorWeights) => {
+    console.log(companyIndicatorsByYear);
+    console.log(indicatorWeights);
     try {
         const response = await axios.post(`http://127.0.0.1:8000/company/metric/`,
           {

@@ -726,7 +726,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   const checkAll = () => {
     const pillarAddsUp = pillarWeighting['E'] + pillarWeighting['S'] + pillarWeighting['G'];
-    if ((pillarAddsUp <= 0.99999) || (pillarAddsUp >= 1.000001)) {
+    if ((pillarAddsUp < 0.99999) || (pillarAddsUp >= 1.000001)) {
       
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your metric weightings add up to 1.');
@@ -819,6 +819,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       obj1["score"] = correspondingScore;
       metricScoreMock[idMetric] = obj1;
     }
+    console.log(metricScoreMock);
     setMetricScores(metricScoreMock);
     const filteredEMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'E');
     seteScore(filteredEMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));

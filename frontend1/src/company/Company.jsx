@@ -311,6 +311,9 @@ const Company = () => {
         let correspondingScore;
         if (selectedYear !== 'Predicted') {
           correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
+          if (isNaN(correspondingScore)) {
+            correspondingScore = 0;
+          }
         } else {
           correspondingScore = 0;
         }        
