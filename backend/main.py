@@ -1128,63 +1128,63 @@ async def get_companies_in_industry(
 
     return companies
   
-#test all of the average ones claire   
-@app.get("/industry/framework/average/", tags=["Industry"])
-async def get_framework_industry_average(
-    industry: str,
-    framework_id: int,
-    year: int,
-    companies: List[company_models.Company] = Depends(get_companies_in_industry),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    # fix - get average for an industry for a framework 
-    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-    TODO: BATCH PROCESSING
-    """    
-    # @GEOFF: CONSIDER BATCH PROCESSING
-    # score = 0
-    # for company in companies:
-    #     score += await get_framework_score(framework_id, company.company_name, year, user, session)
+# #test all of the average ones claire   
+# @app.get("/industry/framework/average/", tags=["Industry"])
+# async def get_framework_industry_average(
+#     industry: str,
+#     framework_id: int,
+#     year: int,
+#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     # fix - get average for an industry for a framework 
+#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+#     TODO: BATCH PROCESSING
+#     """    
+#     # @GEOFF: CONSIDER BATCH PROCESSING
+#     # score = 0
+#     # for company in companies:
+#     #     score += await get_framework_score(framework_id, company.company_name, year, user, session)
     
-    # return score / len(companies) if companies else 0
-    if not companies:
-        return 0
+#     # return score / len(companies) if companies else 0
+#     if not companies:
+#         return 0
 
-    tasks = [
-        get_framework_score(framework_id, company.company_name, year, user, session)
-        for company in companies
-    ]
+#     tasks = [
+#         get_framework_score(framework_id, company.company_name, year, user, session)
+#         for company in companies
+#     ]
 
-    # Run concurrently
-    scores = await asyncio.gather(*tasks)
+#     # Run concurrently
+#     scores = await asyncio.gather(*tasks)
 
-    # Calculate the total score
-    total_score = sum(scores)
+#     # Calculate the total score
+#     total_score = sum(scores)
 
-    # Return the average score
-    return total_score / len(companies)
+#     # Return the average score
+#     return total_score / len(companies)
 
 
-@app.get("/industry/metric/average/", tags=["Industry"])
-async def get_metric_industry_average(
-    metric_id: int,
-    year: int,
-    framework_id: int,
-    companies: List[company_models.Company] = Depends(get_companies_in_industry),
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) :
-    # fix - get average for an industry for a framework 
-    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-      TODO: BATCH PROCESSING
-    """    
-    # @GEOFF: CONSIDER BATCH PROCESSING
-    score = 0
-    for company in companies:
-        score += await calculate_metric(metric_id, company.company_name, framework_id, year, user, session)
+# @app.get("/industry/metric/average/", tags=["Industry"])
+# async def get_metric_industry_average(
+#     metric_id: int,
+#     year: int,
+#     framework_id: int,
+#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) :
+#     # fix - get average for an industry for a framework 
+#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+#       TODO: BATCH PROCESSING
+#     """    
+#     # @GEOFF: CONSIDER BATCH PROCESSING
+#     score = 0
+#     for company in companies:
+#         score += await calculate_metric(metric_id, company.company_name, framework_id, year, user, session)
     
-    return score / len(companies) if companies else 0
+#     return score / len(companies) if companies else 0
   
 @app.get("/industry/indicator/average/", tags=["Industry"])
 async def get_indicator_industry_averages(
@@ -1267,7 +1267,7 @@ def linear_regression(data: List[company_models.CompanyData]) -> float:
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
-    metric_unit = str,
+    indicator_unit = str,
     company_name = str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
@@ -1277,15 +1277,12 @@ async def get_predictive(
         company_models.CompanyData.company_name == company_name, 
     ).all()
 
-    if not isinstance(metric_unit, str):
-        metric_unit = str(metric_unit)
-
     if not data:
         raise HTTPException(status_code=404, detail="Error")
 
-    if "%" in metric_unit:
+    if "%" in indicator_unit:
         prediction = linear_regression(data)
-    elif metric_unit == 'Yes/No':
+    elif indicator_unit == 'Yes/No':
         values = [point.indicator_value for point in data]
         predicted_value = max(set(values), key=values.count) 
         if predicted_value == 1:
@@ -1294,7 +1291,7 @@ async def get_predictive(
             prediction = 'No'
 
     else: 
-        #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
+        #indicator_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
