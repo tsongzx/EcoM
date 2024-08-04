@@ -25,7 +25,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import { getMetricScoreByYear } from '../helper';
+import { getMetricScoreByYear, putFrameworkModifyMetrics } from '../helper';
 
 const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
@@ -67,6 +67,14 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [changed, setChanged] = useState(false);
 
   useEffect(() => {
+    console.log(officialFrameworks);
+  }, [officialFrameworks]);
+
+  useEffect(() => {
+    console.log(pillarWeighting);
+  }, [pillarWeighting]);
+
+  useEffect(() => {
     if (selectedFramework) {
       let newObj = {};
       console.log(officialFrameworks);
@@ -77,7 +85,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       newObj['G'] = foundFramework.G || 0;
       setPillarWeighting(newObj);
     }
-  }, [selectedFramework]);
+  }, [selectedFramework, officialFrameworks]);
 
   useEffect(() => {
     const frameworkScore = eScore * pillarWeighting['E'] + sScore * pillarWeighting['S'] + gScore * pillarWeighting['G'];
@@ -792,9 +800,29 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       }
     }
 
+    putModifiedMetrics();
+
     console.log(sliderValuesIndicator);
     getAdjustedFrameworkScore();
   }
+
+  const putModifiedMetrics = async() => {
+    let array = [];
+    for (let id of selectedMetrics) {
+      let newObj = {};
+      let category = metricNames.find(indicator => indicator.id === id).category;
+      let weighting = sliderValues[id];
+      newObj["category"] = category;
+      newObj["metric_id"] = id;
+      newObj["weighting"] = weighting;
+      array.push(newObj);
+    }
+
+    console.log(pillarWeighting);
+    await putFrameworkModifyMetrics(selectedFramework, array, pillarWeighting);
+    console.log(array);
+  }
+
 
   const getAdjustedFrameworkScore = async() => {
     let metricScoreMock = {};
@@ -1027,7 +1055,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
           {Object.keys(selectedIndicators).length > 0 && (
             <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button variant="contained" color="primary" onClick={() => checkAll()}>
-                Calculate Score
+                Save Framework
               </Button>
               <Button variant="contained" color="primary" onClick={resetToDefault}>
                 Reset to Default

@@ -36,6 +36,10 @@ const LeftPanel = ({
   };
 
   useEffect(() => {
+    console.log(officialFrameworks);
+  }, [officialFrameworks]);
+
+  useEffect(() => {
     console.log(metricNamesFixed);
   }, [metricNamesFixed]);
 

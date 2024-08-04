@@ -901,5 +901,29 @@ export const getPrediction = async(indicatorName, metricUnit, companyName) => {
         }
 }
 
+export const putFrameworkModifyMetrics = async (frameworkId, metrics, categoryWeightings) => {
+    try {
+        const response = await axios.put(
+            `http://127.0.0.1:8000/framework/modify_metrics/?framework_id=${frameworkId}`,
+            {
+                metrics: metrics,
+                category_weightings: categoryWeightings
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(`Error modifying metrics: ${error}`);
+        throw error; // Optionally rethrow the error if you want to handle it further up the call chain
+    }
+};
+
+
+
 
 

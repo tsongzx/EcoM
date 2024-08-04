@@ -52,7 +52,7 @@ const Company = () => {
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [reportModal, setOpenReportModal] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
-  const [officialFrameworks, setOfficialFrameworks] = useState(null);
+  const [officialFrameworks, setOfficialFrameworks] = useState([]);
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
   const [metricNames, setMetricNames] = useState(null);
   const [selectedMetrics, setSelectedMetrics] = useState([]);
@@ -81,6 +81,8 @@ const Company = () => {
   const [companyName1, setCompanyName1] = useState(null);
 
   const [companyId, setCompanyId] = useState(initialCompanyId);
+  console.log("Initial Framework:", initialFramework);
+
 
   useEffect(() => {
     if (initialCompanyId) {
@@ -97,6 +99,7 @@ const Company = () => {
       asyncGetId();
     }
   }, [initialCompanyId]);
+
   
 
   const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
@@ -151,6 +154,7 @@ const Company = () => {
       if (years.length > 0) {
         setSelectedYear(years[years.length - 2]); 
       }
+      console.log(selectedFramework);
     };
 
     const alternativeFetch = async () => {
@@ -177,6 +181,7 @@ const Company = () => {
     }
 
     if (companyId && companyName) {
+      console.log(selectedFramework);
       fetchCompanyIndicators(companyName);
     } else {
       alternativeFetch();
@@ -191,6 +196,7 @@ const Company = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log('here');
       await addToRecentlyViewed(companyId);
 
       const availableOfficialFramework = await getOfficialFrameworks();
@@ -222,7 +228,9 @@ const Company = () => {
     console.log(companyId);
   }, [companyId]);
 
-  
+  useEffect(() => {
+    console.log("Selected Framework on Update:", selectedFramework);
+  }, [selectedFramework]);
 
   useEffect(() => {
     const fetchData = async () => {
