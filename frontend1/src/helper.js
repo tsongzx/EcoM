@@ -791,7 +791,7 @@ export const getIndicatorLineGraph = async(companies) => {
           }
           console.log(companies);
           const queryString = companies.map(company => `companies=${company}`).join('&');
-          const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+          const path = `http://127.0.0.1:8000/graph/indicator/line?${queryString}`;
 
           const response = await axios.get(path,           {           
               headers: {
@@ -813,7 +813,30 @@ export const getIndicatorBarGraph = async(companies) => {
       }
       console.log(companies);
       const queryString = companies.map(company => `companies=${company}`).join('&');
-      const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+      const path = `http://127.0.0.1:8000/graph/indicator/bar?${queryString}`;
+
+      const response = await axios.get(path, 
+          {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(error);
+      console.log(`Error getting industry: ${error}`)
+  }
+}
+
+export const getMetricBarGraph = async(frameworkId, companies) => {
+  try {
+      if (companies.length === 0) {
+        return {};
+      }
+      console.log(companies);
+      const queryString = companies.map(company => `companies=${company}`).join('&');
+      const path = `http://127.0.0.1:8000/graph/metric/bar?framework_id=${frameworkId}&${queryString}`;
 
       const response = await axios.get(path, 
           {           

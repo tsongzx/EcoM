@@ -1,29 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, Typography, Box, Paper } from '@mui/material';
 
-const VisualisationCardInfo = ({indicatorInfo}) => {
+const VisualisationCardInfo = ({info}) => {
+  console.log("displaying info card");
   return (
-    indicatorInfo ? (
+    info ? (
       <Paper elevation={3} sx={{ padding: 2, width: '30%' }}>
         <Stack spacing={1}>
           <Typography variant="body2">
             <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>Data Type: </Typography>
-            {indicatorInfo.data_type}
+            {info.data_type}
           </Typography>
           <Typography variant="body2">
             <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>Unit: </Typography>
-            {indicatorInfo.unit}
+            {info.unit}
           </Typography>
           <Typography variant="body2">
             <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>Pillar: </Typography>
-            {indicatorInfo.pillar}
+            {info.pillar}
           </Typography>
           <Typography variant="body2">
             <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>Source: </Typography>
-            {indicatorInfo.source}
+            {info.source}
           </Typography>
           <Typography variant="body2">
-            {indicatorInfo.description}
+            {info.description}
           </Typography>
         </Stack>
       </Paper>

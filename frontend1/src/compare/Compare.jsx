@@ -383,7 +383,7 @@ const Compare = () => {
         overflow: "hidden",
         overflowY: "scroll",
       }}>
-        <GraphTableToggle display={display} setDisplay={setDisplay} props={{position: 'absolute', bottom: 0, zIndex: '5'}}></GraphTableToggle>
+        <GraphTableToggle display={display} setDisplay={setDisplay} props={{position: 'absolute', bottom: 0, zIndex: '100'}}></GraphTableToggle>
         {display === 'tabular' ? (
         <Box>  
           <TableContainer className='compare-table-cont' style={{height: '75vh',}}>
