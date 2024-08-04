@@ -29,10 +29,10 @@ const LeftPanel = ({companies, setCompanies, setMessage, setShowMessage, handleD
                   styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
                   options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
                   label="Framework"
-                  placeholder="Framework"
+                  placeholder="Select a framework"
                   maxMenuHeight={100}
-                  // defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
-                  onChange={(e) => (e) => setFramework(e.value)}
+                  defaultValue={framework.id ? {value: framework.id, label: framework.name} : null}
+                  onChange={(e) => {console.log(e.value); setFramework({id: e.value, name: e.label});}}
                 />
             </div>}
         </Box>

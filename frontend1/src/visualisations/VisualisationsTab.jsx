@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import VisualisationsPanel from './VisualisationsPanel';
 import { Tabs, Tab, Box } from '@mui/material';
 
-const VisualisationsTab = ({ graphValues, indicatorInfo, categories }) => {
+const VisualisationsTab = ({ graphValues, info, categories, filterColumn, displayInfoCard }) => {
   const [filter, setFilter] = useState("E");
 
   console.log(graphValues);
@@ -27,11 +27,15 @@ const VisualisationsTab = ({ graphValues, indicatorInfo, categories }) => {
         <Tab label="All" value="All" />
       </Tabs>
       {/* Rendering content based on the selected tab */}
-      {filter === 'E' && <VisualisationsPanel graphValues={graphValues} indicatorInfo={indicatorInfo} filter={filter} categories={categories}/>}
-      {filter === 'S' && <VisualisationsPanel graphValues={graphValues} indicatorInfo={indicatorInfo} filter={filter} categories={categories}/>}
-      {filter === 'G' && <VisualisationsPanel graphValues={graphValues} indicatorInfo={indicatorInfo} filter={filter} categories={categories}/>}
-      {filter === 'All' && <VisualisationsPanel graphValues={graphValues} indicatorInfo={indicatorInfo} filter={filter} categories={categories}/>}
-    </Box>
+        <VisualisationsPanel
+          graphValues={graphValues}
+          info={info}
+          filter={filter}
+          categories={categories}
+          filterColumn={filterColumn}
+          displayInfoCard={displayInfoCard}
+        />
+      </Box>
   );
 }
 

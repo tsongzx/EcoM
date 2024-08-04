@@ -503,7 +503,7 @@ async def add_to_recently_viewed(
 # ***************************************************************
 
 @app.get("/company", tags=["company"])
-async def get_all_company(
+async def get_company_by_batch(
     page: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -511,6 +511,15 @@ async def get_all_company(
     offset = page * 20
     companyData = session.query(
         company_models.Company).offset(offset).limit(20).all()
+    return companyData
+  
+@app.get("/company/all", tags=["company"])
+async def get_all_company(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(
+        company_models.Company).all()
     return companyData
 
 @app.get("/company/{company_id}", tags=["company"])
@@ -1334,8 +1343,8 @@ async def articles(
 #                        Visualisation Apis
 # ***************************************************************
 
-@app.get("/graph/indicators/line", tags=["Graph"])
-async def get_indicators_line_graph(
+@app.get("/graph/indicator/line", tags=["Graph"])
+async def get_indicator_line_graph(
     companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -1362,8 +1371,8 @@ async def get_indicators_line_graph(
     return data_by_company
 
 
-@app.get("/graph/indicators/bar", tags=["Graph"])
-async def get_indicators_bar_graph(
+@app.get("/graph/indicator/bar", tags=["Graph"])
+async def get_indicator_bar_graph(
     companies:  List[str] = Query(..., description="List of company names"),
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
@@ -1385,12 +1394,67 @@ async def get_indicators_bar_graph(
       
       # add company value 
       data_by_indicator[entry.indicator_name][entry.indicator_year_int][entry.company_name] = entry.indicator_value
-      # data_point = graph_schemas.IndicatorGraph(indicator=entry.indicator_name, 
-      #                                           year=entry.indicator_year_int,
-      #                                           company=entry.company_name)
-      # data_by_indicator[entry.indicator_name][entry.indicator_year_int].append(data_point)
-     
+       
     return data_by_indicator
+  
+@app.get("/graph/metric/bar", tags=["Graph"])
+async def get_metric_bar_graph(
+    framework_id: int,
+    companies:  List[str] = Query(..., description="List of company names"),
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    # metric_id: int,
+    # company_name: str,
+    # year: int,
+    
+    years = await get_years(companies, user, session)
+    data_by_metric = {}
+    
+    metrics = await get_framework_metrics(framework_id, user, session)
+    
+    for metric in metrics:
+      indicators = get_indicators_for_metric(metric.id, user, session)
+      weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
+      data_by_metric[metric.metric_id] = []
+      for year in years:
+        # company_indicators_year = company_data[year]
+        data_point = {
+          'year': year,
+          'metric': metric.metric_id,
+          'category': metric.category
+        }
+        for company in companies:
+          company_data = session.query(company_models.CompanyData).filter(
+            company_models.CompanyData.company_name == company,
+            company_models.CompanyData.indicator_year_int == year).all()
+    
+          metric_score = await calculate_metric_company_view(company_data, weights, user, session)
+          
+          data_point[company] = metric_score
+       
+        data_by_metric[metric.metric_id].append(data_point)
+       
+    return data_by_metric
+  
+#***************************************************************
+#                        Year Apis
+# ***************************************************************
+@app.get("/years/", tags=["Years"])
+async def get_years(
+  companies:  List[str] = Query(..., description="List of company names"),
+  user: user_schemas.UserInDB = Depends(get_user),
+  session: Session = Depends(get_session),
+):
+  years = session.query(company_models.CompanyData.indicator_year_int)\
+      .filter(company_models.CompanyData.company_name.in_(companies))\
+      .distinct()\
+      .all()
+ 
+  year_list = [year.indicator_year_int for year in years]
+  
+  return sorted(year_list)
+
 #***************************************************************
 #                        Company view Scoring Apis
 # ***************************************************************
@@ -1410,11 +1474,11 @@ async def calculate_metric_company_view(
     """    
     return metrics.calculate_metric(company_indicators, indicators)
 
-@app.post("/company/score/", tags=["Company scores"])
-async def find_weighted_average(
-    values: List[score_schemas.Value],
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> float:
+# @app.post("/company/score/", tags=["Company scores"])
+# async def find_weighted_average(
+#     values: List[score_schemas.Value],
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> float:
       
-    return sum(value.score * value.weighting for value in values)
+#     return sum(value.score * value.weighting for value in values)
