@@ -31,8 +31,10 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
             console.log(formattedLists);
             setWatchlist(formattedLists);
         };
-
-        fetchWatchlist();
+        if (companyId) {
+            fetchWatchlist();
+        }
+       
     }, [companyId]);
 
 
