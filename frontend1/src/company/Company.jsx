@@ -79,6 +79,8 @@ const Company = () => {
   const [frameworkScore, setFrameworkScore] = useState(null);
   const [companyId1, setCompanyId1] = useState(null);
   const [companyName1, setCompanyName1] = useState(null);
+
+  const [graphStateChange, setGraphStateChange] = useState(false);
   const [ticker, setTicker] = useState(null);
   const [companyId, setCompanyId] = useState(initialCompanyId);
   console.log("Initial Framework:", initialFramework);
@@ -304,6 +306,7 @@ const Company = () => {
   }, [selectedFramework]);
 
   useEffect(() => {
+    setGraphStateChange(!graphStateChange);
     const runScore = async() => {
       let metricScoreMock = {};
       for (let idMetric of selectedMetrics) {
@@ -588,7 +591,7 @@ const Company = () => {
             metricScores={metricScores}
             allIndicatorsInfo={allIndicatorsInfo}
           />}
-          {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
+          {frameworkDisplay === 'graphical' && <Visualisations selectedMetrics={selectedMetrics} graphStateChange={graphStateChange} selectedFramework={selectedFramework} companyIndicators={indicatorsCompany} companyName={companyName}/>}
           <CompareModal companyId={companyId} companyName={companyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework
             setSelectedFramework={setSelectedFramework}

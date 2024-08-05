@@ -1456,38 +1456,37 @@ async def get_metric_bar_graph(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    # metric_id: int,
-    # company_name: str,
-    # year: int,
-
+    company_data = {}
+    for company in companies:
+      data = await get_company_indicators(company, user, session)
+      company_data[company] = data
+      
     years = await get_years(companies, user, session)
     data_by_metric = {}
 
     metrics = await get_framework_metrics(framework_id, user, session)
 
     for metric in metrics:
-        indicators = get_indicators_for_metric(metric.id, user, session)
-        weights = {
-            indicator.indicator_name: indicator.weighting for indicator in indicators}
-        data_by_metric[metric.metric_id] = []
-        for year in years:
-            # company_indicators_year = company_data[year]
-            data_point = {
-                'year': year,
-                'metric': metric.metric_id,
-                'category': metric.category
-            }
-            for company in companies:
-                company_data = session.query(company_models.CompanyData).filter(
-                    company_models.CompanyData.company_name == company,
-                    company_models.CompanyData.indicator_year_int == year).all()
-
-                metric_score = await calculate_metric_company_view(company_data, weights, user, session)
-
-                data_point[company] = metric_score
-
-            data_by_metric[metric.metric_id].append(data_point)
-
+      indicators = get_indicators_for_metric(metric.metric_id, user, session)
+      weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
+      data_by_metric[metric.metric_id] = []
+      for year in years:
+        print(f'printing year: {year}')
+        # company_indicators_year = company_data[year]
+        data_point = {
+          'year': year,
+          'metric': metric.metric_id,
+          'category': metric.category
+        }
+        for company in companies:
+          if year not in company_data[company]:
+            continue
+          metric_score = await calculate_metric_company_view(company_data[company][year], weights, user, session)
+          print(f'metric score: {metric_score}')
+          data_point[company] = metric_score
+       
+        data_by_metric[metric.metric_id].append(data_point)
+       
     return data_by_metric
 
 # ***************************************************************

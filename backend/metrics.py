@@ -11,7 +11,6 @@ def calculate_metric(year_indicators, weights):
   indicator_data = read_metrics_file()
   
   overall_score = 0
-  
   for indicator_name, weight in weights.items():
       print(indicator_name)
       print(f'printing weight {weight}')
@@ -36,6 +35,6 @@ def calculate_metric(year_indicators, weights):
       print(f'printing scaled value {scaled_score}')
       
       overall_score += scaled_score * weight
-      print(overall_score)
       
+  print(f'overall score: {overall_score}')
   return overall_score
