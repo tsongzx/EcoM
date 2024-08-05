@@ -19,6 +19,7 @@ const ReportTableRow = ({ items }) => {
     //<View style={styles.row} key={item.sr.toString()}> should have a key
     <View style={styles.row}>
       <Text style={styles.description}>itemDesc</Text>
+      <Text style={styles.description}>itemDesc</Text>
       <Text style={styles.xyz}>item XYZ</Text>
     </View>
   ));

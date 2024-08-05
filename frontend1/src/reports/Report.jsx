@@ -11,7 +11,8 @@ import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../
 import SimpleLineChart from "../SimpleLineChart";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
-
+import ReportFrameworkTable from "./ReportFrameworkTable";
+import { getPrediction } from "../helper";
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
@@ -22,9 +23,10 @@ const Report = () => {
     const { companyId } = useParams();
     const [ components , setComponents ] = useState([]);
     const [ showAddText, setShowAddText] = useState(false);
+    const [predictedScore, setPredictedScore] = useState({});
     const ref = useRef();
     const location = useLocation();
-    const { id, companyName, framework, year } = location.state || {};
+    const { id, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo } = location.state || {};
     // set Components to be a list of JSON objects {id: int, type: '', name: ''}, 
     useEffect(() => {
         console.log('Inside Reporing for company: ', parseInt(companyId));
@@ -38,7 +40,29 @@ const Report = () => {
         // ])
 
         // Get the indicators for the company for the selected year
-        
+        const aiPredict = async () => {
+            let allPredictedScores = {};
+            console.log('ALL INDICATOR INFORMATIOn');
+            console.log(allIndicatorsInfo);
+            if (!allIndicatorsInfo){
+                return;
+            }
+            for (const indicator of Object.values(allIndicatorsInfo)) {
+              let score = await getPrediction(indicator.name, indicator.unit, companyName);
+              if (score) {
+                let newObj = {};
+                newObj['id'] = indicator.id; 
+                newObj['indicator_name'] = score.indicator_name;
+                newObj['prediction'] = score.prediction;
+                allPredictedScores[score.indicator_id] = newObj;
+              }
+            }
+            setPredictedScore(allPredictedScores);
+          }
+          aiPredict();
+
+
+
         // Get Data for each E, S and G Category in the format:
         // {indicator_name, indicator_unit, indicator_value}
 
@@ -92,7 +116,17 @@ const getCompanyMetaInformation = async () => {
         type: 'longSummary',
         name: detailedCompanyInfo.longBusinessSummary,
         isDisplayed: true
-    }] : []),
+    },{
+        id: newCompanyComponents.length + 2,
+        type: 'table',
+        name: 'Indicators Table',
+        isDisplayed: true,
+    }] : [{
+        id: newCompanyComponents.length + 1,
+        type: 'table',
+        name: 'Indicators Table',
+        isDisplayed: true,
+    }]),
     ];
 
     //Add whatever components we fetched
@@ -146,10 +180,23 @@ const getCompanyMetaInformation = async () => {
                         <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
                         {showAddText && <CustomTextarea handleClose={handleClose}/>}
                     </div>
-                    <PDFDownloadLink document={<ReportDoc contentList={components} companyId={id} companyName={companyName} framework={framework} year={year}/>} fileName={`${companyName}.pdf`}>
-                        {({ blob, url, loading, error }) =>
-                        loading ? 'Loading document...' : 'Download PDF'
-                        }
+                    <PDFDownloadLink document={<ReportDoc 
+                        contentList={components} 
+                        companyId={id}
+                        companyName={companyName}
+                        framework={framework}
+                        year={year}
+                        indicatorsCompany = {indicatorsCompany}
+                        selectedIndicators = {selectedIndicators}
+                        metricNames={metricNames}
+                        allIndicators={allIndicators}
+                        metricScores={metricScores}
+                        allIndicatorsInfo={allIndicatorsInfo}
+                        predictedScore={predictedScore}
+                        />} fileName={`${companyName}.pdf`}>
+                            {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' : 'Download PDF'
+                            }
                     </PDFDownloadLink>
                     </div>
                 </div>

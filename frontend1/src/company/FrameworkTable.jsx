@@ -25,6 +25,9 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   const [predictedScore, setPredictedScore] = useState({});
   const [indicatorsInSelectedFramework, setIndicatorsInSelectedFramework] = useState({});
 
+  console.log(`All of Framework Table's stuff`);
+  console.log(indicatorsCompany);
+
   useEffect(() => {
     const selectedIds = Object.values(selectedIndicators).flat();
     const filteredPredictedScore = Object.fromEntries(
@@ -78,6 +81,8 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
 
   const aiPredict = async () => {
     let allPredictedScores = {};
+    console.log('ALL INDICATOR INFORMATIOn COMPPP');
+    console.log(allIndicatorsInfo);
     for (const indicator of Object.values(allIndicatorsInfo)) {
       let score = await getPrediction(indicator.name, indicator.unit, companyName);
       if (score) {

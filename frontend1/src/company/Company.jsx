@@ -115,6 +115,8 @@ const Company = () => {
       const allMetricsAvailable = await getAllMetricsAvailable();
       setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
+      console.log('ALL INDICATOR INFO inside COmpany.jsx');
+      console.log(allIndicators1);
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(name.company_name);
       setIndicatorsCompany(companyIndicators);
@@ -385,6 +387,12 @@ const Company = () => {
             indicatorsCompany={indicatorsCompany}
             sliderValuesIndicator={sliderValuesIndicator}
             selectedMetrics={selectedMetrics}
+
+            selectedIndicators={selectedIndicators}
+            metricNames={metricNames}
+            allIndicators={allIndicators}
+            metricScores={metricScores}
+            allIndicatorsInfo={allIndicatorsInfo}
           />
           <CompanyBody 
             companyId={companyId}

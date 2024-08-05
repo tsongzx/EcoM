@@ -12,7 +12,7 @@ import {
 } from '../helper.js';
 const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, isInFavs, 
   setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany,
-  sliderValuesIndicator, selectedMetrics
+  sliderValuesIndicator, selectedMetrics, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo
 }) => {
 
   console.log(indicatorsCompany);
@@ -45,6 +45,12 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
           companyName,
           framework: selectedFramework,
           year: selectedYear,
+          indicatorsCompany,
+          selectedIndicators,
+          metricNames,
+          allIndicators,
+          metricScores,
+          allIndicators,
         } 
       });
   }

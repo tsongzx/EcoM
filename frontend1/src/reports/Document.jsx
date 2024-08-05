@@ -1,6 +1,6 @@
 import React from 'react';
 import { Page, Text, Image, Document, StyleSheet, View, Font } from '@react-pdf/renderer';
-
+import ReportFrameworkTable from './ReportFrameworkTable';
 //Register Fonts
 // Font.register({
 //   family: "Open Sans",
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     },
   });
 
-export const ReportDoc = ({contentList, companyId, companyName, framework, year}) => {
+export const ReportDoc = ({contentList, companyId, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, predictedScore}) => {
   //content list is what is from Report.jsx
   const headerTypes = ['country', 'year', 'industry', 'longSummary'];
 
@@ -86,6 +86,19 @@ export const ReportDoc = ({contentList, companyId, companyName, framework, year}
               return <Text style={{ ...styles.text, ...{fontWeight: c.fw, fontStyle: c.italic} }}>
                 {c.name}
               </Text>
+            }
+            else if (c.type === 'table' && c.isDisplayed) {
+              return <ReportFrameworkTable 
+                indicatorsCompany={indicatorsCompany}
+                selectedYear={year}
+                selectedFramework={framework}
+                selectedIndicators={selectedIndicators}
+                metricNames={metricNames}
+                allIndicators={allIndicators}
+                metricScores={metricScores}
+                allIndicatorsInfo={allIndicatorsInfo}
+                predictedScore={predictedScore}
+              />
             }
           })}
         </Page>
