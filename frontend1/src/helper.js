@@ -109,6 +109,32 @@ export const fetchIndustries = async() => {
     // }
 }
 
+
+export const getAllCompanies = async() => {
+    const cacheURL = 'http://127.0.0.1:8000/company/all';
+    try {
+        const cache = await caches.open('allCompanies');
+        const cachedResponse = await cache.match(cacheURL);
+        if (cachedResponse) {
+            return await cachedResponse.json();
+        }
+
+        const response = await axios.get(cacheURL,
+            {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+        
+        const responseClone = new Response(JSON.stringify(response.data));
+        cache.put(cacheURL, responseClone);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
+
+//this function is not appropiately named
 export const getCompanyFromRecentlyViewed = async (companyId) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
@@ -120,6 +146,7 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
             } 
         );
         const companyInfo = response.data;
+        console.log('fetched company info ', companyInfo);
         return companyInfo;
     } catch (error) {
         console.log('Error fetching company', error);
@@ -746,6 +773,22 @@ export const getIndicatorFromMetric = async(metricId) => {
     }
 }
 
+export const webscrapeLinks = async(link) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/articles?URL=${link}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+        console.log('successfully web-scraped');
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log('error webscraping link ', link);
+    }
+}
+
 export const getMetricScoreByYear = async(companyIndicatorsByYear, indicatorWeights) => {
     console.log(companyIndicatorsByYear);
     console.log(indicatorWeights);
@@ -852,6 +895,79 @@ export const getMetricBarGraph = async(frameworkId, companies) => {
   }
 }
 
+export const mapToTicker = async() => {
+    
+}
+
+export const getDetailedCompanyInformation = async(companyCode) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_code: companyCode
+                }
+            } 
+        );
+          //if successful
+          console.log('Successfully fetched company Information for ', companyCode);
+          console.log(response.data);
+          return response.data;
+    } catch (error) {
+        console.log('error getting detailed company Information: ', error);
+        return;
+    }
+}
+
+export const getCompanyHistory = async(companyCode, period) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode},${period}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_code: companyCode,
+                    period: period
+                }
+            } 
+        );
+          //if successful
+          console.log('Successfully fetched history for ', companyCode);
+          console.log(response.data);
+          return response.data;
+    } catch (error) {
+        console.log('error getting company history: ', error);
+        return;
+    }
+}
+
+export const getCompanySustainability = async(companyCode) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/sustainability/${companyCode}`, 
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    company_code: companyCode,
+                }
+            } 
+        );
+          //if successful
+          console.log('Successfully fetched sustainability status for ', companyCode);
+          console.log(response.data);
+          return response.data;
+    } catch (error) {
+        console.log('error getting company sustainability scores: ', error);
+        return;
+    }
+}
 export const getPrediction = async(indicatorName, metricUnit, companyName) => {
     try {
 

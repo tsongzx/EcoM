@@ -38,6 +38,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
   };
 
   const handleClickReport = () => {
+    console.log('navigating to /report/',companyId, ' ', companyName, ' fw:', selectedFramework, ' (', selectedYear,')');
     navigate(`/report/${companyId}`, 
       { state: { 
           id: companyId, 

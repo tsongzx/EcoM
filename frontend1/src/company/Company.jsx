@@ -81,6 +81,7 @@ const Company = () => {
   const [companyName1, setCompanyName1] = useState(null);
 
   const [graphStateChange, setGraphStateChange] = useState(false);
+  const [ticker, setTicker] = useState(null);
   const [companyId, setCompanyId] = useState(initialCompanyId);
   console.log("Initial Framework:", initialFramework);
 
@@ -95,6 +96,7 @@ const Company = () => {
         setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
         const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
         setCompanyName(name.company_name);
+        setTicker(name.ticker);
         console.log(name);
       }
       asyncGetId();
@@ -164,6 +166,7 @@ const Company = () => {
       setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
       const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
       setCompanyName(name.company_name);
+      setTicker(name.ticker);
 
       const allMetricsAvailable = await getAllMetricsAvailable();
       setAllMetrics(allMetricsAvailable);
@@ -569,6 +572,7 @@ const Company = () => {
             setgScore={setgScore}
             findCategoricalMetrics={findCategoricalMetrics}
             companyName={companyName}
+            ticker={ticker}
           />
           <GraphTableToggle
             display={frameworkDisplay}
