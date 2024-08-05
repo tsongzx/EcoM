@@ -4,13 +4,13 @@ import './StockAreaChartVisualisation.css'
 import { getCompanyHistory } from '../helper';
 import { format, parseISO } from 'date-fns'
 
-const StockAreaChartVisualisation = ({companyName, period}) => {
+const StockAreaChartVisualisation = ({companyName, period, ticker}) => {
     // each entry in companyData comes in the form "2024-07-01T00:00:00-04:00": 198.3000030517578,
     const [companyData, setCompanyData] = useState([]);
 
     useEffect(() => {
         const initData = async() => {
-            const dataresponse = await getCompanyHistory(companyName, period);
+            const dataresponse = await getCompanyHistory(ticker, period);
             if (dataresponse) {
                 const convertedData = Object.entries(dataresponse.High).map(([datetime, value]) => ({date: datetime.split('T')[0] , value}));
                 setCompanyData(convertedData);

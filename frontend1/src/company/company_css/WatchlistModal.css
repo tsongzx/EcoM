@@ -1,21 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .modalContent {
     background-color: white;
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 400px;
     height: 400px;
+    display: flex;
+    flex-direction: column;
+    border: solid 2px black;
+    border-radius: 10px;
+    align-items: center;
+}
+
+.modalHeaderContent{
+    display: flex;
+    flex-direction: row; 
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .modifyWatchlists {
     position: absolute;
     bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: blue;
+    background-color: rgb(224, 224, 224);
     height: 50px;
-    padding: 5px;
+    padding: 3px 5px;
+    display: flex;
+    margin-bottom: 3px;
+    width: 95%;
+    border-radius: 10px;
 }
 
 .watchlistContainer {
@@ -23,11 +40,65 @@
     flex-direction: column;
     overflow-y: auto;
     height: 300px;
+    width: 100%;
+    align-items: center;
 }
 
-.watchlistContainer Button {
-    background-color: aqua;
-    width: 50%;
+#closeWatchListModal-button {
+    position: absolute;
+    right: 3px;
+    color: black;
+}
+
+.watchList-button {
+    margin-bottom: 5px;
+    width: 90%;
+    color: black;
+    margin: 5px 5px;
+    border: solid 1px black;
+    border-radius: 10px;
+    height: 30px;
+    display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 20px 16px; /* Adjust padding as needed */
+    background-color: #fff; /* Adjust background color as needed */
+    cursor: pointer;
+    font-family: Inter;
+    font-size: 1em;
+}
+
+.watchList-button:hover {
+    border: solid 2px blue;
+    padding: 19px 15px;
+}
+
+.checkedwLbutton {
+    background-color: rgb(196, 244, 244);
+}
+
+.watchList-button svg {
+    flex-shrink: 0;
+}
+
+#watchlistDescriptorText {
+    font-family: Inter;
+    padding-left: 25px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+    width: 90%;
+    font-size: 1.5em;
+}
+
+#addNewlistButton {
+    font-family: Inter;
+}
+
+#addNewlistButton:hover {
+    background-color: rgb(102, 102, 184);
+    color: white;
+}
+
+#setAddlistbutton {
+    font-family: Inter;
 }

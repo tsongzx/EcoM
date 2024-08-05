@@ -533,6 +533,16 @@ async def get_all_company(
     return companyData
 
 
+@app.get("/company/all", tags=["company"])
+async def get_all_company(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companyData = session.query(
+        company_models.Company).all()
+    return companyData
+
+
 @app.get("/company/{company_id}", tags=["company"])
 async def get_company(
     company_id: int,

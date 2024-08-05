@@ -109,6 +109,31 @@ export const fetchIndustries = async() => {
     // }
 }
 
+
+export const getAllCompanies = async() => {
+    const cacheURL = 'http://127.0.0.1:8000/company/all';
+    try {
+        const cache = await caches.open('allCompanies');
+        const cachedResponse = await cache.match(cacheURL);
+        if (cachedResponse) {
+            return await cachedResponse.json();
+        }
+
+        const response = await axios.get(cacheURL,
+            {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+        
+        const responseClone = new Response(JSON.stringify(response.data));
+        cache.put(cacheURL, responseClone);
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
+
 //this function is not appropiately named
 export const getCompanyFromRecentlyViewed = async (companyId) => {
     try {
@@ -121,6 +146,7 @@ export const getCompanyFromRecentlyViewed = async (companyId) => {
             } 
         );
         const companyInfo = response.data;
+        console.log('fetched company info ', companyInfo);
         return companyInfo;
     } catch (error) {
         console.log('Error fetching company', error);
@@ -764,6 +790,8 @@ export const webscrapeLinks = async(link) => {
 }
 
 export const getMetricScoreByYear = async(companyIndicatorsByYear, indicatorWeights) => {
+    console.log(companyIndicatorsByYear);
+    console.log(indicatorWeights);
     try {
         const response = await axios.post(`http://127.0.0.1:8000/company/metric/`,
           {
@@ -806,7 +834,7 @@ export const getIndicatorLineGraph = async(companies) => {
           }
           console.log(companies);
           const queryString = companies.map(company => `companies=${company}`).join('&');
-          const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+          const path = `http://127.0.0.1:8000/graph/indicator/line?${queryString}`;
 
           const response = await axios.get(path,           {           
               headers: {
@@ -828,7 +856,30 @@ export const getIndicatorBarGraph = async(companies) => {
       }
       console.log(companies);
       const queryString = companies.map(company => `companies=${company}`).join('&');
-      const path = `http://127.0.0.1:8000/graph/indicators/bar?${queryString}`;
+      const path = `http://127.0.0.1:8000/graph/indicator/bar?${queryString}`;
+
+      const response = await axios.get(path, 
+          {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(error);
+      console.log(`Error getting industry: ${error}`)
+  }
+}
+
+export const getMetricBarGraph = async(frameworkId, companies) => {
+  try {
+      if (companies.length === 0) {
+        return {};
+      }
+      console.log(companies);
+      const queryString = companies.map(company => `companies=${company}`).join('&');
+      const path = `http://127.0.0.1:8000/graph/metric/bar?framework_id=${frameworkId}&${queryString}`;
 
       const response = await axios.get(path, 
           {           
@@ -965,6 +1016,30 @@ export const getPrediction = async(indicatorName, metricUnit, companyName) => {
             console.log(`Error getting industry: ${error}`)
         }
 }
+
+export const putFrameworkModifyMetrics = async (frameworkId, metrics, categoryWeightings) => {
+    try {
+        const response = await axios.put(
+            `http://127.0.0.1:8000/framework/modify_metrics/?framework_id=${frameworkId}`,
+            {
+                metrics: metrics,
+                category_weightings: categoryWeightings
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.log(`Error modifying metrics: ${error}`);
+        throw error; // Optionally rethrow the error if you want to handle it further up the call chain
+    }
+};
+
+
 
 
 

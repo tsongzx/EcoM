@@ -16,7 +16,9 @@ class Company(Base):
     # description: Mapped[str] = mapped_column(String(1000), nullable=True) 
     industry:  Mapped[str] = mapped_column(String(100)) 
     headquarter_country:  Mapped[str] = mapped_column(String(100), nullable=False) 
-         
+    ticker: Mapped[str] = mapped_column(String(20), nullable=True) 
+    ISIN: Mapped[str] = mapped_column(String(50), nullable=True) 
+    
 class CompanyData(Base):
     __tablename__ = 'CompanyData'
    

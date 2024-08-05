@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './SelfExpiringMessage.css';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 const SelfExpiringMessage = ({message, onExpiry}) => {
+    console.log('SELF EXPIRING MESSAGE');
+    console.log(message, onExpiry);
     const [visible, setVisible] = useState(true);
     const [progress, setProgress] = useState(100);
     const timeout = 3000;

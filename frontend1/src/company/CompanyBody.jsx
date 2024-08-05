@@ -22,7 +22,7 @@ const CompanyBody = ({companyId,
   setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
   setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
   frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
-  seteScore, setsScore, setgScore, findCategoricalMetrics, companyName
+  seteScore, setsScore, setgScore, findCategoricalMetrics, companyName, ticker
 }) => {
   const [period, setPeriod] = useState('1d');
 
@@ -62,7 +62,7 @@ const CompanyBody = ({companyId,
               <Button size="sm" variant={`${period === '1yr' ? 'soft' : 'plain'}`} color={`${period === '1yr' ? 'primary' : 'neutral'}`} onClick={() => setPeriod("1yr")}
                 className={`period-select-button ${period === '1yr' ? 'active-psb' : ''}`}> 1y </Button>
             </div>
-            {/* <StockAreaChartVisualisation companyName={companyName} period={period}/> */}
+            {/* <StockAreaChartVisualisation companyName={companyName} period={period} ticker={ticker}/> */}
           </div>
           <Recommendations companyId={companyId}/>
         </Stack>

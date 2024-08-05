@@ -36,6 +36,10 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   }, [selectedIndicators]);
 
   useEffect(() => {
+    console.log(indicatorsInSelectedFramework);
+  }, [indicatorsInSelectedFramework]);
+
+  useEffect(() => {
     console.log(selectedYear);
   }, [selectedYear]);
 
@@ -92,6 +96,14 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
     console.log(predictedScore);
   }, [predictedScore]);
 
+  const getName = (name) => {
+    if (name === 'Yes/No') {
+      return '1/0';
+    } else {
+      return name;
+    }
+  }
+
   return (
     <Card style={{ width: '100%', display: 'flex', flexDirection: 'column'}}>
       <IconButton onClick={() => setTableCollapsed(!tableCollapsed)} size="large">
@@ -147,13 +159,15 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                       <>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>Score</TableCell>
-                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Name</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Unit</TableCell>
                         <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
                       </>
                     )}
                     {selectedYear === 'Predicted' && (
                       <>
-                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Name</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Unit</TableCell>
                         <TableCell style={{ borderBottom: '1px solid #ddd' }}>Predicted Value</TableCell>
                       </>
                     )}
@@ -167,6 +181,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                         const metricName = metricNames.find(m => m.id === Number(metricId))?.name || 'Unknown Metric';
                         const score = metricScores[metricId]?.score ?? '';
                         const indicators = allIndicators[metricId] || [];
+                        console.log(indicators);
                         return (
                           indicatorIds.map((indicatorId, index) => {
                             const indicator = indicators.find(ind => ind.indicator_id === indicatorId);
@@ -191,6 +206,9 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                                 <TableCell style={{ borderRight: '1px solid #ddd' }}>
                                   {indicator ? indicator.indicator_name : ' '}
                                 </TableCell>
+                                <TableCell style={{ borderRight: '1px solid #ddd' }}>
+                                  {indicator ? getName(Object.values(allIndicatorsInfo).find(item => item.id === indicator.indicator_id).unit) : ' '}
+                                </TableCell>
                                 <TableCell style={{ borderBottom: '1px solid #ddd' }}>
                                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                                     {indicator ? findIndicatorValue(indicator.indicator_name) : ' '}
@@ -205,9 +223,10 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                   )}
                   {selectedYear === 'Predicted' && (
                     <>
-                      {(Object.keys(indicatorsInSelectedFramework).length > 0) && Object.values(indicatorsInSelectedFramework).map((indicator, index) => (
+                      {(Object.keys(predictedScore).length > 0) && Object.values(predictedScore).map((indicator, index) => (
                         <TableRow key={index}>
-                          <TableCell>{indicator.indicator_name}</TableCell>
+                          <TableCell style={{ borderRight: '1px solid #ddd' }}>{indicator.indicator_name}</TableCell>
+                          <TableCell style={{ borderRight: '1px solid #ddd' }}>{getName(Object.values(allIndicatorsInfo).find(item => item.id === indicator.id).unit)}</TableCell>
                           <TableCell align="right">{indicator.prediction}</TableCell>
                         </TableRow>
                       ))}
@@ -225,14 +244,17 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Indicator Name</TableCell>
-                      <TableCell>Indicator Value</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Name</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Unit</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Value</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {(selectedYear !== 'Predicted') && Object.values(indicatorsCompany[selectedYear]).map((indicator, index) => (
+                      
                       <TableRow key={index}>
                         <TableCell>{indicator.indicator_name}</TableCell>
+                        <TableCell>{getName(Object.values(allIndicatorsInfo).find(item => item.name === indicator.indicator_name).unit)}</TableCell>
                         <TableCell align="right">{indicator.indicator_value}</TableCell>
                       </TableRow>
                     ))}
@@ -245,15 +267,17 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Indicator Name</TableCell>
-                      <TableCell>Predicted Value</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Name</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Unit</TableCell>
+                      <TableCell style={{ borderRight: '1px solid #ddd' }}>Predicted Value</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {(Object.keys(predictedScore).length > 0) && Object.values(predictedScore).map((indicator, index) => (
                       <TableRow key={index}>
-                        <TableCell>{indicator.indicator_name}</TableCell>
-                        <TableCell align="right">{indicator.prediction}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>{indicator.indicator_name}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>{getName(Object.values(allIndicatorsInfo).find(item => item.id === indicator.id).unit)}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }} align="right">{indicator.prediction}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

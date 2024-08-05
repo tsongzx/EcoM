@@ -4,31 +4,26 @@ import { Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/mater
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import VisualisationCardInfo from './VisualisationCardInfo';
 
-const VisualisationsPanel = ({filter, graphValues, indicatorInfo, categories}) => {
+const VisualisationsPanel = ({filter, graphValues, info, categories, filterColumn, displayInfoCard}) => {
   return (
     <>
       {/* {graphValues ? <BarChartStyled data={graphValues['HUMAN_RIGHTS_VIOLATION_PAI']}/> : <p>Loading...</p>} */}
       <Stack spacing={3}>
-        {graphValues ? (Object.keys(graphValues).map((indicator) => {
-          console.log(graphValues[indicator]);
-          console.log(filter);
-          console.log(indicator);
-          console.log(graphValues);
-          console.log(indicatorInfo[indicator].pillar);
-   
-          return (filter === 'All' || indicatorInfo[indicator].pillar === filter) ? (
+        {(graphValues && Object.keys(graphValues).length > 0) ? (Object.keys(graphValues).map((graph) => {
+          console.log(info);
+          console.log(info[graph]);
+          console.log(graph);
+          return (filter === 'All' || info[graph][filterColumn] === filter) ? (
             <Accordion defaultExpanded>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
-                aria-controls={`${indicator} graph`}
-                id={`${indicator} graph`}
               >
-                {indicator}
+                {info[graph].name}
               </AccordionSummary>
               <AccordionDetails>
                 <Stack direction="row">
-                  <VisualisationCardInfo indicatorInfo={indicatorInfo[indicator]}></VisualisationCardInfo>
-                  <BarChartStyled data={graphValues[indicator]} title={indicator} unit={indicatorInfo[indicator].unit.trim()} categories={categories}/>
+                  {displayInfoCard && <VisualisationCardInfo info={info[graph]}></VisualisationCardInfo>}
+                  <BarChartStyled data={graphValues[graph]} title={info[graph].name} unit={info[graph].unit ? info[graph].unit : "Metric Score"} categories={categories}/>
                 </Stack>
               </AccordionDetails>
             </Accordion>
