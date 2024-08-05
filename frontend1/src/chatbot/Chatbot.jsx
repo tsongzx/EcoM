@@ -48,7 +48,7 @@ const ChatFeature = () => {
 		}
 	}
 	return (
-    // <Box className='chatbot-container'>
+    <Box className='chatbot-container'>
       <ChatBot options={{
           theme: {}, 
           chatHistory: {storageKey: 'chatHistory'},
@@ -70,8 +70,8 @@ const ChatFeature = () => {
             // flexDirection: 'column'
           }
         }
-    } flow={flow}/>
-    // </Box>
+      } flow={flow}/>
+    </Box>
 	);
 }
 
