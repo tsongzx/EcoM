@@ -7,10 +7,10 @@ import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
 import Navbar from "../Navbar";
 import CustomTextarea from "./CustomTextarea";
-import { getCompanyFromRecentlyViewed } from "../helper";
+import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
 import SimpleLineChart from "../SimpleLineChart";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import { NeinDocument } from "./Document";
+import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
+import { ReportDoc } from "./Document";
 
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
@@ -28,13 +28,14 @@ const Report = () => {
     // set Components to be a list of JSON objects {id: int, type: '', name: ''}, 
     useEffect(() => {
         console.log('Inside Reporing for company: ', parseInt(companyId));
-        setComponents([
-            {id: 1, type: "text", name: "firstelement", isDisplayed: true},
-            {id: 2, type: "text", name: "secondelement", isDisplayed: true},
-            {id: 3, type: "text", name: "thirdelement", isDisplayed: true},
-            {id: 4, type: "text", name: "fourthelement", isDisplayed: true},
-            {id: 5, type: "text", name: "fifthelement", isDisplayed: true},
-        ])
+        getCompanyMetaInformation();
+        // setComponents([
+        //     {id: 4, type: "text", name: "firstelement", isDisplayed: true},
+        //     {id: 5, type: "text", name: "secondelement", isDisplayed: true},
+        //     {id: 6, type: "text", name: "thirdelement", isDisplayed: true},
+        //     {id: 7, type: "text", name: "fourthelement", isDisplayed: true},
+        //     {id: 8, type: "text", name: "fifthelement", isDisplayed: true},
+        // ])
     },[companyId]);
     // name will be the string content, id is auto populated.
 
@@ -67,12 +68,28 @@ const getCompanyMetaInformation = async () => {
     console.log('Getting company Information for Company');
     const companyInfo = await getCompanyFromRecentlyViewed(parseInt(companyId));
 
-    const newComponents = [
-        { id: 1, type: 'title', name: companyInfo.company_name },
-        { id: 2, type: 'country', name: companyInfo.headquarter_country },
+    const detailedCompanyInfo = await getDetailedCompanyInformation(companyName);
+
+    const newCompanyComponents = [
+        { id: 1, type: 'title', name: companyInfo.company_name, isDisplayed: true },
+        { id: 2, type: 'country', name: companyInfo.headquarter_country, isDisplayed: true },
+        { id: 3, type: 'year', name: year, isDisplayed: true},
         // Conditionally add industry if it exists
-        ...(companyInfo.industry ? [{ id: 3, type: 'industry', name: companyInfo.industry }] : [])
+        ...(companyInfo.industry ? [{ id: 4, type: 'industry', name: companyInfo.industry, isDisplayed: true }] : []),
     ];
+
+    //add any information necessary from detailedCompany
+    const newComponents = [...newCompanyComponents,
+      ...(detailedCompanyInfo ? [{ 
+        id: newCompanyComponents.length + 1,
+        type: 'longSummary',
+        name: detailedCompanyInfo.longBusinessSummary,
+        isDisplayed: true
+    }] : []),
+    ];
+
+    //Add whatever components we fetched
+    console.log(newComponents);
     setComponents([...components, ...newComponents]);
 };
 
@@ -82,7 +99,14 @@ const getCompanyMetaInformation = async () => {
             return;
         }
         setShowAddText(false);
-        const newComponents = [...components, {id: components.length + 1, type: `text${textInfo.fontWeight}${textInfo.italic ? 'italic' : ''}`, name: textInfo.message, isDisplayed: true}];
+        const newComponents = [...components, {
+            id: components.length + 1,
+            type: 'text', name: textInfo.message,
+            isDisplayed: true,
+            fw: textInfo.fontWeight,
+            italic: `${textInfo.italic ? 'italic' : 'normal'}`
+        }];
+        console.log(newComponents);
         setComponents(newComponents);
     }
 
@@ -102,7 +126,6 @@ const getCompanyMetaInformation = async () => {
             <div className="reportContainer">
                 <div className="reportContent">
                     {/* components.map goes here, currently just some placeholder code*/}
-                    
                 </div>
 
 
@@ -116,7 +139,7 @@ const getCompanyMetaInformation = async () => {
                         <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
                         {showAddText && <CustomTextarea handleClose={handleClose}/>}
                     </div>
-                    <PDFDownloadLink document={<NeinDocument />} fileName="example.pdf">
+                    <PDFDownloadLink document={<ReportDoc contentList={components} companyId={id} companyName={companyName} framework={framework} year={year}/>} fileName={`${companyName}.pdf`}>
                         {({ blob, url, loading, error }) =>
                         loading ? 'Loading document...' : 'Download PDF'
                         }

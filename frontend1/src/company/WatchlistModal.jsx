@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Modal from '@mui/material/Modal';
 import { Button, Typography, Checkbox, TextField, Box } from "@mui/material";
-import './company_css/WatchlistModal.css'
+import './company_css/WatchlistModal.css';
+import CloseIcon from '@mui/icons-material/Close';
+import Input from '@mui/joy/Input';
 // import axios from "axios";
 import Cookies from "js-cookie";
 import {getFormattedUserLists, createList, addCompanyToList, removeCompanyFromList} from "../helper.js";
+import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
 /**
  * Handling Watchlist modification
  * When the Modal Closes all the changes are reflected
@@ -16,6 +19,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     const [watchlist, setWatchlist] = useState([]); //this should be populated with whatever lists the user has via backend
     const [listName, setListName] = useState(false);
     const [newWatchlistName, setNewWatchlistName] = useState('');
+    const [message, setMessage] = useState('');
+    const [msgIsOpen, setMsgIsOpen] = useState(false);
 
     const token = Cookies.get('authToken');
     // console.log('opened watchlist modal for company: ', companyId, ' token ', token);
@@ -63,6 +68,8 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
     const handleAddNewWatchlist = async () => {
         if (newWatchlistName.trim() === '') {
             console.log('cannot have watchlist without a name');
+            setMessage('Please give your new list a name');
+            setMsgIsOpen(true);
             return;
         };
         setListName(false); 
@@ -146,13 +153,15 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
         <Modal 
             open = {isOpen}>
             <div className="modalContent" onKeyDown={handleKeyPressEsc}>
-                <Typography variant="body2">Add to watchlist</Typography>
-                <Button onClick={() => closeWatchListModal()}>X</Button>
-                {/* Render exisitng watchlists */}
+                <div className="modalHeaderContent">
+                    <Button disableRipple id="closeWatchListModal-button" onClick={() => closeWatchListModal()}><CloseIcon/></Button>
+                    {/* Render exisitng watchlists */}
+                    <h3 id='watchlistDescriptorText' variant="body2">Add to watchlist</h3>
+                </div>
                 <div className="watchlistContainer">
                     {Array.isArray(watchlist) && watchlist?.map((list, index) => (
                         // <Button key={index} onClick={() => handleButtonClick(list.name)}>{list.name}
-                        <Button key={index} onClick={() => handleButtonClick(index)}>{list.name}
+                        <button className={`watchList-button ${watchlist[index].isChecked ? 'checkedwLbutton' : ''}`} key={index} onClick={() => handleButtonClick(index)}>{list.name}
                             {/* <Checkbox {...label} checked={list.isChecked} onChange={(event) => handleCheckboxChange(event, index)}/> */}
                             {watchlist[index].isChecked ?
                             (<svg width="20px" height="20px" viewBox="0 0 24 24">
@@ -170,19 +179,20 @@ const WatchlistModal = ({ isOpen, handleClose, companyId }) => {
                             </g>
                         </svg>)
                         }
-                        </Button>
+                        </button>
                     ))}
                 </div>
                 <div className="modifyWatchlists">
                     {listName ?
-                    (<Box sx={{ display: 'flex', alignItems: 'center'}}>
-                        <TextField fullWidth id="standard-basic" label="new watchlist name" variant="standard" defaultValue={newWatchlistName} onChange={handleNewWatchListName} onKeyDown={handleEnter}/>
-                        <Button variant="outlined" onClick={handleAddNewWatchlist}>OK</Button>
+                    (<Box sx={{ display: 'flex', alignItems: 'center', width: '100%', color: 'black'}}>
+                        <Input sx={{flexGrow: '1', marginRight: '3px' }} variant="soft" label="new watchlist name" placeholder="new list name" defaultValue={newWatchlistName} onChange={handleNewWatchListName} onKeyDown={handleEnter}/>
+                        <Button id="addNewlistButton" variant="outlined" sx={{color: 'black', borderBlockColor: 'black', backgroundColor: 'white'}} onClick={handleAddNewWatchlist}>OK</Button>
                     </Box>) 
-                    : (<Button onClick={handleListName}>+ New WatchList</Button>)
+                    : (<Button id="setAddlistbutton" onClick={handleListName} sx={{color: 'black'}}>New WatchList</Button>)
                     }
                 </div>
             </div>
+            {/* {msgIsOpen && message && (<SelfExpiringMessage message={message} onExpiry={() => setMsgIsOpen(false)}/>)} */}
         </Modal>
     );
 };
