@@ -1,20 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Button,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { useLocation } from 'react-router-dom';
+import { Box } from '@mui/material';
 import Navbar from '../Navbar.jsx';
 import './company_css/Company.css';
 import WatchlistModal from './WatchlistModal.jsx';
-import ReportModal from './ReportModal.jsx';
-import SimpleLineChart from '../SimpleLineChart.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
-  addToFavourites,
-  deleteFromFavourites,
   getOfficialFrameworks,
   getMetricForFramework,
   getMetricName,
@@ -25,7 +16,6 @@ import {
   getAllMetricsAvailable,
   getMetricScoreByYear,
   getIndicatorFromMetric,
-  companyScoreGeneral,
   getCompanyFromRecentlyViewed
 } from '../helper.js';
 import axios from 'axios';
@@ -39,15 +29,11 @@ import CompanyBody from './CompanyBody.jsx';
 import GraphTableToggle from '../utils/GraphTableToggle.jsx';
 import Visualisations from './Visualisations.jsx';
 
-
+// This component renders the general company page once the user has chosen a company to view.
 const Company = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-  // const { companyId, companyName, initialFramework, selectedIndustry } = location.state || {};
   const { companyId: initialCompanyId, companyName: initialCompanyName, initialFramework, selectedIndustry } = location.state || {};
   const [companyName, setCompanyName] = useState(initialCompanyName);
-  const stateCompanyName1 = location.state?.companyName;
-  const displayCompanyName = companyName || stateCompanyName1;
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
   const [reportModal, setOpenReportModal] = useState(false);
@@ -77,13 +63,14 @@ const Company = () => {
   const [sScore, setsScore] = useState(null);
   const [gScore, setgScore] = useState(null);
   const [frameworkScore, setFrameworkScore] = useState(null);
-  const [companyId1, setCompanyId1] = useState(null);
-  const [companyName1, setCompanyName1] = useState(null);
+  const [graphStateChange, setGraphStateChange] = useState(false);
   const [ticker, setTicker] = useState(null);
   const [companyId, setCompanyId] = useState(initialCompanyId);
-  console.log("Initial Framework:", initialFramework);
+  const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
 
-
+  // Use effects below set the state of the company name and company id based on
+  // 1. Whether the user clicked into a company from the dashboard OR
+  // 2. If the user decided to look up a company in the URL
   useEffect(() => {
     if (initialCompanyId) {
       setCompanyId(initialCompanyId); 
@@ -101,44 +88,6 @@ const Company = () => {
     }
   }, [initialCompanyId]);
 
-  
-
-  const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
-  // useEffect(() => {
-  //   console.log(lockedSliders);
-  // }, [lockedSliders]);
-  const [indicatorWeightMapping, setIndicatorWeightMapping] = useState({});
-
-  const latestSliderValuesIndicatorRef = useRef(sliderValuesIndicator);
-  const metricNamesRef = useRef();
-
-  useEffect(() => {
-    metricNamesRef.current = metricNames;
-  }, [metricNames]);
-
-  useEffect(() => {
-    latestSliderValuesIndicatorRef.current = sliderValuesIndicator;
-  }, [sliderValuesIndicator]);
-
-  useEffect(() => {
-    console.log(allIndicatorsInfo);
-  }, [allIndicatorsInfo]);
-
-  useEffect(() => {
-    console.log(eScore);
-  }, [eScore]);
-
-
-  useEffect(() => {
-    console.log(sScore);
-  }, [sScore]);
-
-
-  useEffect(() => {
-    console.log(gScore);
-  }, [gScore]);
-
-
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
       const allMetricsAvailable = await getAllMetricsAvailable();
@@ -146,16 +95,13 @@ const Company = () => {
       const allIndicators1 = await getAllIndicators();
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(companyName);
-      console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
-      console.log(years);
       years.push('Predicted');
       setAvailableYears(years);
       if (years.length > 0) {
         setSelectedYear(years[years.length - 2]); 
       }
-      console.log(selectedFramework);
     };
 
     const alternativeFetch = async () => {
@@ -171,10 +117,8 @@ const Company = () => {
       const allIndicators1 = await getAllIndicators();
       setAllIndicatorsInfo(allIndicators1);
       const companyIndicators = await getIndicatorInfo(name.company_name);
-      console.log(companyIndicators);
       setIndicatorsCompany(companyIndicators);
       const years = Object.keys(companyIndicators);
-      console.log(years);
       years.push('Predicted');
       setAvailableYears(years);
       if (years.length > 0) {
@@ -183,7 +127,6 @@ const Company = () => {
     }
 
     if (companyId && companyName) {
-      console.log(selectedFramework);
       fetchCompanyIndicators(companyName);
     } else {
       alternativeFetch();
@@ -191,30 +134,19 @@ const Company = () => {
     
   }, []);
 
-
-  useEffect(() => {
-    console.log(availableYears);
-  }, [availableYears]);
-
   useEffect(() => {
     const fetchData = async () => {
-      console.log('here');
       await addToRecentlyViewed(companyId);
-
       const availableOfficialFramework = await getOfficialFrameworks();
-      console.log(availableOfficialFramework);
       setOfficialFrameworks(availableOfficialFramework);
-
     };
 
 
+    // User is able to get the favorites list that they can add this company to
     const fetchLists = async () => {
       const favsList = await getFavouritesList();
-      console.log('FAVS LIST:');
-      console.log(favsList);
       const listSearch = favsList.find(item => item.company_id === companyId);
       if (listSearch) {
-        console.log('IN FAVS');
         setIsInFavs(true);
       } else {
         setIsInFavs(false);
@@ -226,30 +158,22 @@ const Company = () => {
     }
   }, [companyId]);
 
-  useEffect(() => {
-    console.log(companyId);
-  }, [companyId]);
-
-  useEffect(() => {
-    console.log("Selected Framework on Update:", selectedFramework);
-  }, [selectedFramework]);
-
+  // Obtain the metrics and indicators associated with a certain framework, if the user 
+  // has chosen to do so
   useEffect(() => {
     const fetchData = async () => {
-      console.log('hereeee');
       if (selectedFramework) {
-        console.log(selectedFramework);
         const metrics = await getMetricForFramework(selectedFramework);
-        console.log(metrics);
         if (metrics) {
           const nameOfMetrics = [];
           const metricIds = [];
           for (const item of Object.values(metrics)) {
             const name = await getMetricName(item.metric_id);
-            console.log(name);
             nameOfMetrics.push({ id: item.metric_id, name: name, category: item.category, weighting: item.weighting });
             metricIds.push(item.metric_id);
           }
+
+          // Metric fixed is for if the user chooses to reset to default -> Avoids another API call
           setMetricNames(nameOfMetrics);
           setMetricNamesFixed(nameOfMetrics);
           setSelectedMetrics(metricIds);
@@ -271,6 +195,7 @@ const Company = () => {
           setSelectedIndicators(newSelectedIndicators);
           setSelectedIndicatorsFixed(newSelectedIndicators);
 
+          // Find the weights of each metric as corresponding to the framework
           const initialSliderValues = {};
           for (let id of metricIds) {
             initialSliderValues[id] = metrics.find(item => item.metric_id === id).weighting;
@@ -279,24 +204,18 @@ const Company = () => {
           setSliderValuesFixed(initialSliderValues);
 
           const initialSliderValuesIndicator = {};
-          // Object.values(newSelectedIndicators).flatMap(arr => arr).forEach(entry => {
-          //   const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
-          //   initialSliderValuesIndicator[entry] = weighting;
-          // });
+
           Object.entries(newSelectedIndicators).forEach(([key, arr]) => {
             arr.forEach(entry => {
               const weighting = Object.values(newAllIndicators).flatMap(arr => arr).find(obj => obj.indicator_id === entry).weighting;
+              // Indicator mapping is 'metricId-indicatorId' as some indicators can be shared across different metrics
               initialSliderValuesIndicator[`${key}-${entry}`] = weighting;
-              // console.log(`Key: ${key}, Entry: ${entry}, Weighting: ${weighting}`);
             });
           });
-          console.log(initialSliderValuesIndicator);
           setSliderValuesIndicator(initialSliderValuesIndicator);
           setSliderValuesIndicatorFixed(initialSliderValuesIndicator);
         }
-
       }
-
     };
     if (selectedFramework) {
       fetchData();
@@ -304,22 +223,20 @@ const Company = () => {
   }, [selectedFramework]);
 
   useEffect(() => {
+    setGraphStateChange(!graphStateChange);
     const runScore = async() => {
       let metricScoreMock = {};
       for (let idMetric of selectedMetrics) {
-        console.log(selectedMetrics.length);
-        // const indicatorsInfo = allIndicators[idMetric];
         const indicatorsInfo = await getIndicatorFromMetric(idMetric);
-        console.log(`${idMetric} - ${indicatorsInfo}`);
 
         const newObj = indicatorsInfo.reduce((acc, indicator) => {
           acc[indicator.indicator_name] = indicator.weighting;
           return acc;
         }, {});
 
-        console.log(newObj);
         let correspondingScore;
         if (selectedYear !== 'Predicted') {
+          // Gets the framework score for the user across a selected year
           correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
           if (isNaN(correspondingScore)) {
             correspondingScore = 0;
@@ -327,7 +244,6 @@ const Company = () => {
         } else {
           correspondingScore = 0;
         }        
-        console.log(correspondingScore);
         
         let obj1 = {};
         obj1["score"] = correspondingScore;
@@ -335,6 +251,8 @@ const Company = () => {
       }
 
       setMetricScores(metricScoreMock);
+
+      // Sets E, S and G scores
       const filteredEMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'E');
       seteScore(filteredEMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
 
@@ -351,14 +269,7 @@ const Company = () => {
     }
   }, [indicatorsCompany, selectedFramework, selectedMetrics, selectedYear, allIndicators, metricNames]);
 
-  useEffect(() => {
-    console.log(indicatorWeightMapping);
-  }, [indicatorWeightMapping]);
-
-  useEffect(() => {
-    console.log(metricScores);
-  }, [metricScores]);
-  
+  // This function finds the score of a category
   const findCategoricalMetrics = (metricScoreMock, metricNames, category) => {
     const eMetrics = metricNames.filter(metric => metric.category === category);
     let metricScoreMockReduced = Object.entries(metricScoreMock).reduce((acc, [key, value]) => {
@@ -377,15 +288,11 @@ const Company = () => {
       score: parseFloat(item.score),
       weighting: parseFloat(item.weighting)
     }));
-    console.log(metricScoreMockReduced);
     return metricScoreMockReduced;
 
   }
 
-  useEffect(() => {
-    console.log(metricNamesFixed);
-  }, [metricNamesFixed]);
-
+  // Once the user has viewed this company, it is added to recently viewed
   const addToRecentlyViewed = async (cId) => {
     if (!token) {
       console.error('No authToken cookie found');
@@ -406,56 +313,20 @@ const Company = () => {
     }
   };
 
+  // User can choose to close a watchlist
   const handleCloseWatchList = () => {
     setWatchlistModalOpen(false);
   };
 
-  const handleCloseReportModal = () => {
-    setOpenReportModal(false);
-  }
-
-  useEffect(() => {
-    console.log(metricNames);
-  }, [metricNames]);
-  // useEffect(() => {
-  // }, [allIndicators]);
- 
-  useEffect(() => {
-    console.log(sliderValues);
-  }, [sliderValues]);
-
-  useEffect(() => {
-    console.log(selectedMetrics);
-  }, [selectedMetrics]);
-
-  useEffect(() => {
-    console.log(selectedIndicators);
-  }, [selectedIndicators]);
-
-  useEffect(() => {
-    console.log(allIndicators);
-  }, [allIndicators]);  
-
-  // useEffect(() => {
-  //   console.log(lockedSlidersIndicators);
-  // }, [lockedSlidersIndicators])  
-
-  // useEffect(() => {
-  //   console.log(errorE);
-  // }, [errorE]);
-
-  useEffect(() => {
-    console.log(sliderValuesIndicator);
-  }, [sliderValuesIndicator]);
-
   return (
     <Box>
-      <Navbar  /*sx={{ width: `calc(100% - ${240}px)`, ml: `${240}px` }}*//>
+      <Navbar />
       <Box sx={{
         height: 'calc(100vh - 5vh)',
         display: 'flex',
         position: 'relative',
       }}>
+        {/* Everything observed on the left hand side of the screen */}
         <LeftPanel
             setSelectedFramework={setSelectedFramework}
             officialFrameworks={officialFrameworks}
@@ -481,13 +352,6 @@ const Company = () => {
             selectedFramework={selectedFramework}
             setCompareModalOpen={setCompareModalOpen}
             allMetrics={allMetrics}
-            setSliderValuesFixed={setSliderValuesFixed}
-            setSliderValuesIndicatorFixed={setSliderValuesIndicatorFixed}
-            setFrameworkDisplay={setFrameworkDisplay}
-            setMetricNamesFixed={setMetricNamesFixed}
-            setSelectedMetricsFixed={setSelectedMetricsFixed}
-            setAllIndicatorsFixed={setAllIndicatorsFixed}
-            setSelectedIndicatorsFixed={setSelectedIndicatorsFixed}
             eScore={eScore}
             sScore={sScore}
             gScore={gScore}
@@ -502,14 +366,13 @@ const Company = () => {
             findCategoricalMetrics={findCategoricalMetrics}
         />
         <Box component="main" sx={{ 
-          // flexGrow: 1, 
           width: '70vw',
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
         }}>
           <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
-          {/* <ReportModal isOpen={reportModal} handleClose={handleCloseReportModal} companyId={companyId} companyName={companyName} /> */}
+          {/* Top center half of the screen */}
           <CompanyHeader
             setWatchlistModalOpen={setWatchlistModalOpen}
             setOpenReportModal={setOpenReportModal}
@@ -575,6 +438,7 @@ const Company = () => {
             display={frameworkDisplay}
             setDisplay={setFrameworkDisplay}
           />
+          {/* Visualises the table or the graph, depending on which one the user wants */}
           {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
@@ -588,7 +452,7 @@ const Company = () => {
             metricScores={metricScores}
             allIndicatorsInfo={allIndicatorsInfo}
           />}
-          {frameworkDisplay === 'graphical' && indicatorsCompany ? (<Visualisations companyIndicators={indicatorsCompany} companyName={companyName}/>) : null }
+          {frameworkDisplay === 'graphical' && <Visualisations selectedMetrics={selectedMetrics} graphStateChange={graphStateChange} selectedFramework={selectedFramework} companyIndicators={indicatorsCompany} companyName={companyName}/>}
           <CompareModal companyId={companyId} companyName={companyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
           <CreateFramework
             setSelectedFramework={setSelectedFramework}

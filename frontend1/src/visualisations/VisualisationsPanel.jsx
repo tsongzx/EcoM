@@ -9,12 +9,10 @@ const VisualisationsPanel = ({filter, graphValues, info, categories, filterColum
     <>
       {/* {graphValues ? <BarChartStyled data={graphValues['HUMAN_RIGHTS_VIOLATION_PAI']}/> : <p>Loading...</p>} */}
       <Stack spacing={3}>
-        {(graphValues && Object.keys(graphValues).length > 0) ? (Object.keys(graphValues).map((graph) => {
-          console.log(info);
-          console.log(info[graph]);
+        {(graphValues && Object.keys(graphValues).length > 0) ? (Object.keys(graphValues).map((graph, index) => {
           console.log(graph);
           return (filter === 'All' || info[graph][filterColumn] === filter) ? (
-            <Accordion defaultExpanded>
+            <Accordion defaultExpanded key={index}>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
               >
