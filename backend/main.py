@@ -40,6 +40,8 @@ import metrics
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
 client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
+alpha_client = os.getenv("ALPHA_VANTAGE_API_KEY")
+
 
 def get_session():
     session = SessionLocal()
@@ -521,6 +523,37 @@ async def get_all_company(
     companyData = session.query(
         company_models.Company).all()
     return companyData
+
+#***************************************************************
+#                        Report Apis
+# ***************************************************************
+
+@app.get("/company/news/sentiment", tags=["company"])
+async def get_company_news_sentiment(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    company = session.query(company_models.Company).filter(
+        company_models.CompanyData.company_name == company_name,
+    ).first()
+
+    ticker = company.ticker
+    print(ticker)
+
+    if not ticker:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No valid company ticker")
+    #CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
+    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
+
+    r = requests.get(url)
+    data = r.json()
+
+    extracted_info = []
+    for info in data['feed']:
+        extracted_info.append({'Article Title': info['title'], 'URL': info['url']})
+
+    return data
 
 @app.get("/company/{company_id}", tags=["company"])
 async def get_company(
