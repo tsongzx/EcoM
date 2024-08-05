@@ -1281,7 +1281,7 @@ async def chat(
 
     # dont accept empty queries
     # Using GPT-4 with the ChatCompletion endpoint
-    response = await client.chat.completions.create(
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
         # require accuracy
         temperature=0,
@@ -1290,7 +1290,7 @@ async def chat(
         messages=[*Config.chat_prompts,
                   {"role": "user", "content": user_query.query}]
     )
-    chatbot_response = response.choices[0].message['content']
+    chatbot_response = response.choices[0].message.content
     # get records of chatbot responses
     Config.chat_prompts.append(
         {"role": "assistant", "content": chatbot_response})

@@ -19,8 +19,8 @@ const ChatFeature = () => {
           }
         }
       );
-      console.log(response.data);
-      await params.injectMessage(response.data);
+      console.log(response.data.response);
+      await params.injectMessage(response.data.response);
     } catch (error) {
       console.log(error);
       await params.injectMessage('Sorry, I am unable to answer this.');
