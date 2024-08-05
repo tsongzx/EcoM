@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button } from '@mui/material';
+import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Container, Box, Stack } from '@mui/material';
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
@@ -186,115 +186,124 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-      <div id='dashboard-container'>
-        <div id='searchbar'>
-          Search For A Company
-          <Select
-            id='industryfilter'
-            options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
-            placeholder="Industry"
-            maxMenuHeight={100}
-            onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
-          />
+        <Box>
+          <Stack justifyContent="center" alignItems="center" spacing={3}
+            sx={{
+              backgroundColor: '#0D2149',
+              width: '100%',
+              height: '30vh'
+            }}
+          >
+            <Typography variant="h2" color="white" fontFamily="Merriweather">Search For A Company</Typography>
+            <Stack direction="row" spacing={3}>
+              <Select
+                id='industryfilter'
+                options={listOfIndustries.map((industry, index) => ({ value: index, label: industry }))}
+                placeholder="Industry"
+                maxMenuHeight={100}
+                onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
+              />
 
-          <Select
-            id='frameworkfilter'
-            options={Object.entries(listOfFrameworks).map(([key, framework]) => ({
-            value: framework.id,
-            label: framework.framework_name,
-            }))}
-            placeholder="Framework"
-            maxMenuHeight={100}
-            onChange={(selectedOption) => setSelectedFramework(selectedOption.value)}
-          />
+              <Select
+                id='frameworkfilter'
+                options={Object.entries(listOfFrameworks).map(([key, framework]) => ({
+                value: framework.id,
+                label: framework.framework_name,
+                }))}
+                placeholder="Framework"
+                maxMenuHeight={100}
+                onChange={(selectedOption) => setSelectedFramework(selectedOption.value)}
+              />
 
-          <Select
-            id='companyfilter'
-            options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
-            placeholder="Company"
-            onChange={(selectedOption) => setSelectedCompany(listOfCompanies.find(company => company.id === selectedOption.value))}
-            maxMenuHeight={100}
-            onMenuScrollToBottom={handleMenuScrollToBottom}
-          />
+              <Select
+                id='companyfilter'
+                options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
+                placeholder="Company"
+                onChange={(selectedOption) => setSelectedCompany(listOfCompanies.find(company => company.id === selectedOption.value))}
+                maxMenuHeight={100}
+                onMenuScrollToBottom={handleMenuScrollToBottom}
+              />
 
-          <Button 
-            id='gobutton'
-            onClick={handleClick}>
-            Go
-          </Button>
-        </div>
-        <div id='recentlyviewedcontainer'>
-          Recently Viewed
-          <Grid container spacing={2}>
-          {recents.map((recent, index) => (
-                    <Grid 
-                      style={{ cursor: 'pointer'}} 
-                      item xs={2} 
-                      key={recent.id}
-                      onClick={() => dashboardToCompany(recent.company_id)}
-                    >
-                      <Card style={{ cursor: 'pointer', height: '120px'}}>
-                        <CardContent>
-                          <Typography variant="h6">{companyNames[index]}</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  ))}
-          </Grid>
-        </div>
-        <div className='favouritescontainer'>
-          <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
-            Favourites {favsList.length}
-          </Typography>
-          <Grid container spacing={2}>
-            {favsList.map((f, index) => (
-              <Grid 
-                style={{ cursor: 'pointer' }} 
-                item xs={12} 
-                key={f.company_id}
-                onClick={() => dashboardToCompany(f.company_id)}
-              >
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{companyNames[index]}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          ))}
-          </Grid>
-        </div>
-        <div id='listcontainer'>
-          My Lists
-          <Grid container spacing={2}>
-            {Array.isArray(lists) && lists.map((list) => (
-              <Grid item xs={2} key={list.id} style={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden' }} 
-              >
-                <Card>
-                  <CardContent style={{ position: 'relative' }}>
-                    <div onClick={() => handleListClick(list)}>
-                      <Typography variant="h6">{list.list_name}</Typography>
-                    </div>
-                    <IconButton
-                      aria-haspopup="true"
-                      onClick={(event) => handleEllipsisClick(event)}
-                      style={{ position: 'absolute', top: 0, right: 0 }}
-                    >
-                      <MoreHorizIcon />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorElement}
-                      open={Boolean(anchorElement)}
-                      onClose={handleCloseMenu}
-                    >
-                      <MenuItem onClick={() => handleDeleteList(list.id)}>Delete the list</MenuItem>
-                    </Menu>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <Button 
+                id='gobutton'
+                onClick={handleClick}>
+                Go
+              </Button>
+            </Stack>
+          </Stack>
+          
+          <div id='recentlyviewedcontainer'>
+            Recently Viewed
+            <Grid container spacing={2}>
+            {recents.map((recent, index) => (
+                      <Grid 
+                        style={{ cursor: 'pointer'}} 
+                        item xs={2} 
+                        key={recent.id}
+                        onClick={() => dashboardToCompany(recent.company_id)}
+                      >
+                        <Card style={{ cursor: 'pointer', height: '120px'}}>
+                          <CardContent>
+                            <Typography variant="h6">{companyNames[index]}</Typography>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+            </Grid>
+          </div>
+          <div className='favouritescontainer'>
+            <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
+              Favourites {favsList.length}
+            </Typography>
+            <Grid container spacing={2}>
+              {favsList.map((f, index) => (
+                <Grid 
+                  style={{ cursor: 'pointer' }} 
+                  item xs={12} 
+                  key={f.company_id}
+                  onClick={() => dashboardToCompany(f.company_id)}
+                >
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{companyNames[index]}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
             ))}
-          </Grid>
-        </div>
-      </div>
+            </Grid>
+          </div>
+          <div id='listcontainer'>
+            My Lists
+            <Grid container spacing={2}>
+              {Array.isArray(lists) && lists.map((list) => (
+                <Grid item xs={2} key={list.id} style={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden' }} 
+                >
+                  <Card>
+                    <CardContent style={{ position: 'relative' }}>
+                      <div onClick={() => handleListClick(list)}>
+                        <Typography variant="h6">{list.list_name}</Typography>
+                      </div>
+                      <IconButton
+                        aria-haspopup="true"
+                        onClick={(event) => handleEllipsisClick(event)}
+                        style={{ position: 'absolute', top: 0, right: 0 }}
+                      >
+                        <MoreHorizIcon />
+                      </IconButton>
+                      <Menu
+                        anchorEl={anchorElement}
+                        open={Boolean(anchorElement)}
+                        onClose={handleCloseMenu}
+                      >
+                        <MenuItem onClick={() => handleDeleteList(list.id)}>Delete the list</MenuItem>
+                      </Menu>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </div>
+      </Box>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany}/>}
       <ChatFeature/>
     </>
