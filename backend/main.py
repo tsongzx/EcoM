@@ -848,6 +848,7 @@ async def delete_framework(
     return {"message": f"Successfully deleted framework {framework_id}"}
 
 # calculate framework score
+# CHANGE THIS CLAIRE
 @app.get("/framework/score/", tags=["Framework"])
 async def get_framework_score(
     framework_id: int,
@@ -1240,7 +1241,7 @@ def linear_regression(data: List[company_models.CompanyData]) -> float:
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
-    indicator_unit = str,
+    metric_unit = str,
     company_name = str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
@@ -1250,12 +1251,15 @@ async def get_predictive(
         company_models.CompanyData.company_name == company_name, 
     ).all()
 
+    if not isinstance(metric_unit, str):
+        metric_uni = str(metric_unit)
+        
     if not data:
         raise HTTPException(status_code=404, detail="Error")
 
-    if "%" in indicator_unit:
+    if "%" in metric_unit:
         prediction = linear_regression(data)
-    elif indicator_unit == 'Yes/No':
+    elif metric_unit == 'Yes/No':
         values = [point.indicator_value for point in data]
         predicted_value = max(set(values), key=values.count) 
         if predicted_value == 1:
@@ -1264,7 +1268,7 @@ async def get_predictive(
             prediction = 'No'
 
     else: 
-        #indicator_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
+        #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name= indicator, prediction=prediction)
