@@ -36,6 +36,13 @@ const Report = () => {
         //     {id: 7, type: "text", name: "fourthelement", isDisplayed: true},
         //     {id: 8, type: "text", name: "fifthelement", isDisplayed: true},
         // ])
+
+        // Get the indicators for the company for the selected year
+        
+        // Get Data for each E, S and G Category in the format:
+        // {indicator_name, indicator_unit, indicator_value}
+
+        //get graphing data
     },[companyId]);
     // name will be the string content, id is auto populated.
 

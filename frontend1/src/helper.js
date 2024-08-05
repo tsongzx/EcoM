@@ -297,6 +297,8 @@ export const getFavouritesList = async() => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }});
+        console.log('favourites');
+        console.log(response.data);
         return response.data;
     } catch (error) {
         console.log(`error getting user's favourites: ${error}`);

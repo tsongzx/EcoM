@@ -68,11 +68,6 @@ export const ReportDoc = ({contentList, companyId, companyName, framework, year}
   return (
     <Document> 
         <Page size="A4" style={styles.body}>
-        {/* <Text style={styles.header} fixed>
-            Los Pollos Hermanos
-        </Text>
-        <Text style={styles.title}>The Time I And The With For Same</Text>
-        <Text style={styles.author}>Desmond Benjamin</Text> */}
 
         {/* Title Page mapping */}
         {contentList.map(c => {

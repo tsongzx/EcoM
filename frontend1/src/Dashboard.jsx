@@ -66,8 +66,20 @@ const Dashboard = () => {
 
         const recentlyViewed = await getRecentlyViewed();
 
-        const fetchFavsList = await getFavouritesList();
-        setFavsList(fetchFavsList);
+        const favsListTmp = await getFavouritesList();
+
+        const fetchFavsList = async() => {
+          const data = await Promise.all(favsListTmp.map(async(f) => {
+            const c = await getCompanyFromRecentlyViewed(f.company_id);
+            return {...f, company_name: c.company_name}
+          }));
+          console.log('WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW');
+          console.log(data);
+          setFavsList(data);
+        }
+
+        fetchFavsList();
+
 
         const uniqueRecents = recentlyViewed.reduce((acc, current) => {
           const x = acc.find(item => item.company_id === current.company_id);
@@ -256,7 +268,7 @@ const Dashboard = () => {
               >
             <Card>
               <CardContent>
-                <Typography variant="h6">{companyNames[index]}</Typography>
+                <Typography variant="h6">{f.company_name}</Typography>
               </CardContent>
             </Card>
           </Grid>

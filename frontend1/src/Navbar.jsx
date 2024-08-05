@@ -22,11 +22,11 @@ const Navbar = () => {
         <div>
             <div className='nav-placeholder'></div>
             <div className='nav'>
-                <ul>
+                <ul className='navbar-ul'>
                     {/* <li><Link to="/">Home</Link></li> */}
-                    <li id='home'><a href="/dashboard" onClick={handleHome}>Home</a></li>
-                    <li id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>
-                    <li id='profile'><a onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</a></li>
+                    <li className='navbar-li' id='home'><a href="/dashboard" onClick={handleHome}>Home</a></li>
+                    <li className='navbar-li' id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>
+                    <li className='navbar-li' id='profile'><a onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</a></li>
                 </ul>
             </div>
             {isProfileOpen && (<div className='profileTab'>
