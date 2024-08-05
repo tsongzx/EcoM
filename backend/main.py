@@ -1317,8 +1317,9 @@ def linear_regression(data: List[company_models.CompanyData]) -> float:
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
-    indicator_unit=str,
-    company_name=str,
+    # indicator_unit = str,
+    metric_unit = str,
+    company_name = str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
 ) -> PredictiveIndicators:
@@ -1330,9 +1331,11 @@ async def get_predictive(
     if not data:
         raise HTTPException(status_code=404, detail="Error")
 
-    if "%" in indicator_unit:
+    # if "%" in indicator_unit:
+    if "%" in metric_unit:
         prediction = linear_regression(data)
-    elif indicator_unit == 'Yes/No':
+    # elif indicator_unit == 'Yes/No':
+    elif metric_unit == 'Yes/No':
         values = [point.indicator_value for point in data]
         predicted_value = max(set(values), key=values.count)
         if predicted_value == 1:
