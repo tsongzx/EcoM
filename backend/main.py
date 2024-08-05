@@ -446,7 +446,7 @@ async def get_recently_viewed(
     if recentList == None:
         return []
     recentCompanies = session.query(list_models.List).filter(
-        list_models.List.list_id == recentList.id).order_by(list_models.List.created_at).all()
+        list_models.List.list_id == recentList.id).order_by(list_models.List.id.desc()).all()
     return recentCompanies
 
 
@@ -492,7 +492,7 @@ async def add_to_recently_viewed(
         session.delete(statement)
         session.commit()
 
-    if recent_companies_length >= 5:
+    if recent_companies_length > 5:
         statement = session.query(list_models.List).where(
             list_models.List.list_id == recent_id).order_by(list_models.List.id).first()
 

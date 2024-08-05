@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Typography, Grid, Paper, Card, CardContent, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
-import { fetchCompaniesInList, getCompanyFromRecentlyViewed, removeCompanyFromList } from './helper';
+import { fetchCompaniesInList, getCompanyFromRecentlyViewed, removeCompanyFromList } from '../helper';
 import { useNavigate } from 'react-router-dom';
 
 const ListModal = ({ isOpen, onClose, list, setSelectedCompany }) => {

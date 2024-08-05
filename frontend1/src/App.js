@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Home.jsx';
-import Dashboard from './Dashboard.jsx';
+import Dashboard from './dashboard/Dashboard.jsx';
 import Company from './company/Company.jsx';
 import Compare from './compare/Compare.jsx';
 import Profile from './Profile.jsx';
