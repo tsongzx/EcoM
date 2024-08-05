@@ -1,634 +1,526 @@
 {
-    "TURNOVEREMPLOYEES": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 189.06,
-        "indicator": "positive"
-    },
-    "ANALYTICEMPLOYMENTCREATION": {
-        "unit": "% growth in number of employees over last year",
-        "lower": -100.0,
-        "higher": 3099900.0,
-        "indicator": "positive"
-    },
-    "ANALYTICAUDITCOMMIND": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "WOMENMANAGERS": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "WATER_TECHNOLOGIES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TOXIC_CHEMICALS_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "COMMMEETINGSATTENDANCEAVG": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "ENERGYUSETOTAL": {
-        "unit": "GJ",
-        "lower": 0.0,
-        "higher": 150361000000.0,
-        "indicator": "positive"
-    },
-    "ANALYTICBOARDFEMALE": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "SUSTAINABLE_BUILDING_PRODUCTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANALYTICTOTALDONATIONS": {
-        "unit": "USD donated per million of revenue USD",
-        "lower": 0.0,
-        "higher": 145877906.5,
-        "indicator": "positive"
-    },
-    "ANALYTICWASTERECYCLINGRATIO": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 439915.11,
-        "indicator": "positive"
-    },
-    "POLICY_SUSTAINABLE_PACKAGING": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANALYTICNOMINATIONCOMMIND": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "CSR_REPORTINGGRI": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TRADEUNIONREP": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "AUDITCOMMNONEXECMEMBERS": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
+    "AIRPOLLUTANTS_DIRECT": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 187109.96986799754,
+        "mean": 14727.452444739169
     },
     "AIRPOLLUTANTS_INDIRECT": {
-        "unit": "USD (000)",
-        "lower": 0.0,
-        "higher": 12585665766.14,
-        "indicator": "positive"
-    },
-    "TIRTOTAL": {
-        "unit": "Injured / million hours",
-        "lower": 0.0,
-        "higher": 11840.0,
-        "indicator": "positive"
-    },
-    "WASTETOTAL": {
-        "unit": "Tons",
-        "lower": 0.0,
-        "higher": 34159000000.0,
-        "indicator": "positive"
-    },
-    "ANALYTICCOMPCOMMIND": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "AVGTRAININGHOURS": {
-        "unit": "Hours/employee",
-        "lower": 0.0,
-        "higher": 17237.92,
-        "indicator": "positive"
-    },
-    "ANALYTICQMS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "PARTICULATE_MATTER_EMISSIONS": {
-        "unit": "Tons",
-        "lower": 0.0,
-        "higher": 139600.0,
-        "indicator": "positive"
-    },
-    "VOCEMISSIONS": {
-        "unit": "Tons of VOC",
-        "lower": 0.0,
-        "higher": 391000.0,
-        "indicator": "positive"
-    },
-    "DAY_CARE_SERVICES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANALYTICINDEPBOARD": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "CLIMATE_CHANGE_RISKS_OPP": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "WHISTLEBLOWER_PROTECTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "CO2INDIRECTSCOPE2": {
-        "unit": "Tons CO2e",
-        "lower": 0.0,
-        "higher": 75600000000.0,
-        "indicator": "positive"
-    },
-    "EMPLOYEE_HEALTH_SAFETY_POLICY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "EMPLOYEEFATALITIES": {
-        "unit": "Number of fatalities",
-        "lower": 0.0,
-        "higher": 124.0,
-        "indicator": "positive"
-    },
-    "WASTE_REDUCTION_TOTAL": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "CO2INDIRECTSCOPE3": {
-        "unit": "Tons CO2e",
-        "lower": 0.0,
-        "higher": 8254000000.0,
-        "indicator": "positive"
-    },
-    "COMPCOMMNONEXECMEMBERS": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "CEO_ANNUAL_COMPENSATION": {
-        "unit": "USD",
-        "lower": 0.0,
-        "higher": 1313730000.0,
-        "indicator": "positive"
-    },
-    "POLICY_EMISSIONS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "SOXEMISSIONS": {
-        "unit": "Tons of SOx",
-        "lower": 0.0,
-        "higher": 52000000.0,
-        "indicator": "positive"
-    },
-    "LABELED_WOOD": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "HAZARDOUSWASTE": {
-        "unit": "Tons",
-        "lower": 0.0,
-        "higher": 3983000000.0,
-        "indicator": "positive"
-    },
-    "ANALYTIC_ANTI_TAKEOVER_DEVICES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "POLICY_CHILD_LABOR": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "WATERWITHDRAWALTOTAL": {
-        "unit": "Cubic meters",
-        "lower": 0.0,
-        "higher": 1305000000000.0,
-        "indicator": "positive"
-    },
-    "ANALYTICNONEXECBOARD": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "RENEWENERGYPRODUCED": {
-        "unit": "GJ",
-        "lower": 0.0,
-        "higher": 1140000000.0,
-        "indicator": "positive"
-    },
-    "WOMENEMPLOYEES": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 597.16,
-        "indicator": "positive"
-    },
-    "POLICY_WATER_EFFICIENCY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TARGETS_EMISSIONS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TRANALYTICRENEWENERGYUSE": {
-        "unit": "%",
-        "lower": 0.0,
-        "higher": 115.92,
-        "indicator": "positive"
-    },
-    "RENEWENERGYCONSUMED": {
-        "unit": "GJ",
-        "lower": 0.0,
-        "higher": 9208200600.0,
-        "indicator": "positive"
-    },
-    "ANALYTICESTIMATEDCO2TOTAL": {
-        "unit": "Tons CO2e",
-        "lower": 0.0,
-        "higher": 12115067173.49,
-        "indicator": "positive"
-    },
-    "CO2DIRECTSCOPE1": {
-        "unit": "Tons CO2e",
-        "lower": 0.0,
-        "higher": 18054539100.0,
-        "indicator": "positive"
-    },
-    "AIRPOLLUTANTS_DIRECT": {
-        "unit": "USD (000)",
-        "lower": 0.0,
-        "higher": 18156210.21,
-        "indicator": "positive"
-    },
-    "POLICY_BOARD_DIVERSITY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "CONFORMANCE_UN_GUID": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "POLICY_BRIBERYAND_CORRUPTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "NOXEMISSIONS": {
-        "unit": "Tons of NOx",
-        "lower": 0.0,
-        "higher": 1805854.56,
-        "indicator": "positive"
-    },
-    "BRIBERY_AND_CORRUPTION_PAI_INSUFFICIENT_ACTIONS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 0,
-        "indicator": "positive"
-    },
-    "ORGANIC_PRODUCTS_INITIATIVES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ISO14000": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "WASTE_RECYCLED": {
-        "unit": "Tons",
-        "lower": 0.0,
-        "higher": 1893000000.0,
-        "indicator": "positive"
-    },
-    "POLICY_FREEDOMOF_ASSOCIATION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "POLICY_DATA_PRIVACY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "RENEWENERGYPURCHASED": {
-        "unit": "GJ",
-        "lower": 0.0,
-        "higher": 9208200600.0,
-        "indicator": "positive"
-    },
-    "GLOBAL_COMPACT": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TAKEBACK_RECYCLING_INITIATIVES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "CONFORMANCE_OECD_MNE": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "BOARDMEETINGATTENDANCEAVG": {
-        "unit": "%",
-        "lower": 0.98,
-        "higher": 100.0,
-        "indicator": "positive"
-    },
-    "LOSTWORKINGDAYS": {
-        "unit": "Number of days",
-        "lower": 0.0,
-        "higher": 796413.0,
-        "indicator": "positive"
-    },
-    "HUMAN_RIGHTS_VIOLATION_PAI": {
-        "unit": "Number of breaches",
-        "lower": 0.0,
-        "higher": 1.0,
-        "indicator": "positive"
-    },
-    "WATER_USE_PAI_M10": {
-        "unit": "Cubic meters / million EUR of revenue of investee companies",
-        "lower": 0.0,
-        "higher": 0.0,
-        "indicator": "positive"
-    },
-    "ANALYTIC_AUDIT_COMM_EXPERTISE": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "GRIEVANCE_REPORTING_PROCESS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "SUPPLY_CHAINHS_POLICY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "POLICY_FORCED_LABOR": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "CSR_REPORTING_EXTERNAL_AUDIT": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANIMAL_TESTING_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ENV_INVESTMENTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "TARGETS_DIVERSITY_OPPORTUNITY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "HUMAN_RIGHTS_CONTRACTOR": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "GENDER_PAY_GAP_PERCENTAGE": {
-        "unit": "%",
-        "lower": 1.0,
-        "higher": 256.0,
-        "indicator": "positive"
-    },
-    "POLICY_HUMAN_RIGHTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANALYTICCSR_COMP_INCENTIVES": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ENV_SUPPLY_CHAIN_MGT": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "ANALYTICNONAUDITAUDITFEESRATIO": {
-        "unit": "Non / audit USD / audit USD",
-        "lower": 0.0,
-        "higher": 40.09,
-        "indicator": "positive"
-    },
-    "ANALYTIC_VOTING_RIGHTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "HUMAN_RIGHTS_POLICY_DUEDILIGENCE": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
-    },
-    "BIODIVERSITY_IMPACT_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 87203994.75750695,
+        "mean": 10136926.002689736
+    },
+    "ANALYTICAUDITCOMMIND": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 18.251168750692266,
+        "mean": 91.41973205425074
+    },
+    "ANALYTICBOARDFEMALE": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 14.695020506575583,
+        "mean": 21.06181788283659
     },
     "ANALYTICCEO_CHAIRMAN_SEPARATION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+        "type": "Yes/No",
+        "pos": "Positive"
     },
-    "N_OXS_OX_EMISSIONS_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICCOMPCOMMIND": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 22.193419948952975,
+        "mean": 86.52492319596492
     },
-    "IMPROVEMENT_TOOLS_BUSINESS_ETHICS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICCSR_COMP_INCENTIVES": {
+        "type": "Yes/No",
+        "pos": "Positive"
     },
-    "VOC_EMISSIONS_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICEMPLOYMENTCREATION": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 8302.275050987515,
+        "mean": 103.54936037829766
     },
-    "ECO_DESIGN_PRODUCTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICESTIMATEDCO2TOTAL": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 32310775.780974526,
+        "mean": 603893.9539230242
     },
-    "E_WASTE_REDUCTION": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICINDEPBOARD": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 24.017408389341767,
+        "mean": 61.89652247605011
     },
-    "TARGETS_WATER_EFFICIENCY": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "ANALYTICNOMINATIONCOMMIND": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 22.801752318798627,
+        "mean": 85.43209967449357
     },
-    "ELECTRICITYPURCHASED": {
-        "unit": "GJ",
-        "lower": 23.51,
-        "higher": 152501925.6,
-        "indicator": "positive"
+    "ANALYTICNONAUDITAUDITFEESRATIO": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 1.248170317511008,
+        "mean": 0.21643199233716476
     },
-    "NATURAL_RESOURCE_USE_DIRECT": {
-        "unit": "USD (000)",
-        "lower": 0.0,
-        "higher": 5801246.96,
-        "indicator": "positive"
+    "ANALYTICNONEXECBOARD": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 16.656903897774825,
+        "mean": 81.99400432637387
     },
-    "EMS_CERTIFIED_PCT": {
-        "unit": "%",
-        "lower": 1.0,
-        "higher": 100.0,
-        "indicator": "positive"
+    "ANALYTICQMS": {
+        "type": "Yes/No",
+        "pos": "Positive"
     },
-    "CEO_PAY_RATIO_MEDIAN": {
-        "unit": "Ratio",
-        "lower": 0.0,
-        "higher": 9415.95,
-        "indicator": "positive"
+    "ANALYTICTOTALDONATIONS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 3004342.513227525,
+        "mean": 132795.17032374968
+    },
+    "ANALYTICWASTERECYCLINGRATIO": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 4354.788137598436,
+        "mean": 134.97781012347698
+    },
+    "ANALYTIC_ANTI_TAKEOVER_DEVICES": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ANALYTIC_AUDIT_COMM_EXPERTISE": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ANALYTIC_VOTING_RIGHTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ANIMAL_TESTING_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
     },
     "ANNUAL_MEDIAN_COMPENSATION": {
-        "unit": "USD",
-        "lower": 33.92,
-        "higher": 9953490.0,
-        "indicator": "positive"
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 173055.48575396786,
+        "mean": 92701.23825315153
+    },
+    "AUDITCOMMNONEXECMEMBERS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 5.496483825503852,
+        "mean": 99.1851817079776
+    },
+    "AVGTRAININGHOURS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 157.3560920211881,
+        "mean": 31.65634741413344
+    },
+    "BIODIVERSITY_IMPACT_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "BOARDMEETINGATTENDANCEAVG": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 10.510760550757512,
+        "mean": 90.57639859861455
+    },
+    "BRIBERY_AND_CORRUPTION_PAI_INSUFFICIENT_ACTIONS": {
+        "type": "Yes/No",
+        "pos": "Positive"
     },
     "CALL_MEETINGS_LIMITED_RIGHTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+        "type": "Yes/No",
+        "pos": "Positive"
     },
-    "ELIMINATION_CUM_VOTING_RIGHTS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "CEO_ANNUAL_COMPENSATION": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 21898511.271160122,
+        "mean": 8000044.800315181
     },
-    "POLICY_BUSINESS_ETHICS": {
-        "unit": "Yes/No",
-        "lower": 0,
-        "higher": 1,
-        "indicator": "positive"
+    "CEO_PAY_RATIO_MEDIAN": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 362.02324929565856,
+        "mean": 167.14165953399905
     },
-    "ENERGYPURCHASEDDIRECT": {
-        "unit": "GJ",
-        "lower": 1051.2,
-        "higher": 408000000.0,
-        "indicator": "positive"
+    "CLIMATE_CHANGE_RISKS_OPP": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "CO2DIRECTSCOPE1": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 48475701.42440395,
+        "mean": 490780.36799490504
+    },
+    "CO2INDIRECTSCOPE2": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 166387877.2886495,
+        "mean": 489518.49048328487
+    },
+    "CO2INDIRECTSCOPE3": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 38400202.30502764,
+        "mean": 1142484.9496693674
     },
     "CO2_NO_EQUIVALENTS": {
-        "unit": "Tons CO2",
-        "lower": 40755.83,
-        "higher": 65000.0,
-        "indicator": "positive"
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 17143.21701123946,
+        "mean": 52877.915
+    },
+    "COMMMEETINGSATTENDANCEAVG": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 11.115291521919115,
+        "mean": 90.12138406764575
+    },
+    "COMPCOMMNONEXECMEMBERS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 10.38439564814005,
+        "mean": 96.92695802621955
+    },
+    "CONFORMANCE_OECD_MNE": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "CONFORMANCE_UN_GUID": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "CSR_REPORTINGGRI": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "CSR_REPORTING_EXTERNAL_AUDIT": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "DAY_CARE_SERVICES": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ECO_DESIGN_PRODUCTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ELECTRICITYPURCHASED": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 16870364.808325138,
+        "mean": 4927357.744680135
+    },
+    "ELIMINATION_CUM_VOTING_RIGHTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "EMPLOYEEFATALITIES": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 2.2056231737292333,
+        "mean": 0.467068567243225
+    },
+    "EMPLOYEE_HEALTH_SAFETY_POLICY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "EMS_CERTIFIED_PCT": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 44.30397975492981,
+        "mean": 72.60340775558167
+    },
+    "ENERGYPURCHASEDDIRECT": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 69663372.27164443,
+        "mean": 19611284.794210527
+    },
+    "ENERGYUSETOTAL": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 350232885.78742224,
+        "mean": 4818994.533237994
+    },
+    "ENV_INVESTMENTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ENV_SUPPLY_CHAIN_MGT": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "E_WASTE_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "GENDER_PAY_GAP_PERCENTAGE": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 14.877670357344565,
+        "mean": 87.21704160246533
+    },
+    "GLOBAL_COMPACT": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "GRIEVANCE_REPORTING_PROCESS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "HAZARDOUSWASTE": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 13616826.567842873,
+        "mean": 192044.3481114314
+    },
+    "HUMAN_RIGHTS_CONTRACTOR": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "HUMAN_RIGHTS_POLICY_DUEDILIGENCE": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "HUMAN_RIGHTS_VIOLATION_PAI": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 0.025415628826102012,
+        "mean": 0.00064635849961427
+    },
+    "IMPROVEMENT_TOOLS_BUSINESS_ETHICS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ISO14000": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "LABELED_WOOD": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "LOSTWORKINGDAYS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 32565.988625472317,
+        "mean": 5150.5338811128395
+    },
+    "NATURAL_RESOURCE_USE_DIRECT": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 100804.13437538338,
+        "mean": 13529.658721936536
+    },
+    "NOXEMISSIONS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 12884.66260350342,
+        "mean": 714.1552929360159
+    },
+    "N_OXS_OX_EMISSIONS_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "ORGANIC_PRODUCTS_INITIATIVES": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "PARTICULATE_MATTER_EMISSIONS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 1376.6724405987686,
+        "mean": 71.59910693507571
+    },
+    "POLICY_BOARD_DIVERSITY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_BRIBERYAND_CORRUPTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_BUSINESS_ETHICS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_CHILD_LABOR": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_DATA_PRIVACY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_EMISSIONS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_FORCED_LABOR": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_FREEDOMOF_ASSOCIATION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_HUMAN_RIGHTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_SUSTAINABLE_PACKAGING": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "POLICY_WATER_EFFICIENCY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "RENEWENERGYCONSUMED": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 100194201.08457679,
+        "mean": 4209013.743562148
+    },
+    "RENEWENERGYPRODUCED": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 29550850.89164117,
+        "mean": 3308442.7230638852
+    },
+    "RENEWENERGYPURCHASED": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 154475601.12667102,
+        "mean": 4570219.666904294
+    },
+    "SOXEMISSIONS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 146056.18070742255,
+        "mean": 978.2038836956281
+    },
+    "SUPPLY_CHAINHS_POLICY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "SUSTAINABLE_BUILDING_PRODUCTS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TAKEBACK_RECYCLING_INITIATIVES": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TARGETS_DIVERSITY_OPPORTUNITY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TARGETS_EMISSIONS": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TARGETS_WATER_EFFICIENCY": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TIRTOTAL": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 109.82925037271265,
+        "mean": 6.289674922600619
+    },
+    "TOXIC_CHEMICALS_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "TRADEUNIONREP": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 36.85721150374717,
+        "mean": 31.896636885450462
+    },
+    "TRANALYTICRENEWENERGYUSE": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 26.7195248905396,
+        "mean": 19.22750798185179
+    },
+    "TURNOVEREMPLOYEES": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 11.162288413678352,
+        "mean": 13.7686021203792
+    },
+    "VOCEMISSIONS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 3728.1752506272046,
+        "mean": 168.67353106065596
+    },
+    "VOC_EMISSIONS_REDUCTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "WASTETOTAL": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 78782770.49135439,
+        "mean": 283865.8128485392
+    },
+    "WASTE_RECYCLED": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 19116773.217919677,
+        "mean": 661653.5866147028
+    },
+    "WASTE_REDUCTION_TOTAL": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "WATERWITHDRAWALTOTAL": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 5314809296.7531805,
+        "mean": 57667412.24783661
+    },
+    "WATER_TECHNOLOGIES": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "WATER_USE_PAI_M10": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 0.0,
+        "mean": 0.0
+    },
+    "WHISTLEBLOWER_PROTECTION": {
+        "type": "Yes/No",
+        "pos": "Positive"
+    },
+    "WOMENEMPLOYEES": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 18.15398934825414,
+        "mean": 35.91772519226578
+    },
+    "WOMENMANAGERS": {
+        "type": "Value",
+        "pos": "Positive",
+        "stdev": 15.62337543347856,
+        "mean": 28.23137361312108
     }
 }
-
-
