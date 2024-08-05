@@ -1128,63 +1128,36 @@ async def get_companies_in_industry(
 
     return companies
   
-# #test all of the average ones claire   
-# @app.get("/industry/framework/average/", tags=["Industry"])
-# async def get_framework_industry_average(
-#     industry: str,
-#     framework_id: int,
-#     year: int,
-#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) :
-#     # fix - get average for an industry for a framework 
-#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-#     TODO: BATCH PROCESSING
-#     """    
-#     # @GEOFF: CONSIDER BATCH PROCESSING
-#     # score = 0
-#     # for company in companies:
-#     #     score += await get_framework_score(framework_id, company.company_name, year, user, session)
+
+@app.get("/company/framework/average/", tags=["company"])
+async def get_framework_company_average(
+    company_name: str,
+    year: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
     
-#     # return score / len(companies) if companies else 0
-#     if not companies:
-#         return 0
+    frameworks = session.query(framework_models.Frameworks).filter(or_(
+        # framework_models.Frameworks.user_id == user.id,
+        framework_models.Frameworks.is_official_framework == True
+        )
+    ).all()
 
-#     tasks = [
-#         get_framework_score(framework_id, company.company_name, year, user, session)
-#         for company in companies
-#     ]
+    #REMOVE LATER
+    if not frameworks:
+        # Return 0 or handle the case when no frameworks are found
+        return 0 
 
-#     # Run concurrently
-#     scores = await asyncio.gather(*tasks)
-
-#     # Calculate the total score
-#     total_score = sum(scores)
-
-#     # Return the average score
-#     return total_score / len(companies)
-
-
-# @app.get("/industry/metric/average/", tags=["Industry"])
-# async def get_metric_industry_average(
-#     metric_id: int,
-#     year: int,
-#     framework_id: int,
-#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) :
-#     # fix - get average for an industry for a framework 
-#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-#       TODO: BATCH PROCESSING
-#     """    
-#     # @GEOFF: CONSIDER BATCH PROCESSING
-#     score = 0
-#     for company in companies:
-#         score += await calculate_metric(metric_id, company.company_name, framework_id, year, user, session)
+    # Print all frameworks
+    for framework in frameworks:
+        print(framework)
     
-#     return score / len(companies) if companies else 0
+    score = 0
+
+    for framework in frameworks:
+        score += await get_framework_score(framework_id=framework.id, company_name=company_name, year=year, user=user, session=session)
+    
+    return score / len(frameworks)
   
 @app.get("/industry/indicator/average/", tags=["Industry"])
 async def get_indicator_industry_averages(
