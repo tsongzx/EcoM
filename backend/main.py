@@ -77,7 +77,7 @@ async def get_token(
     user: user_schemas.UserInDB,
 ):
     access_token_expires = timedelta(
-        minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
+        days=Config.ACCESS_TOKEN_EXPIRE_DAYS)
     access_token = generate_token(
         data={"userId": user.id}, expires_delta=access_token_expires
     )
