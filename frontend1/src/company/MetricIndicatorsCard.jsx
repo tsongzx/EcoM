@@ -1,25 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  FormControl,
-  FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  IconButton,
-  Typography,
-  Collapse,
-  Card,
-  Slider,
-  TextField,
-  Modal,
-  Tooltip
-} from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogTitle, DialogContent, FormControl, FormLabel,
+  FormGroup, FormControlLabel, Checkbox, IconButton, Typography, Collapse, Card, Slider, TextField,
+  Modal, Tooltip } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -27,6 +9,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getMetricScoreByYear, putFrameworkModifyMetrics } from '../helper';
 
+// This component displays everything associated to the category, metric and indicator weightings, as well as the
+// modals associated if the user chooses to change them. 
 const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
@@ -38,7 +22,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [lockedSliders, setLockedSliders] = useState({});
   const [lockedSlidersIndicators, setLockedSlidersIndicators] = useState({}); 
   const [triggerSource, setTriggerSource] = useState(false);
-
   const [expandedMetrics, setExpandedMetrics] = useState({});
   const [expanded1, setExpanded1] = useState(false);
 
@@ -46,7 +29,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [errorS, setErrorS] = useState('');
   const [errorG, setErrorG] = useState('');
 
-
+  // Users can choose to lock a metric
   const [isLockedE, setIsLockedE] = useState(false);
   const [isLockedS, setIsLockedS] = useState(false);
   const [isLockedG, setIsLockedG] = useState(false);
@@ -54,8 +37,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [errorMetrics, setErrorMetrics] = useState({});
   const [errorPillarModal, setErrorPillarModal] = useState('');
 
-  const [pillarWeighting, setPillarWeighting] = useState({});
-  // const [editMode, setEditMode] = useState({ E: false, S: false, G: false });
+  const [pillarWeighting, setPillarWeighting] = useState({'E': 0, 'S': 0, 'G': 0});
 
   const [modalE, setModalE] = useState(pillarWeighting['E']);
   const [modalS, setModalS] = useState(pillarWeighting['S']);
@@ -64,20 +46,17 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
   const [modalOpen, setModalOpen] = useState(false);
   const [modalWeightingOpen, setModalWeightingOpen] = useState(false);
   const [modalWeightingError, setModalWeightingError] = useState('');
-  const [changed, setChanged] = useState(false);
 
-  useEffect(() => {
-    console.log(officialFrameworks);
-  }, [officialFrameworks]);
-
-  useEffect(() => {
-    console.log(pillarWeighting);
+  // Sets the categorical weighting as displayed on the modal
+  useEffect(() => { 
+    setModalE(pillarWeighting['E']);
+    setModalS(pillarWeighting['S']);
+    setModalG(pillarWeighting['G']);
   }, [pillarWeighting]);
 
   useEffect(() => {
     if (selectedFramework) {
       let newObj = {};
-      console.log(officialFrameworks);
       const foundFramework = officialFrameworks.find(obj => obj.id === selectedFramework) || { E: 0, S: 0, G: 0 };
 
       newObj['E'] = foundFramework.E || 0;
@@ -87,13 +66,15 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   }, [selectedFramework, officialFrameworks]);
 
+  // Finds the overall framework score and sets it
   useEffect(() => {
     const frameworkScore = eScore * pillarWeighting['E'] + sScore * pillarWeighting['S'] + gScore * pillarWeighting['G'];
     setFrameworkScore(frameworkScore);
   }, [eScore, sScore, gScore]);
 
+  // The next 2 functions deals with any instances the user changes the indicator weightings
+  // and/or metric weightings. This includes if the user wants to reset back to default
   useEffect(() => {
-    console.log(triggerSource);
     let newLockedSlidersIndicators = {};
     let newSliderValuesIndicators = {};
 
@@ -107,31 +88,24 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         }
       }
     }
-
-    console.log(newLockedSlidersIndicators);
-
+    
+    // Sets all the indicators that the user has locked (i.e finalised so its weightings won't change)
     setLockedSlidersIndicators(newLockedSlidersIndicators);
 
     Object.entries(selectedIndicators).forEach(([key, arr]) => {
-      console.log(arr);
       let unlockedWeighting = 0;
       let lockedWeighting = 0;
-      let unlockedIndicators = 0;
-      let totalWeighting = 0;
+
+      // Finds the total sum of indicators that aren't locked
       arr.forEach(value => {
         if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator[`${key}-${value}`]) {
-          console.log(sliderValuesIndicator[`${key}-${value}`]);
           unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
-          unlockedIndicators += 1;
         } else if (lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`)) {
           lockedWeighting += sliderValuesIndicator[`${key}-${value}`];
           unlockedWeighting += sliderValuesIndicator[`${key}-${value}`];
-        } else {
-          unlockedIndicators += 1;
         }
       });
 
-      console.log(unlockedWeighting);
       arr.forEach(value => {
           if (!lockedSlidersIndicators.hasOwnProperty(`${key}-${value}`) && sliderValuesIndicator.hasOwnProperty(`${key}-${value}`)) {
           newSliderValuesIndicators[`${key}-${value}`] = (1 - lockedWeighting) * sliderValuesIndicator[`${key}-${value}`] / (unlockedWeighting - lockedWeighting);
@@ -144,45 +118,34 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       unlockedWeighting = 0;
       lockedWeighting = 0;
     });
-    console.log(newSliderValuesIndicators);
 
     setSliderValuesIndicator(newSliderValuesIndicators);
 
     let newArray = selectedMetrics.filter(value => selectedIndicators.hasOwnProperty(value));
     setSelectedMetrics(newArray);
 
+    // This implies the user wants to reset back to default
     if (triggerSource === true) {
       setSliderValuesIndicator(sliderValuesIndicatorFixed);
       setTriggerSource(false);
     } 
     
-
   }, [selectedIndicators, triggerSource]);
 
   useEffect(() => {
-    console.log(selectedMetrics);
-    console.log('here111');
     let newLockedSliders = {};
     let newSliderValues = {};
 
     // 1. Update Locked sliders
     const keys = Object.keys(lockedSliders).map(key => Number(key));
-    console.log(keys);
-    console.log(selectedMetrics);
 
     for (let key of keys) {
       if (selectedMetrics.includes(key)) {
         newLockedSliders[key] = lockedSliders[key];
       }
     }
-    console.log(newLockedSliders);
 
     setLockedSliders(newLockedSliders);
-
-    // 2. Get length of each pillar
-    let numE = 0;
-    let numS = 0;
-    let numG = 0;
 
     let totalE = 0;
     let totalS = 0;
@@ -206,19 +169,10 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     let lockedS = 0;
     let lockedG = 0;
 
-
     for (let entry of selectedMetrics) {
       let category = metricNames.find(metric => metric.id === entry).category;
 
-      if (!lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
-        if (category === 'E') {
-          numE += 1;
-        } else if (category === 'S') {
-          numS += 1;
-        } else {
-          numG += 1;
-        }
-      } else if (lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
+      if (lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
         if (category === 'E') {
           lockedE += sliderValues[entry];
         } else if (category === 'S') {
@@ -229,12 +183,13 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       }
     }
 
+    // The weighting of each metric of a specific category has been set according to its
+    // relative ratio to everything else
     for (let entry of selectedMetrics) {
       let category = metricNames.find(metric => metric.id === entry).category;
 
       if (!lockedSliders.hasOwnProperty(entry) && sliderValues.hasOwnProperty(entry)) {
         if (category === 'E') {
-          console.log(`${(1- lockedE)} ${sliderValues[entry]} ${totalE} ${lockedE}`);
           newSliderValues[entry] = isNaN((1- lockedE) * sliderValues[entry] / (totalE - lockedE)) ? 0 : (1- lockedE) * sliderValues[entry] / (totalE - lockedE);
         } else if (category === 'S') {
           newSliderValues[entry] = isNaN((1- lockedS) * sliderValues[entry] / (totalS - lockedS)) ? 0 : (1- lockedS) * sliderValues[entry] / (totalS - lockedS);
@@ -244,18 +199,16 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       } else if (!lockedSliders.hasOwnProperty(entry) && !sliderValues.hasOwnProperty(entry)) {
         newSliderValues[entry] = 0;
       } else {
+        // Locked metric weightings don't change
         newSliderValues[entry] = sliderValues[entry];
       }
 
     }
 
     setSliderValues(newSliderValues);
-
     
-
-    
+    // Resets everything 
     if (triggerSource === true) {
-      console.log('here');
       setSelectedIndicators(selectedIndicatorsFixed);
       setSliderValues(sliderValuesFixed);
       
@@ -263,17 +216,21 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   }, [selectedMetrics, triggerSource]);
 
+  // This function deals with the occurrence that the user has 
+  // changed the existing set of metrics
   const handleMetricChange = (event) => {
     const metricId = Number(event.target.value);
   
     let newSelectedIndicators = { ...selectedIndicators };
     let newSelectedMetrics = [...selectedMetrics];
-  
+    
     if (selectedMetrics.includes(metricId)) {
       newSelectedMetrics = selectedMetrics.filter((id) => id !== metricId);
+      // User has unselected a metric
       delete newSelectedIndicators[metricId];
     } else {
       newSelectedMetrics = [...selectedMetrics, metricId];
+      // User added a new metric
       newSelectedIndicators[metricId] = allIndicators[metricId].map(indicator => indicator.indicator_id);
     }
     setSelectedMetrics(newSelectedMetrics);
@@ -290,14 +247,19 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       [metricId]: !prev[metricId]
     }));
   };
+
+  // This checks that the weights of the pillars the user has set adds up to 1
   const checkPillarWeighting = () => {
     const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
+
+    // Need to make sure it is a decimal
     if ((!decimalRegex.test(modalE) || !decimalRegex.test(modalS) || !decimalRegex.test(modalG))) {
       setErrorPillarModal('Please ensure all fields contain a value from 0 to 1.')
     } else if (isNaN(parseFloat(modalE)) || isNaN(parseFloat(modalS)) || isNaN(parseFloat(modalG))) {
       setErrorPillarModal('Please ensure all fields contain a value from 0 to 1.')
     } else {
       let cumSum = parseFloat(modalE) + parseFloat(modalS) + parseFloat(modalG);
+      // Decimal sum has to be near close to one
       if (cumSum <= 0.999999 || cumSum >= 1.000001) {
         setErrorPillarModal('Please ensure that all weightings add up to 1.');
       } else {
@@ -306,6 +268,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         newPillarWeighting['S'] = modalS;
         newPillarWeighting['G'] = modalG;
 
+        // Sets the new weighting since they are valid
         setPillarWeighting(newPillarWeighting);
         setModalOpen(false);
         setErrorPillarModal('');
@@ -313,22 +276,16 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   }
 
+  // This function loads the description of the indicator that is observed
+  // on hover
   const loadIndicatorInfo = (indicatorId) => {
     const description = allIndicatorsInfo[indicatorId].description;
     return description;
   }
 
-  useEffect(() => {
-    console.log(allIndicators);
-  }, [allIndicators]);
-
-  useEffect(() => {
-    console.log(selectedIndicators);
-  }, [selectedIndicators]);
-
-
+  // This function sets the selected metric back to default -> I.e the states
+  // upon initial load
   const resetToDefault = () => {
-    console.log(metricNamesFixed);
     setLockedSliders({});
     setLockedSlidersIndicators({});
     setTriggerSource(true);
@@ -336,14 +293,16 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     setSelectedMetrics(selectedMetricsFixed);
     setAllIndicators(allIndicatorsFixed);
     setSelectedIndicators(selectedIndicatorsFixed);
-    // setSliderValuesFixed(sliderValuesFixed);
-    // setSliderValuesIndicatorFixed(sliderValuesIndicatorFixed);
   }
 
+  // This function renders the information of each category
   const renderMetricsByCategory = (category) => {
+    // If there are no metrics available, then there is nothing to render
     if (!metricNames) return null;
+    
+    // All the metrics under this category
     const filteredMetrics = metricNames.filter(metric => metric.category === category);
-    console.log(selectedMetrics);
+
     return (
       <div style={{ display: 'flex', flexDirection: 'column'}}>
         <FormGroup style={{ marginTop: '10px'}}>
@@ -357,11 +316,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                   label={<span style={{ fontSize: '17px' }}>{metric.name}</span>}
                   onChange={(event) => handleMetricChange(event)}
                 />
+                {/*User can choose to expand or collapse*/}
                 <div style={{ marginLeft: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                  <IconButton
-                    onClick={() => handleMetricExpandClick(metric.id)}
-                    size="small"
-                  >
+                  <IconButton onClick={() => handleMetricExpandClick(metric.id)} size="small">
                     {expandedMetrics[metric.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
                   </IconButton>
                 </div>
@@ -384,6 +341,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                   </div>
                 )}
               </div>
+
+              {/*Maps the indicators of a selected metric*/}
               <Collapse in={expandedMetrics[metric.id]}>
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
                   <FormGroup
@@ -394,19 +353,15 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                     {allIndicators[metric.id]?.map((indicator) => (
                       <div key={indicator.indicator_id} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between'}}>
                         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '80%'}}>
-                          <FormControlLabel
-                            key={indicator.indicator_id}
-                            value={indicator.indicator_id.toString()}
-                            control={
-                              <Checkbox
-                                checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false}
-                                sx={{
+                          <FormControlLabel key={indicator.indicator_id} value={indicator.indicator_id.toString()}
+                            control={<Checkbox checked={selectedIndicators[metric.id]?.includes(indicator.indicator_id) || false}
+                              sx={{
+                                color: 'red',
+                                '&.Mui-checked': {
                                   color: 'red',
-                                  '&.Mui-checked': {
-                                    color: 'red',
-                                  },
-                                }}
-                              />
+                                },
+                              }}
+                            />
                             }
                             label={indicator.indicator_name}
                             onChange={(event) => handleIndicatorChange(event, metric.id)}
@@ -416,6 +371,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                               },
                             }}
                           />
+                          {/**Displays information about indicator on hover */}
                           <Tooltip placement="right" 
                             title={
                               <Typography variant="h6" sx={{ fontSize: '16px' }}>
@@ -446,19 +402,15 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                                 marginRight: '25px',
                                 marginTop: '5px',
                                 '& .MuiSlider-thumb': {
-                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
                                   color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-track': {
-                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
                                   color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                                 '& .MuiSlider-rail': {
-                                  // color: lockedSlidersIndicators[indicator.indicator_id] ? 'gray' : 'red',
                                   color: lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? 'gray' : 'red',
                                 },
                               }}
-                              // value={sliderValuesIndicator[indicator.indicator_id] || 0}
                               value={sliderValuesIndicator[`${metric.id}-${indicator.indicator_id}`] || 0}
                               onChange={(event, newValue) => handleSliderChangeIndicators(indicator.indicator_id, newValue, metric.id)}
                               min={0}
@@ -466,11 +418,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                               step={0.01}
                               valueLabelDisplay="auto"
                               valueLabelFormat={(value) => value.toFixed(6)}
-                              // disabled={lockedSlidersIndicators[indicator.indicator_id]} 
                               disabled={lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`]} 
                             />
                             <IconButton onClick={() => handleLockClickIndicator(metric.id, indicator.indicator_id)} size="small">
-                              {/* {lockedSlidersIndicators[indicator.indicator_id] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />} */}
                               {lockedSlidersIndicators[`${metric.id}-${indicator.indicator_id}`] ? <LockIcon fontSize="small" /> : <LockOpenIcon fontSize="small" />}
                             </IconButton>
                           </div>
@@ -489,12 +439,14 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
           <Button variant="contained" color="primary" onClick={() => checkPillar(category)}>Check</Button>
         </FormGroup>
       </div>
-
     );
   };
+
+  // This function changes the weighting of the category modals if the user decides to change it
   const handleWeightingChange = (pillar, value) => {
     const decimalRegex = /^[0-9]+(\.[0-9]+)?$/;
     const numericValue = parseFloat(value);
+    // Ensures form is valid
     if (!isNaN(numericValue) && numericValue >= 0 && numericValue <= 1 && decimalRegex.test(value)) {
       if (pillar === 'E') {
         setModalE(value);
@@ -506,6 +458,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }
   };
 
+  // Allows user to exist the modal
   const handleCancel = () => {
     setModalOpen(false);
     setModalE(pillarWeighting['E']);
@@ -514,23 +467,19 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     setErrorPillarModal('');
   };
 
+  // Checks if each metric and its indicators' weighting adds up to 1
   const checkMetric = (metricId) => {
-
-
     let cumSum = 0;
     let errors = {};
 
     const indicatorsOfConcern = allIndicators[metricId];
     indicatorsOfConcern.forEach(indicator => {
       if (selectedIndicators[metricId].includes(indicator.indicator_id)) {
-        console.log(indicator.weighting);
-        // cumSum += sliderValuesIndicator[indicator.indicator_id];
         cumSum += sliderValuesIndicator[`${metricId}-${indicator.indicator_id}`];
       }
     });
 
-    console.log(cumSum);
-
+    // Accepted range of scores
     if (!(cumSum >= 0.9999 && cumSum <= 1.0001)) {
       errors[metricId] = 'Selected indicators must add up to 1.'
     } else {
@@ -543,75 +492,69 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     }));
   }
 
+  // This function deals with changing the weighting of indicators 
   const handleSliderChangeIndicators = (indicatorId, newValue, metricId) => {
-    console.log(indicatorId);
+
+    // Get all the other indicators under the same metric
     let indicatorsOfSameMetric = allIndicators[metricId];
     indicatorsOfSameMetric = indicatorsOfSameMetric
     .filter(indicator => indicator.indicator_id !== indicatorId)
     .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
-    // .filter(indicator => !lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
     
+    // Get all the locked indicators of the same metrics
     let lockedIndicators = allIndicators[metricId]
       .filter(indicator => indicator.indicator_id !== indicatorId)
       .filter(indicator => lockedSlidersIndicators.hasOwnProperty(`${metricId}-${indicator.indicator_id}`));
-      // .filter(indicator => lockedSlidersIndicators.hasOwnProperty(indicator.indicator_id));
 
     const additional = lockedIndicators.reduce((sum, indicator) => sum + indicator.weighting, 0);
-
     const remainingWeight = 1 - newValue - additional;
     const totalWeighting = indicatorsOfSameMetric.reduce((total, item) => total + item.weighting, 0);
-
-    console.log(remainingWeight);
     
+    // Make sure the lowest possible indicator weighting is 0
     if (remainingWeight < 0) {
       indicatorsOfSameMetric.forEach(item => 
         item.weighting = 0
       );
     } else {
+      // Makes indicator weighting of relative ratio (similar to metrics)
       indicatorsOfSameMetric.forEach(item => 
         item.weighting = remainingWeight * (item.weighting / totalWeighting)
       );
     }
 
-    console.log(indicatorsOfSameMetric);
-
+    // Update the state of the indicators
     setSliderValuesIndicator(prevValues => {
       const updatedValues = {...prevValues};
       indicatorsOfSameMetric.forEach(item => {
-        // updatedValues[item.indicator_id] = isNaN(item.weighting) ? 0 : item.weighting;
         updatedValues[`${metricId}-${item.indicator_id}`] = isNaN(item.weighting) ? 0 : item.weighting;
-
       });
-
-      // updatedValues[indicatorId] = newValue;
       updatedValues[`${metricId}-${indicatorId}`] = newValue;
       return updatedValues;
     });
 
   }
+  
   const getClampedValue = (value, max) => {
-    console.log(value);
-    console.log(max);
     return Math.min(value, max);
   }
 
+  // This function checks all the weightings of the metrics of a category adds up to 1
   const checkPillar = (category) => {
     const allMetrics = metricNames
     .filter(metric => metric.category === category)
     .filter(metric => selectedMetrics.includes(metric.id));
 
+    // No categorical metrics chosen
     if (allMetrics.length === 0) {
       return;
     }
-
-    console.log(allMetrics);
 
     let cumWeighting = 0;
     allMetrics.forEach(metric => 
       cumWeighting += sliderValues[metric.id]
     );
 
-    console.log(cumWeighting);
+    // Accepted range of values
     if (!(cumWeighting >= 0.9999 && cumWeighting <= 1.0001)) {
       if (category === 'E') {
         setErrorE('Selected Environmental metrics must add up to 1.');
@@ -620,7 +563,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       } else {
         setErrorG('Selected Governance metrics must add up to 1.');
       }
-      
     } else {
       if (category === 'E') {
         setErrorE('');
@@ -630,11 +572,10 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         setErrorG('');
       }
     }
-    
   }
 
+  // Upon initial rendering, this finds the largest weight a metric could possibly take
   const findMaxWeight = (metricId) => {
-
     const categoryOfInterest = metricNames.find(metric => metric.id === metricId)['category'];
     const lockedMetrics = metricNames
       .filter(metric => metric.category === categoryOfInterest)
@@ -644,12 +585,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     if (lockedMetrics.length === 0) {
       return 1;
     } else {
-      console.log('here');
       const totalWeighting = lockedMetrics.reduce((sum, metric) => sum + metric.weighting, 0);
       return 1 - totalWeighting;
     }
   }
 
+  // This function deals with the event that an indicator has been locked
   const handleLockClickIndicator = (metricId, indicatorId) => {
     setLockedSlidersIndicators((prevLockedSlidersIndicators) => {
       const newLockedSlidersIndicators = {...prevLockedSlidersIndicators};
@@ -662,6 +603,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     });
   }
 
+  // This indicator sets the event that a metric has been locked
   const handleLockClick = (id) => {
     setLockedSliders((prevLockedSliders) => {
       const newLockedSliders = { ...prevLockedSliders };
@@ -674,8 +616,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     });
   };
 
+  // This function is the metric version of weighting changes
   const handleSliderChange = (metricId, newValue) => {
-
     const changedMetric = metricNames.find(metric => metric.id === metricId);
     changedMetric.weighting = newValue;
     const category = changedMetric.category;
@@ -684,8 +626,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       .filter(metric => metric.id !== metricId)
       .filter(metric => selectedMetrics.includes(metric.id))
       .filter(metric => !lockedSliders.hasOwnProperty(metric.id));
-    
-    console.log(filteredMetrics);
       
     const lockedMetrics = metricNames
       .filter(metric => metric.category === category)
@@ -698,23 +638,18 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       additional += sliderValues[metric.id];
     });
 
-    // const additional = lockedMetrics.reduce((sum, metric) => sum + metric.weighting, 0);
-
     const remainingWeight = 1 - newValue - additional;
-    // const totalWeighting = filteredMetrics.reduce((total, item) => total + item.weighting, 0);
     let totalWeighting = 0;
     filteredMetrics.forEach(metric => {
       totalWeighting += sliderValues[metric.id];
     })
     
-    // const newWeight = remainingWeight / filteredMetrics.length;
     if (remainingWeight < 0) {
       filteredMetrics.forEach(item =>
         item.weighting = 0
       );
     } else {
       filteredMetrics.forEach(item => {
-          console.log(item.weighting);
           item.weighting = isNaN(remainingWeight * (sliderValues[item.id] / totalWeighting)) ? 0 : remainingWeight * (sliderValues[item.id] / totalWeighting)
         }
       );
@@ -732,10 +667,10 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
   };
 
+  // This function checks that the sum of all categories add up to 1
   const checkAll = () => {
     const pillarAddsUp = pillarWeighting['E'] + pillarWeighting['S'] + pillarWeighting['G'];
     if ((pillarAddsUp < 0.99999) || (pillarAddsUp >= 1.000001)) {
-      
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your metric weightings add up to 1.');
       return;
@@ -752,8 +687,6 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     for (const key in sliderValues) {
       let category = metricNames.find(indicator => indicator.id === parseInt(key)).category;
       let weighting = sliderValues[parseInt(key)];
-      console.log(weighting);
-
       if (category === 'E') {
         eLength += 1;
         eWeighting += weighting;
@@ -766,12 +699,11 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       }    
     }
 
-    console.log(eWeighting);
-
     const eOK = ((eWeighting >= 0.99999 && eWeighting <= 1.00001 && eLength > 0) || (eLength === 0));
     const sOK = ((sWeighting >= 0.99999 && sWeighting <= 1.00001 && sLength > 0) || (sLength === 0));
     const gOK = ((gWeighting >= 0.99999 && gWeighting <= 1.00001 && gLength > 0) || (gLength === 0));
 
+    // One of the metrics is not OK -> Immediately exit
     if (!eOK) {
       setModalWeightingOpen(true);
       setModalWeightingError('Please ensure your environmental metric weightings add up to 1.');
@@ -788,42 +720,38 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
 
     for (const key in selectedIndicators) {
       let indicatorWeighting = 0;
-      // selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[element]);
       selectedIndicators[key].forEach(element => indicatorWeighting += sliderValuesIndicator[`${key}-${element}`]);
-      console.log(key);
-      console.log(indicatorWeighting);
       if ((indicatorWeighting <= 0.99999) || (indicatorWeighting > 1.00001)) {
+        // One of the indicators is not OK
         let metricNameInvolved = metricNames.find(item => item.id === parseInt(key)).name;
         setModalWeightingOpen(true);
         setModalWeightingError(`Please ensure your selected indicators for ${metricNameInvolved} add up to 1.`);  
         return;
       }
     }
-
     putModifiedMetrics();
-
-    console.log(sliderValuesIndicator);
     getAdjustedFrameworkScore();
   }
 
+  // This function deals with the event that a user has changed the weightings of 
+  // either a metric or an indicator and decides to save these changes for later
   const putModifiedMetrics = async() => {
     let array = [];
     for (let id of selectedMetrics) {
       let newObj = {};
       let category = metricNames.find(indicator => indicator.id === id).category;
       let weighting = sliderValues[id];
+      // New weighting will be remembered next time
       newObj["category"] = category;
       newObj["metric_id"] = id;
       newObj["weighting"] = weighting;
       array.push(newObj);
     }
-
-    console.log(pillarWeighting);
     await putFrameworkModifyMetrics(selectedFramework, array, pillarWeighting);
-    console.log(array);
   }
 
-
+  // This function deals with the event that a framework score has been adjusted as its
+  // metrics and indicator properties have been altered
   const getAdjustedFrameworkScore = async() => {
     let metricScoreMock = {};
     for (let idMetric of selectedMetrics) {
@@ -834,20 +762,20 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
         newObj[indicatorObject.indicator_name] = sliderValuesIndicator[`${idMetric}-${idIndicator}`];
       }
 
-
       let correspondingScore;
+      // There is no such year as 'predicted' - that's only to see the predicted values
       if (selectedYear !== 'Predicted') {
         correspondingScore = await getMetricScoreByYear(indicatorsCompany[selectedYear], newObj);
       } else {
         correspondingScore = 0;
       }
       
-      console.log(correspondingScore);
       let obj1 = {};
       obj1["score"] = correspondingScore;
       metricScoreMock[idMetric] = obj1;
     }
-    console.log(metricScoreMock);
+
+    // Set the new set of score
     setMetricScores(metricScoreMock);
     const filteredEMetrics = findCategoricalMetrics(metricScoreMock, metricNames, 'E');
     seteScore(filteredEMetrics.reduce((sum, { score, weighting }) => sum + (score * weighting), 0));
@@ -865,6 +793,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
     setModalWeightingError('');
   }
 
+  // This function deals with the event that an indicator has been added or removed
   const handleIndicatorChange = (event, metricId) => {
     const indicatorId = Number(event.target.value);
     
@@ -888,6 +817,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
       return result;
     });
   };  
+
   return (
     <Card style={{ marginTop: '2vh' }}>
       <FormControl style={{ marginLeft: '1.5vw', display: 'flex', flexDirection: 'column', flex: '1' }} component="fieldset">
@@ -975,6 +905,8 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`Overall Framework Score: ${isNaN(frameworkScore) ? '' : frameworkScore}`}</h6>
             )}
           </div>
+
+          {/**Displays the scores */}
           <Dialog maxWidth="xs" fullWidth open={modalOpen} onClose={() => setModalOpen(false)}>
             <DialogTitle style={{ display: 'flex', justifyContent: 'center' }}>
               Edit Pillar Weighting
@@ -993,11 +925,11 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                     width: '200px',
                   }}
                   inputProps={{
-                    pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
-                    min: 0,                       // Minimum value allowed
-                    max: 1,                       // Maximum value allowed
-                    step: 0.01,                   // Step interval
-                    inputMode: 'decimal'          // Input mode for decimal numbers
+                    pattern: /^[0-9]+(\.[0-9]+)?$/, 
+                    min: 0,                      
+                    max: 1,          
+                    step: 0.01,             
+                    inputMode: 'decimal'          
                   }}
                   disabled={isLockedE}
                 />
@@ -1014,11 +946,11 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                     width: '200px',
                   }}
                   inputProps={{
-                    pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
-                    min: 0,                       // Minimum value allowed
-                    max: 1,                       // Maximum value allowed
-                    step: 0.01,                   // Step interval
-                    inputMode: 'decimal'          // Input mode for decimal numbers
+                    pattern: /^[0-9]+(\.[0-9]+)?$/,  
+                    min: 0,                      
+                    max: 1,                
+                    step: 0.01,             
+                    inputMode: 'decimal'      
                   }}
                   disabled={isLockedS}
                 />
@@ -1035,11 +967,11 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                     width: '200px',
                   }}
                   inputProps={{
-                    pattern: /^[0-9]+(\.[0-9]+)?$/, // Regular expression for numeric input
-                    min: 0,                       // Minimum value allowed
-                    max: 1,                       // Maximum value allowed
-                    step: 0.01,                   // Step interval
-                    inputMode: 'decimal'          // Input mode for decimal numbers
+                    pattern: /^[0-9]+(\.[0-9]+)?$/, 
+                    min: 0,                    
+                    max: 1,              
+                    step: 0.01,               
+                    inputMode: 'decimal'       
                   }}
                   disabled={isLockedG}
                 />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -10,6 +10,11 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getIndicatorFromMetric } from "../helper";
 
+// This component includes the majority of the left bar of the company page.
+// It contains 3 children components 
+// 1. Section showing the selected framework (if any has been selected)
+// 2. Section showing all the metrics and indicators selected
+// 3. Section showing additional metrics the users can select
 const LeftPanel = ({
   setSelectedFramework,
   officialFrameworks,
@@ -18,8 +23,7 @@ const LeftPanel = ({
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
   setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
-  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
-  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
+  eScore, sScore, gScore,
   frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
   seteScore, setsScore, setgScore, findCategoricalMetrics
 }) => {
@@ -31,46 +35,28 @@ const LeftPanel = ({
     navigate('/dashboard');
   };
 
+  // Opens the modal if the user wants to open compare between companies
   const openCompareModal = () => {
     setCompareModalOpen(true);
   };
 
-  useEffect(() => {
-    console.log(officialFrameworks);
-  }, [officialFrameworks]);
-
-  useEffect(() => {
-    console.log(metricNamesFixed);
-  }, [metricNamesFixed]);
-
-  useEffect(() => {
-    console.log('Selected Metrics:', selectedMetrics);
-  }, [selectedMetrics]);
-
+  // Component that allows the user to select/unselect metrics -> Passed into
+  // children component
   const updateMetricName = async (newValue, newValue1, unselectedMetricId) => {
-    console.log(unselectedMetricId);
-    console.log('Updating metric names:', newValue, newValue1);
     setMetricNames(newValue);
     setSelectedMetrics(newValue1);
-    console.log('Metric names set:', newValue);
-    console.log('Selected metrics set:', newValue1);
     const unselectedIndicators = await getIndicatorFromMetric(unselectedMetricId);
-    console.log(unselectedIndicators);
-    console.log(allIndicators);
     setAllIndicators((prevIndicators) => ({
       ...prevIndicators,
       [unselectedMetricId]: unselectedIndicators
     }));
     const indicatorIds = unselectedIndicators.map(indicator => indicator.indicator_id);
-    console.log(indicatorIds);
-
     setSelectedIndicators((prevIndicators) => ({
       ...prevIndicators,
       [unselectedMetricId]: indicatorIds
     }));
    
   };
-
 
   return (
     <Box
@@ -140,27 +126,12 @@ const LeftPanel = ({
             selectedFramework={selectedFramework}
           />
           <AdditionalMetrics
-            selectedIndicators={selectedIndicators}
             selectedMetrics={selectedMetrics}
             metricNames={metricNames}
             setSelectedIndicators={setSelectedIndicators}
             setSelectedMetrics={setSelectedMetrics}
-            allIndicators={allIndicators}
-            allIndicatorsInfo={allIndicatorsInfo}
             setMetricNames={setMetricNames}
-            setAllIndicators={setAllIndicators}
-            sliderValues={sliderValues}
-            sliderValuesFixed={sliderValuesFixed}
-            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
-            metricNamesFixed={metricNamesFixed}
-            selectedMetricsFixed={selectedMetricsFixed}
-            allIndicatorsFixed={allIndicatorsFixed}
-            selectedIndicatorsFixed={selectedIndicatorsFixed}
-            sliderValuesIndicator={sliderValuesIndicator}
-            setSliderValuesIndicator={setSliderValuesIndicator}
-            setSliderValues={setSliderValues}
             allMetrics={allMetrics}
-            selectedFramework={selectedFramework}
             setSelectedFramework={setSelectedFramework}
             updateMetricName={updateMetricName}
             exitFramework={exitFramework}

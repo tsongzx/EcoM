@@ -40,7 +40,8 @@ import metrics
 
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
-client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
+alpha_client = os.getenv("ALPHA_VANTAGE_API_KEY")
 
 
 def get_session():
@@ -554,6 +555,37 @@ async def get_all_company(
         company_models.Company).all()
     return companyData
 
+#***************************************************************
+#                        Report Apis
+# ***************************************************************
+
+@app.get("/company/news/sentiment", tags=["company"])
+async def get_company_news_sentiment(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    company = session.query(company_models.Company).filter(
+        company_models.CompanyData.company_name == company_name,
+    ).first()
+
+    ticker = company.ticker
+    print(ticker)
+
+    if not ticker:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No valid company ticker")
+    #CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
+    url = 'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
+
+    r = requests.get(url)
+    data = r.json()
+
+    extracted_info = []
+    for info in data['feed']:
+        extracted_info.append({'Article Title': info['title'], 'URL': info['url']})
+
+    return data
+
 
 @app.get("/company/{company_id}", tags=["company"])
 async def get_company(
@@ -892,8 +924,7 @@ async def delete_framework(
     return {"message": f"Successfully deleted framework {framework_id}"}
 
 # calculate framework score
-
-
+# CHANGE THIS CLAIRE
 @app.get("/framework/score/", tags=["Framework"])
 async def get_framework_score(
     framework_id: int,
@@ -1203,6 +1234,7 @@ async def get_recommended_companies(
     companies = session.query(company_models.Company).filter_by(industry=industry).order_by(func.rand()).limit(10).all()
     
     return companies
+
 # #test all of the average ones claire
 # @app.get("/industry/framework/average/", tags=["Industry"])
 # async def get_framework_industry_average(
@@ -1234,13 +1266,36 @@ async def get_recommended_companies(
 #     # Run concurrently
 #     scores = await asyncio.gather(*tasks)
 
-#     # Calculate the total score
-#     total_score = sum(scores)
+@app.get("/company/framework/average/", tags=["company"])
+async def get_framework_company_average(
+    company_name: str,
+    year: int,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> float:
+    
+    frameworks = session.query(framework_models.Frameworks).filter(or_(
+        # framework_models.Frameworks.user_id == user.id,
+        framework_models.Frameworks.is_official_framework == True
+        )
+    ).all()
 
-#     # Return the average score
-#     return total_score / len(companies)
+    #REMOVE LATER
+    if not frameworks:
+        # Return 0 or handle the case when no frameworks are found
+        return 0 
 
+    # Print all frameworks
+    for framework in frameworks:
+        print(framework)
+    
+    score = 0
 
+    for framework in frameworks:
+        score += await get_framework_score(framework_id=framework.id, company_name=company_name, year=year, user=user, session=session)
+    
+    return score / len(frameworks)
+  
 # @app.get("/industry/metric/average/", tags=["Industry"])
 # async def get_metric_industry_average(
 #     metric_id: int,
@@ -1350,8 +1405,8 @@ def linear_regression(data: List[company_models.CompanyData]) -> float:
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
-    indicator_unit=str,
-    company_name=str,
+    metric_unit = str,
+    company_name = str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
 ) -> PredictiveIndicators:
@@ -1360,21 +1415,23 @@ async def get_predictive(
         company_models.CompanyData.company_name == company_name,
     ).all()
 
+    if not isinstance(metric_unit, str):
+        metric_uni = str(metric_unit)
+        
     if not data:
         raise HTTPException(status_code=404, detail="Error")
 
-    if "%" in indicator_unit:
+    if "%" in metric_unit:
         prediction = linear_regression(data)
-    elif indicator_unit == 'Yes/No':
+    elif metric_unit == 'Yes/No':
         values = [point.indicator_value for point in data]
         predicted_value = max(set(values), key=values.count)
         if predicted_value == 1:
             prediction = 'Yes'
         elif predicted_value == 0:
             prediction = 'No'
-
-    else:
-        # indicator_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
+    else: 
+        #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name=indicator, prediction=prediction)
@@ -1568,5 +1625,4 @@ async def calculate_metric_company_view(
 #     user: user_schemas.UserInDB = Depends(get_user),
 #     session: Session = Depends(get_session),
 # ) -> float:
-
 #     return sum(value.score * value.weighting for value in values)
