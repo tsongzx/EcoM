@@ -1,6 +1,5 @@
 import {React, useState, useEffect} from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, Link } from '@mui/material';
-import './LoginModal.css'
 
 const LoginModal = ({ open, handleCloseLogin, handleLogin, goToRegister, setErrorMessage, errorMessage }) => {
 

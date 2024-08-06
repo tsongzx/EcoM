@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchCompaniesInList } from "../helper.js";
-import CompanyElement from "../CompanyElement.jsx";
+import { fetchCompaniesInList } from "../../helper.js";
+import CompanyElement from "./CompanyElement.jsx";
 /**
  * 
  * @param {*} param0 gets passed in the id of the LIST, fetches the information on the list

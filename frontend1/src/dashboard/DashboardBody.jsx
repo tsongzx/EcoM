@@ -66,6 +66,10 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     // Implement logic to delete the list
     deleteList(listId);
 
+    // remove list from userLists on frontend
+    const newLists = lists.filter(list => list.id !== listId);
+    setLists(newLists);
+
   };
 
   const handleEllipsisClick = (event) => {

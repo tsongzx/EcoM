@@ -272,7 +272,7 @@ async def delete_list(
 
     session.commit()
 
-    return {"message": f"Successfully deleted list {list_id.id}"}
+    return {"message": f"Successfully deleted list {list_id}"}
 
 
 @app.post("/list/company", tags=["List"])
