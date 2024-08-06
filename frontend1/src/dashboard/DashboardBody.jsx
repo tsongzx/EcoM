@@ -1,7 +1,7 @@
 import {React, useEffect, useState} from 'react';
 import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Container, Box, Stack } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { fetchLists, getRecentlyViewed, getCompanyFromRecentlyViewed, getFavouritesList, deleteList } from '../helper.js';
+import { fetchLists, getRecentlyViewed, fetchCompanyInfo, getFavouritesList, deleteList } from '../helper.js';
 import { useNavigate } from 'react-router-dom';
 import ListModal from './ListModal.jsx';
 
@@ -85,7 +85,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     let nameList = [];
     for (let recent of Object.keys(recents)) {
       console.log(recents[recent].company_id);
-      const individualCompany = await getCompanyFromRecentlyViewed(recents[recent].company_id);
+      const individualCompany = await fetchCompanyInfo(recents[recent].company_id);
       nameList.push(individualCompany.company_name);
     }
     console.log(nameList);
@@ -94,7 +94,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
 
   const dashboardToCompany = async (companyId) => {
     try {
-      const companyInfo = await getCompanyFromRecentlyViewed(companyId);
+      const companyInfo = await fetchCompanyInfo(companyId);
       setSelectedCompany(companyInfo);
       navigate(`/company/${encodeURIComponent(companyInfo.id)}`, 
       { state: { 

@@ -1194,6 +1194,15 @@ async def get_companies_in_industry(
     companyData = query.offset(offset).limit(20).all()
     return companyData
 
+@app.get("/industry/companies/recommended", tags=["Industry"])
+async def get_recommended_companies(
+    industry: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companies = session.query(company_models.Company).filter_by(industry=industry).order_by(func.rand()).limit(10).all()
+    
+    return companies
 # #test all of the average ones claire
 # @app.get("/industry/framework/average/", tags=["Industry"])
 # async def get_framework_industry_average(

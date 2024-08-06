@@ -150,8 +150,7 @@ export const getAllCompanies = async() => {
     }
 }
 
-//this function is not appropiately named
-export const getCompanyFromRecentlyViewed = async (companyId) => {
+export const fetchCompanyInfo = async (companyId) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
             {
@@ -492,34 +491,7 @@ export const getIndicatorsInfoByName = async() => {
   }
 }
 
-export const getCompaniesOfIndustry = async(search, loadedOptions, { page }, industryName) => {
-    // const cacheURL = `http://127.0.0.1:8000/industry/companies?industry=${industryName}`;
-    
-    // try {
-    //     const cache = await caches.open('companiesInIndustry');
-    //     const cachedResponse = await cache.match(cacheURL);
-    //     if (cachedResponse) {
-    //         console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-    //         console.log(cachedResponse.json());
-    //         return await cachedResponse.json();
-    //     }
-    //     const response = await axios.get('http://127.0.0.1:8000/industry/companies', {
-    //         params: { industry: industryName },
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${Cookies.get('authToken')}`
-    //         }
-    //     });
-    //     const responseClone = new Response(JSON.stringify(response.data));
-    //     cache.put(cacheURL, responseClone);
-    //     console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-    //     console.log(response.data);
-    //     return response.data;
-    // } catch (error) {
-    //     console.error(`Error getting companies: ${error}`);
-    //     return [];
-    // }
-
+export const getCompaniesOfIndustryByBatch = async(search, loadedOptions, { page }, industryName) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
         {
@@ -555,6 +527,27 @@ export const getCompaniesOfIndustry = async(search, loadedOptions, { page }, ind
           hasMore: false,
         };
     }
+}
+
+export const getRecommendedCompanies = async(industryName) => {
+  try {
+      const response = await axios.get('http://127.0.0.1:8000/industry/companies/recommended', 
+      {
+          params: {
+              industry: industryName,
+          },             
+          
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }
+      });
+
+      return response.data;
+  } catch (error) {
+      console.error('Error fetching companies:', error);
+      return [];
+  }
 }
 // Given a framework already, requires company Indicators by metric
 // indicators List of json objects {id, indicator_id, indicator_name (string), metric_id, weighting (float)}

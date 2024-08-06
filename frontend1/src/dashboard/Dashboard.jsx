@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem,
 import Navbar from '../Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList, deleteList } from '../helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, fetchCompanyInfo, fetchIndustries, getCompaniesOfIndustryByBatch, getOfficialFrameworks, getFavouritesList, deleteList } from '../helper.js';
 import './Dashboard.css'
 import ChatFeature from '../chatbot/Chatbot.jsx';
 import './Dashboard.css'
@@ -18,13 +18,11 @@ const Dashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [listOfIndustries, setListOfIndustries] = useState([]);
   const [listOfFrameworks, setListOfFrameworks] = useState({});
-  const [page, setPage] = useState(0);
   const [selectedFramework, setSelectedFramework] = useState(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    console.log(page);
-    const fetchData = async () => {
+      const fetchData = async () => {
       try {
         const industriesAvailable = await fetchIndustries();
         console.log(industriesAvailable);
@@ -48,10 +46,11 @@ const Dashboard = () => {
     } else {
       console.log(selectedFramework);
       console.log(selectedCompany.id);
-      navigate(`/company/${encodeURIComponent(selectedCompany.id)}`, 
+      console.log(selectedCompany);
+      navigate(`/company/${encodeURIComponent(selectedCompany.value)}`, 
       { state: { 
-          companyId: selectedCompany.id, 
-          companyName: selectedCompany.company_name,
+          companyId: Number(selectedCompany.value), 
+          companyName: selectedCompany.label,
           initialFramework: selectedFramework,
           selectedIndustry: selectedIndustry
         } 
@@ -102,7 +101,7 @@ const Dashboard = () => {
                 maxMenuHeight={100}
                 loadOptions={(search, loadedOptions, additional) => {
                   return selectedIndustry 
-                    ? getCompaniesOfIndustry(search, loadedOptions, additional, selectedIndustry)
+                    ? getCompaniesOfIndustryByBatch(search, loadedOptions, additional, selectedIndustry)
                     : fetchCompanies(search, loadedOptions, additional);
                 }}
                 cacheOptions
@@ -121,7 +120,7 @@ const Dashboard = () => {
             </Stack>
           </Stack>
           
-          {selectedIndustry ? <IndustryPage></IndustryPage> : <DashboardBody page={page} setSelectedCompany={setSelectedCompany}/>}
+          {selectedIndustry ? <IndustryPage></IndustryPage> : <DashboardBody setSelectedCompany={setSelectedCompany}/>}
         </Box>
       <ChatFeature/>
     </>

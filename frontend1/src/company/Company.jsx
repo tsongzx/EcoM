@@ -26,7 +26,7 @@ import {
   getMetricScoreByYear,
   getIndicatorFromMetric,
   companyScoreGeneral,
-  getCompanyFromRecentlyViewed
+  fetchCompanyInfo
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -85,25 +85,22 @@ const Company = () => {
   const [companyId, setCompanyId] = useState(initialCompanyId);
   console.log("Initial Framework:", initialFramework);
 
+  console.log(`initial company id: ${initialCompanyId}`);
 
   useEffect(() => {
-    if (initialCompanyId) {
-      setCompanyId(initialCompanyId); 
-    } else {
-      const asyncGetId = async () => {
-        let url = window.location.href;
-        let companyIdActual = url.split("/");
+    const asyncGetId = async () => {
+      let url = window.location.href;
+      let companyIdActual = url.split("/");
+      if (companyIdActual) {
         setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
-        const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+        const name = await fetchCompanyInfo(Number(companyIdActual[companyIdActual.length - 1]));
         setCompanyName(name.company_name);
         setTicker(name.ticker);
         console.log(name);
       }
-      asyncGetId();
     }
-  }, [initialCompanyId]);
-
-  
+    asyncGetId();
+  }, [window.location.href]);
 
   const [frameworkDisplay, setFrameworkDisplay] = useState('tabular');
   // useEffect(() => {
@@ -164,7 +161,7 @@ const Company = () => {
       let url = window.location.href;
       let companyIdActual = url.split("/");
       setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
-      const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+      const name = await fetchCompanyInfo(Number(companyIdActual[companyIdActual.length - 1]));
       setCompanyName(name.company_name);
       setTicker(name.ticker);
 
