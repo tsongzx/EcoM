@@ -5,7 +5,7 @@ import Switch from '@mui/material/Switch';
 import {closestCorners, DndContext} from '@dnd-kit/core';
 import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
-import Navbar from "../Navbar";
+import Navbar from "../navbar/Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { fetchCompanyInfo, getDetailedCompanyInformation } from "../helper";
 import SimpleLineChart from "../SimpleLineChart";
