@@ -104,7 +104,6 @@ const Dashboard = () => {
                 maxMenuHeight={100}
                 onChange={(selectedOption) => setSelectedIndustry(selectedOption.label)}
               />
-
               <Select
                 id='frameworkfilter'
                 options={Object.entries(listOfFrameworks).map(([key, framework]) => ({

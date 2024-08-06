@@ -109,52 +109,105 @@ const DashboardBody = ({page, setSelectedCompany}) => {
   };
   return (
     <>
-      <div id='recentlyviewedcontainer'>
-        Recently Viewed
-        <Grid container spacing={2}>
-        {recents.map((recent, index) => (
-                  <Grid 
-                    style={{ cursor: 'pointer'}} 
-                    item xs={2} 
-                    key={recent.id}
-                    onClick={() => dashboardToCompany(recent.company_id)}
-                  >
-                    <Card style={{ cursor: 'pointer', height: '120px'}}>
-                      <CardContent>
-                        <Typography variant="h6">{companyNames[index]}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
+      <Stack sx={{
+          marginTop: '20px',
+          width: '100vw'
+        }}
+          alignItems={'center'} 
+          spacing={2}>
+        <Typography sx={{
+           color: '#0D2149',
+           fontSize: '30px',
+           fontWeight: 'bold',
+           fontFamily: 'Merriweather',
+           textAlign: 'left',
+           width: '95vw'
+        }}>Recently Viewed</Typography>
+        <Grid container spacing={2}
+          sx={{
+            justifyContent: 'left',
+            width: '95vw',
+            // marginLeft: 0,
+          }}
+        >
+          {recents.map((recent, index) => (
+            <Grid 
+              style={{
+                cursor: 'pointer',
+                // width: '15%'
+              }} 
+              item xs={2} 
+              key={recent.id}
+              onClick={() => dashboardToCompany(recent.company_id)}
+            >
+              <Card style={{ cursor: 'pointer', height: '120px'}}>
+                <CardContent>
+                  <Typography variant="h6">{companyNames[index]}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
-      </div>
-      <div className='favouritescontainer'>
-        <Typography variant="h6" gutterBottom style={{ color: 'black', alignSelf: 'flex-start' }}>
-          Favourites {favsList.length}
-        </Typography>
-        <Grid container spacing={2}>
+      </Stack>
+
+      <Stack sx={{
+          marginTop: '20px',
+          width: '100vw'
+        }}
+          alignItems={'center'} 
+          spacing={2}>
+        <Typography sx={{
+           color: '#0D2149',
+           fontSize: '30px',
+           fontWeight: 'bold',
+           fontFamily: 'Merriweather',
+           textAlign: 'left',
+           width: '95vw'
+        }}>Favourites: {favsList.length}</Typography>
+        <Grid container spacing={2}
+          sx={{
+            justifyContent: 'left',
+            width: '95vw',
+            // marginLeft: 0,
+          }}
+        >
           {favsList.map((f, index) => (
             <Grid 
               style={{ cursor: 'pointer' }} 
-              item xs={12} 
+              item xs={2} 
               key={f.company_id}
               onClick={() => dashboardToCompany(f.company_id)}
             >
-          <Card>
-            <CardContent>
-              <Typography variant="h6">{companyNames[index]}</Typography>
-            </CardContent>
-          </Card>
+              <Card sx={{height: '120px'}}>
+                <CardContent>
+                  <Typography variant="h6">{companyNames[index]}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
         </Grid>
-        ))}
-        </Grid>
-      </div>
-      <div id='listcontainer'>
-        My Lists
-        <Grid container spacing={2}>
+      </Stack>
+
+      <Stack sx={{
+        marginTop: '20px'
+      }}
+        spacing={2}>
+        <Stack spacing={2} alignItems="center"
+          sx={{
+            width: '100vw',
+            // marginLeft: 0,
+          }}
+        >        
+          <Typography sx={{
+            color: '#0D2149',
+            fontSize: '30px',
+            fontWeight: 'bold',
+            fontFamily: 'Merriweather',
+            textAlign: 'left',
+            width: '95vw'
+          }}>My Lists</Typography>
           {Array.isArray(lists) && lists.map((list) => (
-            <Grid item xs={2} key={list.id} style={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden' }} 
-            >
+            <Box key={list.id} sx={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden', width: '95%' }}>
               <Card>
                 <CardContent style={{ position: 'relative' }}>
                   <div onClick={() => handleListClick(list)}>
@@ -176,10 +229,10 @@ const DashboardBody = ({page, setSelectedCompany}) => {
                   </Menu>
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
-      </div>
+        </Stack>
+      </Stack>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany}/>}
     </>
     
