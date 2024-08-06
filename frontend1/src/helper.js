@@ -47,7 +47,7 @@ export const fetchLists = async() => {
 }
 
 // Gets 20 companies at a time when the user first goes into the dashboard
-export const fetchCompanies = async(page) => {
+export const fetchCompanies = async(search, loadedOptions, { page }) => {
     console.log('Getting all the companies available');
     try {
         const response = await axios.get('http://127.0.0.1:8000/company', 
@@ -57,16 +57,32 @@ export const fetchCompanies = async(page) => {
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
                 },
                 params: {
-                    page: page
+                    page: page,
+                    search: search 
                 }
             }
         );
-        const companies = response.data.slice(0, 20);
-        return companies;
-    } catch (error) {
-        console.log('Error fetching the companies', error);
-        return [];
-    }
+
+        const filteredOptions = response.data
+          .map(company => ({
+            value: company.id,
+            label: company.company_name,
+          }));
+        
+        return {
+          options: filteredOptions,
+          hasMore: response.data.length >= 20, // there might be more data if we get results
+          additional: {
+            page: page + 1,
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        return {
+          options: [],
+          hasMore: false,
+        };
+      }
 }
 
 export const fetchIndustries = async() => {
@@ -476,7 +492,7 @@ export const getIndicatorsInfoByName = async() => {
   }
 }
 
-export const getCompaniesOfIndustry = async(industryName) => {
+export const getCompaniesOfIndustry = async(search, loadedOptions, { page }, industryName) => {
     // const cacheURL = `http://127.0.0.1:8000/industry/companies?industry=${industryName}`;
     
     // try {
@@ -508,7 +524,9 @@ export const getCompaniesOfIndustry = async(industryName) => {
         const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
         {
             params: {
-                industry: industryName
+                industry: industryName,
+                page: page,
+                search: search 
             },             
             
             headers: {
@@ -516,15 +534,28 @@ export const getCompaniesOfIndustry = async(industryName) => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-        console.log('Searching for companies in industry, ', industryName);
-        console.log(response.data);
-        return response.data;
+        const filteredOptions = response.data
+            .map(company => ({
+              value: company.id,
+              label: company.company_name,
+            })
+        );
+
+        return {
+            options: filteredOptions,
+            hasMore: response.data.length >= 20, // there might be more data if we get results
+            additional: {
+              page: page + 1,
+            }
+        }
     } catch (error) {
-        console.log(`Error getting metric: ${error}`);
-        return [];
+        console.error('Error fetching companies:', error);
+        return {
+          options: [],
+          hasMore: false,
+        };
     }
 }
-
 // Given a framework already, requires company Indicators by metric
 // indicators List of json objects {id, indicator_id, indicator_name (string), metric_id, weighting (float)}
 // used pre-stored data from the json file to avoid continuously accessing it

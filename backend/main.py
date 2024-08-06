@@ -514,12 +514,24 @@ async def add_to_recently_viewed(
 @app.get("/company", tags=["company"])
 async def get_company_by_batch(
     page: int,
+    search: str,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    offset = page * 20
-    companyData = session.query(
-        company_models.Company).offset(offset).limit(20).all()
+    offset = (page - 1) * 20
+    
+    search = search.strip()
+    print(f'page: {page}')
+
+    if search:
+      query = session.query(company_models.Company).filter(
+          company_models.Company.company_name.like(f"{search}%")
+      )
+    else:
+      query = session.query(company_models.Company)
+    
+    # Apply pagination and limit the results
+    companyData = query.offset(offset).limit(20).all()
     return companyData
 
 
@@ -1161,14 +1173,26 @@ async def get_industries(
 
 @app.get("/industry/companies", tags=["Industry"])
 async def get_companies_in_industry(
+    page: int,
     industry: str,
+    search: str,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companies = session.query(company_models.Company).filter_by(
-        industry=industry).all()
+    offset = (page - 1) * 20
+    
+    search = search.strip()
+    print(f'page: {page}')
 
-    return companies
+    query = session.query(company_models.Company).filter_by(industry=industry)
+    if search:
+      query = query.filter(
+          company_models.Company.company_name.like(f"{search}%")
+      )
+    
+    # Apply pagination and limit the results
+    companyData = query.offset(offset).limit(20).all()
+    return companyData
 
 # #test all of the average ones claire
 # @app.get("/industry/framework/average/", tags=["Industry"])

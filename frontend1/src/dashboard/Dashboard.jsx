@@ -8,6 +8,8 @@ import './Dashboard.css'
 import ChatFeature from '../chatbot/Chatbot.jsx';
 import './Dashboard.css'
 import DashboardBody from './DashboardBody.jsx';
+import IndustryPage from './IndustryPage.jsx';
+import { AsyncPaginate } from 'react-select-async-paginate';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,37 +18,17 @@ const Dashboard = () => {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [listOfIndustries, setListOfIndustries] = useState([]);
   const [listOfFrameworks, setListOfFrameworks] = useState({});
-  const [listOfCompanies, setListOfCompanies] = useState([]);
   const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [selectedFramework, setSelectedFramework] = useState(null);
   const [error, setError] = useState(false);
-
-  const setIndustryAndCompany = async() => {
-    if (selectedIndustry) {
-      console.log(selectedIndustry);
-      const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry);
-      setListOfCompanies(companyOfIndustry);
-    }
-  }
-  useEffect(() => {
-    setIndustryAndCompany();
-  }, [selectedIndustry]);
 
   useEffect(() => {
     console.log(page);
     const fetchData = async () => {
-      setLoading(true);
       try {
-
         const industriesAvailable = await fetchIndustries();
         console.log(industriesAvailable);
         setListOfIndustries(industriesAvailable);
-
-        const companiesAvailable = await fetchCompanies(page);
-        setListOfCompanies(prevCompanies => [...prevCompanies, ...companiesAvailable]);
-        setHasMore(companiesAvailable.length > 0);
 
         const frameworksAvailable = await getOfficialFrameworks();
         console.log(frameworksAvailable);
@@ -55,17 +37,10 @@ const Dashboard = () => {
       } catch (error) {
         console.error('Error fetching companies:', error);
       }
-      setLoading(false);
     };
 
     fetchData();
-  }, [page]);
-
-  const handleMenuScrollToBottom = () => {
-    if (!loading && hasMore) {
-      setPage(prevPage => prevPage + 1);
-    }
-  };
+  }, []);
 
   const handleClick = () => {
     if (!selectedCompany) {
@@ -83,6 +58,10 @@ const Dashboard = () => {
       });
     }
   }
+
+  const getOptionValue = (option) => option.value; 
+
+  const getOptionLabel = (option) => option.label;
 
   return (
     <>
@@ -115,14 +94,24 @@ const Dashboard = () => {
                 onChange={(selectedOption) => setSelectedFramework(selectedOption.value)}
               />
 
-              <Select
+              <AsyncPaginate
+                key={selectedIndustry ? `industry-${selectedIndustry}` : 'all-companies'}
+                value={selectedCompany}
                 id='companyfilter'
-                options={listOfCompanies.map(company => ({ value: company.id, label: company.company_name }))}
                 placeholder="Company"
-                onChange={(selectedOption) => setSelectedCompany(listOfCompanies.find(company => company.id === selectedOption.value))}
                 maxMenuHeight={100}
-                onMenuScrollToBottom={handleMenuScrollToBottom}
-              />
+                loadOptions={(search, loadedOptions, additional) => {
+                  return selectedIndustry 
+                    ? getCompaniesOfIndustry(search, loadedOptions, additional, selectedIndustry)
+                    : fetchCompanies(search, loadedOptions, additional);
+                }}
+                cacheOptions
+                // getOptionValue={getOptionValue}
+                // getOptionLabel={getOptionLabel}
+                onChange={(selectedOption) => setSelectedCompany(selectedOption)}
+                additional={{
+                  page: 1,
+              }}></AsyncPaginate>
 
               <Button 
                 id='gobutton'
@@ -132,7 +121,7 @@ const Dashboard = () => {
             </Stack>
           </Stack>
           
-          <DashboardBody page={page} setSelectedCompany={setSelectedCompany}/>
+          {selectedIndustry ? <IndustryPage></IndustryPage> : <DashboardBody page={page} setSelectedCompany={setSelectedCompany}/>}
         </Box>
       <ChatFeature/>
     </>
