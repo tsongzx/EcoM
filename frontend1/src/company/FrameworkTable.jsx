@@ -25,8 +25,13 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   const [predictedScore, setPredictedScore] = useState({});
   const [indicatorsInSelectedFramework, setIndicatorsInSelectedFramework] = useState({});
 
-  console.log(`All of Framework Table's stuff`);
+  console.log(`All of Framework Table's stuff (indicatorsCompany)`);
   console.log(indicatorsCompany);
+  console.log(selectedIndicators);
+  console.log(metricNames);
+  console.log(allIndicators);
+  console.log(metricScores);
+  console.log(allIndicatorsInfo);
 
   useEffect(() => {
     const selectedIds = Object.values(selectedIndicators).flat();

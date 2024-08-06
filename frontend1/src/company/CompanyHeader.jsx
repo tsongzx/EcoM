@@ -50,7 +50,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
           metricNames,
           allIndicators,
           metricScores,
-          allIndicators,
+          allIndicatorsInfo,
         } 
       });
   }

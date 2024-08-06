@@ -1,22 +1,20 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import './Report.css'
-import Switch from '@mui/material/Switch';
 import {closestCorners, DndContext} from '@dnd-kit/core';
 import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
 import Navbar from "../Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
-import SimpleLineChart from "../SimpleLineChart";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
-import ReportFrameworkTable from "./ReportFrameworkTable";
 import { getPrediction } from "../helper";
+import FrameworkTable from "../company/FrameworkTable";
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
- * 
+ * In future can change key inside a useEffect so it ensures that the key changes after the components is set
  * @returns {React}
  */
 const Report = () => {
@@ -24,6 +22,7 @@ const Report = () => {
     const [ components , setComponents ] = useState([]);
     const [ showAddText, setShowAddText] = useState(false);
     const [predictedScore, setPredictedScore] = useState({});
+    const [key, setKey] = useState(0);
     const ref = useRef();
     const location = useLocation();
     const { id, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo } = location.state || {};
@@ -38,7 +37,7 @@ const Report = () => {
         //     {id: 7, type: "text", name: "fourthelement", isDisplayed: true},
         //     {id: 8, type: "text", name: "fifthelement", isDisplayed: true},
         // ])
-
+        logAllParams();
         // Get the indicators for the company for the selected year
         const aiPredict = async () => {
             let allPredictedScores = {};
@@ -70,6 +69,23 @@ const Report = () => {
     },[companyId]);
     // name will be the string content, id is auto populated.
 
+    const logAllParams = () => {
+        console.log('LOGGING ALL PARAMS FOR REPORT.JSX');
+        console.log('id: ', id, ' company name: ', companyName, ' framework', framework, ' year', year);
+        console.log('indicatorsCompany');
+        console.log(indicatorsCompany);
+        console.log('Selected Indicators');
+        console.log(selectedIndicators);
+        console.log('metric names');
+        console.log(metricNames);
+        console.log('AllIndicators');
+        console.log(allIndicators);
+        console.log('metricScores');
+        console.log(metricScores);
+        console.log('AllIndicatorsInfo');
+        console.log(allIndicatorsInfo);
+    }
+
     // report container will go through the list of components everytime and check what kind of 
     // object it is and render based on it
     // Types include [title, metric scores, visualisation, paragraph] title includes stuff like the name and stuff
@@ -77,6 +93,7 @@ const Report = () => {
     const getComponentPos = (id) => {
         return components.findIndex(c => c.id === id);
     }
+
     const handleDragEnd = (event) => {
         const {active, over} = event;
         if (active.id === over.id) return;
@@ -86,6 +103,7 @@ const Report = () => {
 
             return arrayMove(components, originalPosition, newPosition);
         });
+        setKey(prevKey => prevKey + 1);
     }
 
     //{
@@ -132,6 +150,7 @@ const getCompanyMetaInformation = async () => {
     //Add whatever components we fetched
     console.log(newComponents);
     setComponents([...components, ...newComponents]);
+    setKey(prevKey => prevKey + 1);
 };
 
 
@@ -149,6 +168,7 @@ const getCompanyMetaInformation = async () => {
         }];
         console.log(newComponents);
         setComponents(newComponents);
+        setKey(prevKey => prevKey + 1);
     }
 
     const toggleDisplay = (id) => {
@@ -158,6 +178,7 @@ const getCompanyMetaInformation = async () => {
                 c.id === id ? { ...c, isDisplayed: !c.isDisplayed } : c
             )
         );
+        setKey(prevKey => prevKey + 1);
     };
     
 
@@ -167,6 +188,19 @@ const getCompanyMetaInformation = async () => {
             <div className="reportContainer">
                 <div className="reportContent">
                     {/* components.map goes here, currently just some placeholder code*/}
+                    <FrameworkTable 
+                        indicatorsCompany={indicatorsCompany}
+                        selectedYear={year}
+                        setSelectedYear={toggleDisplay}
+                        companyName={companyName}
+                        availableYears={[2018, 2019, 2020, 2021, 2022, 2023, 2024]}
+                        selectedFramework={framework}
+                        selectedIndicators={selectedIndicators}
+                        metricNames={metricNames}
+                        allIndicators={allIndicators}
+                        metricScores={metricScores}
+                        allIndicatorsInfo={allIndicatorsInfo}
+                    />
                 </div>
 
 
@@ -180,7 +214,9 @@ const getCompanyMetaInformation = async () => {
                         <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
                         {showAddText && <CustomTextarea handleClose={handleClose}/>}
                     </div>
-                    <PDFDownloadLink document={<ReportDoc 
+                    <PDFDownloadLink 
+                        key={key}
+                        document={<ReportDoc 
                         contentList={components} 
                         companyId={id}
                         companyName={companyName}

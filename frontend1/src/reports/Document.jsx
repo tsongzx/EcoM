@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Page, Text, Image, Document, StyleSheet, View, Font } from '@react-pdf/renderer';
 import ReportFrameworkTable from './ReportFrameworkTable';
 //Register Fonts
@@ -64,6 +64,12 @@ const styles = StyleSheet.create({
 export const ReportDoc = ({contentList, companyId, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, predictedScore}) => {
   //content list is what is from Report.jsx
   const headerTypes = ['country', 'year', 'industry', 'longSummary'];
+
+  useEffect(() => {
+    console.log('Inside ReportDocument');
+    console.log(contentList);
+
+  },[contentList]);
 
   return (
     <Document> 
