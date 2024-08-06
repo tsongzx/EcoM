@@ -1,0 +1,9 @@
+.company-long-summary {
+    border-right: solid 1px gray;
+
+}
+
+.company-summary-container{
+    display: flex;
+    flex-direction: row;
+}

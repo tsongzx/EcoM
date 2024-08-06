@@ -1,39 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
   FormControl,
   FormLabel,
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
   IconButton,
   Typography,
   Collapse,
   Card,
-  Slider,
-  TextField,
-  Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
-const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
-  allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
-  sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
-  selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, allMetrics, selectedFramework, setSelectedFramework, updateMetricName, exitFramework, setExitFramework
+// This component lists out all the additional metrics that the user can add to their current framework.
+// This implies 2 things:
+// 1. This section won't render any metrics if no framework has been chosen
+// 2. Once a user adds a metric to their framework, by default all indicators of that metric will be added too
+const AdditionalMetrics = ({ selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
+  setMetricNames, allMetrics, setSelectedFramework, updateMetricName, exitFramework, setExitFramework
 }) => {
 
   const [unselectedMetrics, setUnselectedMetrics] = useState([]);
   const [open, setOpen] = useState({ E: true, S: true, G: true });
   const [expanded2, setExpanded2] = useState(false);
 
+  // This allows the user to unselect a framework
   useEffect(() => {
 	if (exitFramework === true) {
 		setSelectedFramework(null);
@@ -42,12 +32,11 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
 		setSelectedIndicators({});
 		setExitFramework(false);
 	}
-
   }, [exitFramework]);
 
+	// This function removes an additional metrics once its been chosen
   useEffect(() => {
     let unselectedMetrics1 = [];
-    console.log(allMetrics);
     Object.keys(allMetrics).forEach((key) => {
       allMetrics[key].forEach((item) => {
         let unselectedMetricObject = {};
@@ -60,24 +49,19 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
         }
       });
     });
-		console.log(unselectedMetrics1);
     setUnselectedMetrics(unselectedMetrics1);
   }, [metricNames]);
 
-	useEffect(() => {
-		console.log(metricNamesFixed);
-	}, [metricNamesFixed]);
-
+	// This function registers the event the user clicks on one of the 'add' icon
   const handleAdditionalClick = (unselectedMetricId) => {
 		let unselectedObject = {};
 		for (const category in allMetrics) {
 				unselectedObject = allMetrics[category].find(metric => metric.id === unselectedMetricId);
 				if (unselectedObject) {
-						unselectedObject.weighting = 0; // Modify a property of an object
+						unselectedObject.weighting = 0;
 						break;
 				}
 		}
-		
 		// Create a new array for metricNames
 		const newMetricNames = [...metricNames];
 		if (!newMetricNames.some(metric => metric.id === unselectedObject.id)) {
@@ -96,13 +80,7 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
 		// Create a new array for unselectedMetrics
 		const newArray = unselectedMetrics.filter(item => item.id !== unselectedMetricId);
 		setUnselectedMetrics(newArray);
-
-
   }
-
-	useEffect(() => {
-		console.log(metricNames);
-	}, [metricNames]);
 
   const handleCategoryClick = (category) => {
     setOpen(prevOpen => ({ ...prevOpen, [category]: !prevOpen[category] }));
@@ -144,6 +122,7 @@ const AdditionalMetrics = ({ selectedIndicators, selectedMetrics, metricNames, s
 												<Typography style={{ fontSize: '18px', fontFamily: 'Arial, sans-serif' }}>
 													{filteredMetric.name}
 												</Typography>
+												{/**Click this to add the chosen metric */}
 												<IconButton onClick={() => handleAdditionalClick(filteredMetric.id)} style={{ marginRight: '30px' }}>
 													<AddIcon />
 												</IconButton>

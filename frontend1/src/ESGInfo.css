@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .ESGInfo-container {
     width: 100%;
     padding: 50px 0px;
@@ -15,7 +17,7 @@
 
 
 .ESGInfo-container p {
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: Inter;
 }
 
 .ESGInfo-title, .ESGReporting-container, .ESGScore-containers {
@@ -33,7 +35,7 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    background-color: orange;
+    background-color: rgb(8, 0, 255);
     margin-bottom: 10px;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -48,4 +50,47 @@
 .ESGCategory-Text {
     flex: 1;
     margin-left: 10px;
+    margin-right: 10px;
+}
+
+
+
+.ESGScore-ext-raise-button:hover,
+.ESGScore-ext-raise-button:focus {
+  box-shadow: 0 0.5em 0.5em -0.4em #8979ff; 
+  transform: translateY(-0.25em);
+}
+
+.ESGScore-ext-raise-button {
+  --color: #8d60ff;
+  --hover: #d279ff; 
+  background: none;
+  border: 2px solid;
+  font: inherit;
+  line-height: 1;
+  margin: 0.5em;
+  padding: 1em 2em;
+  color: var(--color);
+  transition: 0.25s;
+  cursor: pointer;
+}
+
+.ESGScore-ext-raise-button:hover,
+.ESGScore-ext-raise-button:focus { 
+  border-color: var(--hover);
+  color: #f6b8de;
+}
+
+.ESGScore-externalLinks-container {
+  color: #fff;
+  background: hsl(227, 10%, 10%);
+  font: 300 1em 'Fira Sans', sans-serif;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  text-align: center;
+  display: flex;
+}
+h1 {
+  font-weight: 400;
 }

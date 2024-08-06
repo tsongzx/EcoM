@@ -20,6 +20,7 @@ const Navbar = () => {
 
     return (
         <div>
+            <div className='nav-placeholder'></div>
             <div className='nav'>
                 <ul>
                     {/* <li><Link to="/">Home</Link></li> */}
@@ -29,7 +30,7 @@ const Navbar = () => {
                 </ul>
             </div>
             {isProfileOpen && (<div className='profileTab'>
-                <button onClick={() => {setIsProfileOpen(false)}}>close</button>
+                <button className="closepfp-button" onClick={() => {setIsProfileOpen(false)}}>close</button>
                 <Profile/>
             </div>)}
         </div>

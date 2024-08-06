@@ -17,19 +17,26 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
+// This component contains a list of radio buttons, which shows the framework the user
+// has chosen and/or allows them to choose a framework of their choice.
 const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetrics,
   setAllIndicators, setSelectedIndicators, selectedFramework, officialFrameworks
 }) => {
+
+  // This section is collapsable/expandable
   const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  // This function handles the event that a framework has been chosen or if the
+  // user decides to switch from one framework to another
   const handleFrameworkChange = async (event) => {
     const frameworkId = Number(event.target.value);
     setSelectedFramework(frameworkId);
-
+    
+    // Gets all the metrics and indicators for a specific framework
     const metrics = await getMetricForFramework(frameworkId);
     if (metrics) {
       const nameOfMetrics = [];
@@ -52,14 +59,14 @@ const SelectFramework = ({setSelectedFramework, setMetricNames, setSelectedMetri
           console.log(error);
         }
       }
+
+      // Sets the metrics and indicators to those determined
       setAllIndicators(newAllIndicators);
       
       const newSelectedIndicators = {};
       for (const id of metricIds) {
-        console.log(id);
         newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
       }
-      console.log(newSelectedIndicators);
       setSelectedIndicators(newSelectedIndicators);
     }
   };
