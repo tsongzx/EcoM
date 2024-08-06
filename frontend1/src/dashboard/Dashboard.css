@@ -1,0 +1,38 @@
+html, body {
+    background-color: rgb(242, 243, 248);
+}
+#searchbar {
+    background-color: #0D2149;
+    color: white;
+    text-align: center;
+    padding-top: 40px;
+    padding-bottom: 60px;
+    font-size: 40px;
+    height: 100px;
+}
+
+#industryfilter {
+    width: 15vw;
+}
+
+#frameworkfilter {
+    width: 15vw;
+}
+
+#companyfilter {
+    width: 25vw;
+}
+
+#gobutton {
+    background-color: #B4B2FC;
+    font-weight: bold;
+}
+
+/* .dashboard-body {
+    color: #0D2149;
+    font-size: 30px;
+    font-weight: bold;
+    margin-left: 30px;
+    margin-top: 20px;
+    font-family: 'Merriweather';
+} */

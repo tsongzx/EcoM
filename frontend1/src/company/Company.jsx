@@ -16,7 +16,9 @@ import {
   getAllMetricsAvailable,
   getMetricScoreByYear,
   getIndicatorFromMetric,
-  getCompanyFromRecentlyViewed
+  companyScoreGeneral,
+  fetchCompanyInfo
+
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -72,21 +74,19 @@ const Company = () => {
   // 1. Whether the user clicked into a company from the dashboard OR
   // 2. If the user decided to look up a company in the URL
   useEffect(() => {
-    if (initialCompanyId) {
-      setCompanyId(initialCompanyId); 
-    } else {
-      const asyncGetId = async () => {
-        let url = window.location.href;
-        let companyIdActual = url.split("/");
+    const asyncGetId = async () => {
+      let url = window.location.href;
+      let companyIdActual = url.split("/");
+      if (companyIdActual) {
         setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
-        const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+        const name = await fetchCompanyInfo(Number(companyIdActual[companyIdActual.length - 1]));
         setCompanyName(name.company_name);
         setTicker(name.ticker);
         console.log(name);
       }
-      asyncGetId();
     }
-  }, [initialCompanyId]);
+    asyncGetId();
+  }, [window.location.href]);
 
   useEffect(() => {
     const fetchCompanyIndicators = async(companyName) => {
@@ -108,7 +108,7 @@ const Company = () => {
       let url = window.location.href;
       let companyIdActual = url.split("/");
       setCompanyId(Number(companyIdActual[companyIdActual.length - 1]));
-      const name = await getCompanyFromRecentlyViewed(Number(companyIdActual[companyIdActual.length - 1]));
+      const name = await fetchCompanyInfo(Number(companyIdActual[companyIdActual.length - 1]));
       setCompanyName(name.company_name);
       setTicker(name.ticker);
 

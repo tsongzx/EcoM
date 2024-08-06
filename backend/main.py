@@ -78,7 +78,7 @@ async def get_token(
     user: user_schemas.UserInDB,
 ):
     access_token_expires = timedelta(
-        minutes=Config.ACCESS_TOKEN_EXPIRE_MINUTES)
+        days=Config.ACCESS_TOKEN_EXPIRE_DAYS)
     access_token = generate_token(
         data={"userId": user.id}, expires_delta=access_token_expires
     )
@@ -447,7 +447,7 @@ async def get_recently_viewed(
     if recentList == None:
         return []
     recentCompanies = session.query(list_models.List).filter(
-        list_models.List.list_id == recentList.id).order_by(list_models.List.created_at).all()
+        list_models.List.list_id == recentList.id).order_by(list_models.List.id.desc()).all()
     return recentCompanies
 
 
@@ -493,7 +493,7 @@ async def add_to_recently_viewed(
         session.delete(statement)
         session.commit()
 
-    if recent_companies_length >= 5:
+    if recent_companies_length > 5:
         statement = session.query(list_models.List).where(
             list_models.List.list_id == recent_id).order_by(list_models.List.id).first()
 
@@ -515,12 +515,24 @@ async def add_to_recently_viewed(
 @app.get("/company", tags=["company"])
 async def get_company_by_batch(
     page: int,
+    search: str,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    offset = page * 20
-    companyData = session.query(
-        company_models.Company).offset(offset).limit(20).all()
+    offset = (page - 1) * 20
+    
+    search = search.strip()
+    print(f'page: {page}')
+
+    if search:
+      query = session.query(company_models.Company).filter(
+          company_models.Company.company_name.like(f"{search}%")
+      )
+    else:
+      query = session.query(company_models.Company)
+    
+    # Apply pagination and limit the results
+    companyData = query.offset(offset).limit(20).all()
     return companyData
 
 
@@ -1192,14 +1204,36 @@ async def get_industries(
 
 @app.get("/industry/companies", tags=["Industry"])
 async def get_companies_in_industry(
+    page: int,
+    industry: str,
+    search: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    offset = (page - 1) * 20
+    
+    search = search.strip()
+    print(f'page: {page}')
+
+    query = session.query(company_models.Company).filter_by(industry=industry)
+    if search:
+      query = query.filter(
+          company_models.Company.company_name.like(f"{search}%")
+      )
+    
+    # Apply pagination and limit the results
+    companyData = query.offset(offset).limit(20).all()
+    return companyData
+
+@app.get("/industry/companies/recommended", tags=["Industry"])
+async def get_recommended_companies(
     industry: str,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companies = session.query(company_models.Company).filter_by(
-        industry=industry).all()
-
-    return companie
+    companies = session.query(company_models.Company).filter_by(industry=industry).order_by(func.rand()).limit(10).all()
+    
+    return companies
 
 # #test all of the average ones claire
 # @app.get("/industry/framework/average/", tags=["Industry"])
@@ -1335,7 +1369,7 @@ async def chat(
 
     # dont accept empty queries
     # Using GPT-4 with the ChatCompletion endpoint
-    response = await client.chat.completions.create(
+    response = client.chat.completions.create(
         model="gpt-4o-mini",
         # require accuracy
         temperature=0,
@@ -1344,7 +1378,7 @@ async def chat(
         messages=[*Config.chat_prompts,
                   {"role": "user", "content": user_query.query}]
     )
-    chatbot_response = response.choices[0].message['content']
+    chatbot_response = response.choices[0].message.content
     # get records of chatbot responses
     Config.chat_prompts.append(
         {"role": "assistant", "content": chatbot_response})

@@ -11,7 +11,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 async def is_authenticated(db, token: str) -> user_schemas.TokenData:
     credentials_exception = HTTPException(
-        status_code=status.HTTP_418_IM_A_TEAPOT,
+        status_code=status.HTTP_403_FORBIDDEN,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -31,7 +31,6 @@ async def is_authenticated(db, token: str) -> user_schemas.TokenData:
           headers={"WWW-Authenticate": "Bearer"},
       )
     except jwt.exceptions.InvalidTokenError:
-        print("invalid token?!")
         raise credentials_exception
       
 def authenticate_user(db, email: str, password: str):
