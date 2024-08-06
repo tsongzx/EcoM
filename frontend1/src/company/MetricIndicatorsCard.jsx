@@ -831,10 +831,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Environmental</h3>
-                {eScore !== null && (
-                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${eScore})`}</h6>
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '0'}}>
+                  <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Environmental</h3>
+                  {eScore !== null && (
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${eScore}`}</h6>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -855,10 +857,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Social</h3>
-                {sScore !== null && (
-                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${sScore})`}</h6>
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px'}}>
+                  <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Social</h3>
+                  {sScore !== null && (
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${sScore}`}</h6>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -879,10 +883,12 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '20px'}}>
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <h3 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>Governance</h3>
-                {gScore !== null && (
-                  <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`(Score: ${gScore})`}</h6>
-                )}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px'}}>
+                  <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Governance</h3>
+                  {gScore !== null && (
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${gScore}`}</h6>
+                  )}
+                </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
                   <Button variant="outlined" style={{
                     borderRadius: '30%', 
@@ -985,7 +991,7 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
           </Dialog>
 
           {Object.keys(selectedIndicators).length > 0 && (
-            <div style={{ marginLeft: '20px', marginTop: '100px', marginBottom: '40px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            <div style={{ margin: '100px 10px 40px 10px', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
               <Button variant="contained" color="primary" onClick={() => checkAll()}>
                 Save Framework
               </Button>
