@@ -2,7 +2,7 @@ import functools
 import json 
 @functools.lru_cache
 def read_metrics_file():
-  file_name = 'db/metrics.json'
+  file_name = 'backend/db/metrics.json'
   # Open and read the JSON file
   with open(file_name, 'r') as file:
       return json.load(file)
@@ -19,11 +19,6 @@ def calculate_metric(year_indicators, weights):
             print("skipping")
             continue
         indicator_scaling = indicator_data[indicator_name]
-        
-        
-
-        lower = indicator_scaling["lower"]
-        higher = indicator_scaling["higher"]
         indicator_value = year_indicators[indicator_name].indicator_value
         
         scaled_score = 0
@@ -48,11 +43,10 @@ def calculate_metric(year_indicators, weights):
                 scaled_score = 100
             
             # If negative reverses score
-            if indicator_scaling == "Negative":
+            if indicator_scaling["pos"] == "Negative":
                 scaled_score = 100 - scaled_score            
-        
         print(f'printing indicator value {indicator_value}')
         overall_score += scaled_score * weight
         
     print(f'overall score: {overall_score}')
-    return overall_score
+    return round(overall_score)

@@ -1,13 +1,13 @@
 {
     "AIRPOLLUTANTS_DIRECT": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 187109.96986799754,
         "mean": 14727.452444739169
     },
     "AIRPOLLUTANTS_INDIRECT": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 87203994.75750695,
         "mean": 10136926.002689736
     },
@@ -45,7 +45,7 @@
     },
     "ANALYTICESTIMATEDCO2TOTAL": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 32310775.780974526,
         "mean": 603893.9539230242
     },
@@ -135,11 +135,11 @@
     },
     "BRIBERY_AND_CORRUPTION_PAI_INSUFFICIENT_ACTIONS": {
         "type": "Yes/No",
-        "pos": "Positive"
+        "pos": "Negative"
     },
     "CALL_MEETINGS_LIMITED_RIGHTS": {
         "type": "Yes/No",
-        "pos": "Positive"
+        "pos": "Negative"
     },
     "CEO_ANNUAL_COMPENSATION": {
         "type": "Value",
@@ -159,25 +159,25 @@
     },
     "CO2DIRECTSCOPE1": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 48475701.42440395,
         "mean": 490780.36799490504
     },
     "CO2INDIRECTSCOPE2": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 166387877.2886495,
         "mean": 489518.49048328487
     },
     "CO2INDIRECTSCOPE3": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 38400202.30502764,
         "mean": 1142484.9496693674
     },
     "CO2_NO_EQUIVALENTS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 17143.21701123946,
         "mean": 52877.915
     },
@@ -219,17 +219,17 @@
     },
     "ELECTRICITYPURCHASED": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 16870364.808325138,
         "mean": 4927357.744680135
     },
     "ELIMINATION_CUM_VOTING_RIGHTS": {
         "type": "Yes/No",
-        "pos": "Positive"
+        "pos": "Negative"
     },
     "EMPLOYEEFATALITIES": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 2.2056231737292333,
         "mean": 0.467068567243225
     },
@@ -245,13 +245,13 @@
     },
     "ENERGYPURCHASEDDIRECT": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 69663372.27164443,
         "mean": 19611284.794210527
     },
     "ENERGYUSETOTAL": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 350232885.78742224,
         "mean": 4818994.533237994
     },
@@ -283,7 +283,7 @@
     },
     "HAZARDOUSWASTE": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 13616826.567842873,
         "mean": 192044.3481114314
     },
@@ -297,7 +297,7 @@
     },
     "HUMAN_RIGHTS_VIOLATION_PAI": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 0.025415628826102012,
         "mean": 0.00064635849961427
     },
@@ -315,19 +315,19 @@
     },
     "LOSTWORKINGDAYS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 32565.988625472317,
         "mean": 5150.5338811128395
     },
     "NATURAL_RESOURCE_USE_DIRECT": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 100804.13437538338,
         "mean": 13529.658721936536
     },
     "NOXEMISSIONS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 12884.66260350342,
         "mean": 714.1552929360159
     },
@@ -341,7 +341,7 @@
     },
     "PARTICULATE_MATTER_EMISSIONS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 1376.6724405987686,
         "mean": 71.59910693507571
     },
@@ -409,7 +409,7 @@
     },
     "SOXEMISSIONS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 146056.18070742255,
         "mean": 978.2038836956281
     },
@@ -439,7 +439,7 @@
     },
     "TIRTOTAL": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 109.82925037271265,
         "mean": 6.289674922600619
     },
@@ -461,13 +461,13 @@
     },
     "TURNOVEREMPLOYEES": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 11.162288413678352,
         "mean": 13.7686021203792
     },
     "VOCEMISSIONS": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 3728.1752506272046,
         "mean": 168.67353106065596
     },
@@ -477,7 +477,7 @@
     },
     "WASTETOTAL": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 78782770.49135439,
         "mean": 283865.8128485392
     },
@@ -493,7 +493,7 @@
     },
     "WATERWITHDRAWALTOTAL": {
         "type": "Value",
-        "pos": "Positive",
+        "pos": "Negative",
         "stdev": 5314809296.7531805,
         "mean": 57667412.24783661
     },
