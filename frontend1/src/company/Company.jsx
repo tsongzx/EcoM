@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Navbar from '../navbar/Navbar.jsx';
 import './company_css/Company.css';
-import WatchlistModal from './WatchlistModal.jsx';
+import WatchlistModal from './ListModal.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
   getOfficialFrameworks,

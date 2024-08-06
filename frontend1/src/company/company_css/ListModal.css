@@ -35,7 +35,7 @@
     border-radius: 10px;
 }
 
-.watchlistContainer {
+.listContainer {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
@@ -44,13 +44,13 @@
     align-items: center;
 }
 
-#closeWatchListModal-button {
+#closeListModal-button {
     position: absolute;
     right: 3px;
     color: black;
 }
 
-.watchList-button {
+.list-button {
     margin-bottom: 5px;
     width: 90%;
     color: black;
@@ -68,7 +68,7 @@
     font-size: 1em;
 }
 
-.watchList-button:hover {
+.list-button:hover {
     border: solid 2px blue;
     padding: 19px 15px;
 }
@@ -77,11 +77,11 @@
     background-color: rgb(196, 244, 244);
 }
 
-.watchList-button svg {
+.list-button svg {
     flex-shrink: 0;
 }
 
-#watchlistDescriptorText {
+#listDescriptorText {
     font-family: Inter;
     padding-left: 25px;
     margin-top: 10px;
