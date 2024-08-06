@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Navbar from '../navbar/Navbar.jsx';
 import './company_css/Company.css';
-import WatchlistModal from './ListModal.jsx';
+import ListModal from './ListModal.jsx';
 import CompareModal from '../compare/CompareModal.jsx';
 import {
   getOfficialFrameworks,
@@ -371,7 +371,7 @@ const Company = () => {
           overflow: "hidden",
           overflowY: "scroll",
         }}>
-          <WatchlistModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
+          <ListModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
           {/* Top center half of the screen */}
           <CompanyHeader
             setWatchlistModalOpen={setWatchlistModalOpen}
