@@ -14,7 +14,8 @@ const DashboardBody = ({page, setSelectedCompany}) => {
   const [selectedList, setSelectedList] = useState(null); 
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [favsList, setFavsList] = useState([]);
-  const [companyNames, setCompanyNames] = useState([]);
+  const [recentCompanyNames, setRecentCompanyNames] = useState([]);
+  const [favCompanyNames, setFavCompanyNames] = useState([]);
   const [anchorElement, setanchorElement] = useState(null); // For dropdown menu
 
   useEffect(() => {
@@ -29,6 +30,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
         const recentlyViewed = await getRecentlyViewed();
 
         const fetchFavsList = await getFavouritesList();
+        console.log(fetchFavsList);
         setFavsList(fetchFavsList);
 
         const uniqueRecents = recentlyViewed.reduce((acc, current) => {
@@ -53,8 +55,21 @@ const DashboardBody = ({page, setSelectedCompany}) => {
 
   useEffect(() => {
     console.log(recents);
-    getRecentlyViewedCompanyNames(recents);
+    const setNames = async() => {
+      const names = await getCompanyNames(recents);
+      setRecentCompanyNames(names);
+    }
+    setNames();
   }, [recents]);
+
+  useEffect(() => {
+    console.log(favsList);
+    const setNames = async() => {
+      const names = await getCompanyNames(favsList);
+      setFavCompanyNames(names);
+    }
+    setNames();
+  }, [favsList]);
 
   const handleListClick = (list) => {
     setSelectedList(list); 
@@ -84,25 +99,26 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     setIsListModalOpen(false);
   };
 
-  const getRecentlyViewedCompanyNames = async(recents) => {
-    console.log(recents);
+  const getCompanyNames = async(companies) => {
+    console.log(companies);
     let nameList = [];
-    for (let recent of Object.keys(recents)) {
-      console.log(recents[recent].company_id);
-      const individualCompany = await fetchCompanyInfo(recents[recent].company_id);
+    for (let company of Object.keys(companies)) {
+      console.log(companies[company].company_id);
+      const individualCompany = await fetchCompanyInfo(companies[company].company_id);
       nameList.push(individualCompany.company_name);
     }
     console.log(nameList);
-    setCompanyNames(nameList);
+    return nameList;
   }
 
   const dashboardToCompany = async (companyId) => {
     try {
+      console.log(companyId);
       const companyInfo = await fetchCompanyInfo(companyId);
       setSelectedCompany(companyInfo);
-      navigate(`/company/${encodeURIComponent(companyInfo.id)}`, 
+      navigate(`/company/${encodeURIComponent(companyId)}`, 
       { state: { 
-          companyId: companyInfo.id, 
+          companyId: companyId, 
           companyName: companyInfo.company_name,
           initialFramework: null
         } 
@@ -148,7 +164,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
             >
               <Card style={{ cursor: 'pointer', height: '120px'}}>
                 <CardContent>
-                  <Typography variant="h6">{companyNames[index]}</Typography>
+                  <Typography variant="h6">{recentCompanyNames[index]}</Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -185,7 +201,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
             >
               <Card sx={{height: '120px'}}>
                 <CardContent>
-                  <Typography variant="h6">{companyNames[index]}</Typography>
+                  <Typography variant="h6">{favCompanyNames[index]}</Typography>
                 </CardContent>
               </Card>
             </Grid>

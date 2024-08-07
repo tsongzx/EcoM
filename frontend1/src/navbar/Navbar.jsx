@@ -4,7 +4,6 @@ import './Navbar.css';
 import Cookies from 'js-cookie';
 import Profile from '../Profile';
 import { AppBar, Stack, Toolbar } from '@mui/material';
-import CreateFramework from '../company/CreateFramework';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -16,15 +15,18 @@ const Navbar = () => {
     };
 
     // Go back to the dashboard
-    const handleHome = () => {
+    const handleHome = (event) => {
+        event.preventDefault();
         navigate('/dashboard');
     }
 
-    const handleCompare = () => {
+    const handleCompare = (event) => {
+      event.preventDefault();
       navigate('/compare', { state: { companiesList: [], selectedFramework: null } });
     }
 
-    const handleCreateFramework = () => {
+    const handleCreateFramework = (event) => {
+      event.preventDefault();
       navigate('/create');
     }
     return (
