@@ -63,7 +63,9 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: 'calc(67vh - 50px)' }}>
+    <Box sx={{ display: 'flex', 
+      height: 'calc(67vh - 50px)'
+    }}>
       <Box
         sx={{
           width: '20%',
@@ -73,9 +75,19 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
           overflowY: 'scroll',
         }}
       >
-        <Typography variant="h6">Headquarter country</Typography>
-        <Button variant="contained" onClick={handleSelectAll} sx={{ marginBottom: 1, marginRight: 1 }}>Select All</Button>
-        <Button variant="contained" onClick={handleDeselectAll} sx={{ marginBottom: 1 }}>Deselect All</Button>
+        <Typography variant="h6" fontWeight='bold'
+          fontFamily='Merriweather'
+        >Filter by headquarter country</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6} key={'select'}>
+            <Button variant="text" onClick={handleSelectAll}>Select All</Button>
+          </Grid>
+          <Grid item xs={6} key={'deselect'}>
+            <Button variant="text" onClick={handleDeselectAll}>Deselect All</Button>  
+          </Grid>
+        </Grid>
+        <Stack direction="row" spacing={3}>
+        </Stack>
         {headquarterCountries && (
           <FormGroup>
             <Grid container spacing={2}>
@@ -98,11 +110,16 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
       <Stack alignItems="center"
         sx={{
           width: '80%',
-          overflowY: 'scroll',
+          overflowY: 'scroll'
         }}
       >
         <Pagination page={curPage} count={numPages} onChange={(event, value) => setCurPage(value)} color="secondary"/>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper}
+          sx={{
+            boxSizing: 'border-box',
+            padding: '0 2% 5% 0'
+          }}
+        >
           <Table>
             <TableHead
               sx={{

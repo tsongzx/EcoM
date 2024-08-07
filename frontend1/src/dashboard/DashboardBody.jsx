@@ -112,9 +112,11 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     }
   };
   return (
-    <>
+    <Stack spacing={3} sx={{
+      boxSizing: 'border-box',
+      paddingBottom: '5%'
+    }}>
       <Stack sx={{
-          marginTop: '20px',
           width: '100vw',
         }}
           alignItems={'center'} 
@@ -155,7 +157,6 @@ const DashboardBody = ({page, setSelectedCompany}) => {
       </Stack>
 
       <Stack sx={{
-          marginTop: '20px',
           width: '100vw'
         }}
           alignItems={'center'} 
@@ -192,9 +193,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
         </Grid>
       </Stack>
 
-      <Stack sx={{
-        marginTop: '20px'
-      }}
+      <Stack
         spacing={2}>
         <Stack spacing={2} alignItems="center"
           sx={{
@@ -238,7 +237,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
         </Stack>
       </Stack>
       {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany}/>}
-    </>
+    </Stack>
     
   );
 }
