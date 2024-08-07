@@ -21,6 +21,7 @@
         "react-dom": "^18.3.1",
         "react-is": "^18.3.1",
         "react-pdf": "^9.1.0",
+        "react-pdf-charts": "^0.2.5",
         "react-pdf-table": "^1.0.0-alfa.3",
         "react-router-dom": "^6.23.1",
         "react-scripts": "5.0.1",
