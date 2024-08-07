@@ -39,7 +39,6 @@ import requests
 from bs4 import BeautifulSoup
 import liveData
 import metrics
-
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
 client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
@@ -1401,14 +1400,77 @@ async def get_indicator_industry_averages(
 #                        Chatbot Apis
 # ***************************************************************
 
+qna_data = [
+    {
+        "question": "How many official frameworks does ESG Now have?",
+        "answer": "There are 7 key frameworks: IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, and APRA-CPG Framework."
+    },
+    {
+        "question": "How many companies does ESG Now store?",
+        "answer": "The platform stores over 70,000 companies in the database."
+    },
+    {
+        "question": "What are the core functionalities in ESG Now?",
+        "answer": "1. Single Mode Functionality: Users can choose one industry and one company from a database including S&P 500 and ASX 200 companies, like CommBank and Westpac. 2. Comparison Mode Functionality: Allows comparison of multiple companies across various industries. 3. Select Framework Functionality: Users can choose or customize ESG frameworks (e.g., IFRS S1, IFRS S2, TCFD, TNFD, APRA-CPG). 4. Subjective Weighting Functionality: Users can assign weights to categories and metrics and visualize details. 5. Download Report Functionality: Users can download comprehensive ESG reports. 6. Chat Feature Functionality: Integration with ChatGPT API for a chatbot interface."
+    },
+    {
+        "question": "What are the innovative functionalities in ESG Now?",
+        "answer": "1. Favourites List Functionality: Adding companies to your favourites list so you can view it conveniently in the dashboard. 2. Custom Lists Functionality: Creating custom lists for various companies to help with organization optimization. 3. Industry View Functionality: View all companies within an industry, the industry description, and the average score for that industry. 4. Information Page Functionality: View critical ESG information and are directed to reliable external sources."
+    },
+    {
+        "question": "What is the difference between company view and industry view?",
+        "answer": "The company view focuses on individual company metrics, while the industry view aggregates data across multiple companies in the same industry."
+    },
+    {
+        "question": "What does Compare view show?",
+        "answer": "The Compare view allows you to compare metrics across different companies or industries. It shows predictive data, and you are able to visualize various graphs and metrics here as well."
+    },
+    {
+        "question": "How does customize metrics work?",
+        "answer": "Customize metrics lets you select and adjust the metrics that are most relevant to your analysis."
+    },
+    {
+        "question": "What does a framework do?",
+        "answer": "A framework in our platform is a structured approach to evaluate and compare different sets of data. You may personalize this data or alternatively use the following official frameworks: IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework."
+    },
+    {
+        "question": "How do Lists work?",
+        "answer": "Lists in our platform help you organize and manage data sets, allowing for easy retrieval and comparison. You can sort various companies into different lists for ease of analysis as well."
+    },
+    {
+        "question": "What are some unique features of this platform?",
+        "answer": "You can view aggregate data across an entire industry and view the companies within that industry, you can access external links to view news articles, there is an information page, and you can leverage the chatbot to answer any queries."
+    },
+    {
+        "question": "How do I favourite a company?",
+        "answer": "Simply go to the company overview page and select LIKE. When you return to your home page, it will appear in favourites."
+    }
+]
+
+
+def set_answers(query: str, qna_data: list) -> str:
+    for item in qna_data:
+        if query.lower() in item["question"].lower():
+            return item["answer"]
+    return None
+
 
 @app.post("/chat", tags=["Chatbot"])
 async def chat(
     user_query: chat_schemas.ChatQuery,
     user: user_schemas.UserInDB = Depends(get_user)
 ):
-    instructions = "You are an ESG related chatbot. You calculate various ESG scores out of 100, which is derived by the average of many metrics. Your 7 key frameworks are IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework You have over 70,000 companies in your data base. You can add companies to your watchlist, compare multiple companies at once, view industry averages etc."
-    # see if this works as a way to personalise our chat bot
+    query = user_query.query.strip()
+
+    answer = set_answers(query, qna_data)
+    
+    if answer:
+        return {'response': answer}
+
+    instructions = """
+    You are an ESG related chatbot. You calculate various ESG scores out of 100, which is derived by the average of many metrics. Your 7 key frameworks are IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework You have over 70,000 companies in your data base. You can add companies to your watchlist, compare multiple companies at once, view industry averages etc. 
+    
+    """
     prompt = """
     {}
     User: Tell me about yourself.
@@ -1433,6 +1495,7 @@ async def chat(
     # message = response.choices[0].message.content
     print(chatbot_response)
     return {'response': chatbot_response}
+
 
 
 # ***************************************************************
