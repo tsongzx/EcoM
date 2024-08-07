@@ -12,6 +12,7 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+import FrameworkAverageVisualisation from './FrameworkAverageVisualisation.jsx';
 
 const CompanyBody = ({companyId, companyName}) => {
   const [period, setPeriod] = useState('1mo');
@@ -26,7 +27,8 @@ const CompanyBody = ({companyId, companyName}) => {
           <div className='livedata-section'>
             <Tabs defaultValue={0} className='companySummaryTabs'>
               <TabList>
-                <Tab >Graph</Tab>
+                <Tab>Stock Price</Tab>
+                <Tab>ESG Performance</Tab>
                 <Tab>Summary</Tab>
               </TabList>
 
@@ -49,6 +51,9 @@ const CompanyBody = ({companyId, companyName}) => {
               </div>
               </TabPanel>
               <TabPanel value={1}>
+                <FrameworkAverageVisualisation companyName={companyName}/>
+              </TabPanel>
+              <TabPanel value={2}>
               <CompanySummary companyName={companyName} ticker={"AMZN"}/>
               </TabPanel>
             </Tabs>          

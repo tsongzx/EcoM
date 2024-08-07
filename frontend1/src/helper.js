@@ -921,6 +921,24 @@ export const getMetricBarGraph = async(frameworkId, companies) => {
   }
 }
 
+export const getFrameworkAvgGraph = async(companyName) => {
+  try {
+      const path = `http://127.0.0.1:8000/graph/framework/average?company_name=${companyName}`;
+
+      const response = await axios.get(path, 
+          {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(error);
+      console.log(`Error getting industry: ${error}`)
+  }
+}
+
 export const mapToTicker = async() => {
     
 }
