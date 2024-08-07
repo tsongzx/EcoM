@@ -9,6 +9,7 @@ import AdditionalMetrics from "./AdditionalMetrics";
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getIndicatorFromMetric } from "../helper";
+import CreateFramework from "./CreateFramework";
 
 // This component includes the majority of the left bar of the company page.
 // It contains 3 children components 
@@ -137,6 +138,7 @@ const LeftPanel = ({
             exitFramework={exitFramework}
             setExitFramework={setExitFramework}
           />
+          <CreateFramework/>
         </div>
     </Box> 
   );

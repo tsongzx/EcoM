@@ -21,7 +21,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   companyName, availableYears, selectedFramework, selectedIndicators, metricNames, allIndicators,
   metricScores, allIndicatorsInfo
 }) => {
-  const [tableCollapsed, setTableCollapsed] = useState(true);
+  const [tableCollapsed, setTableCollapsed] = useState(false);
   const [predictedScore, setPredictedScore] = useState({});
   const [indicatorsInSelectedFramework, setIndicatorsInSelectedFramework] = useState({});
 
@@ -34,32 +34,6 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
     console.log(filteredPredictedScore);
     setIndicatorsInSelectedFramework(filteredPredictedScore);
   }, [selectedIndicators]);
-
-  useEffect(() => {
-    console.log(indicatorsInSelectedFramework);
-  }, [indicatorsInSelectedFramework]);
-
-  useEffect(() => {
-    console.log(selectedYear);
-  }, [selectedYear]);
-
-  useEffect(() => {
-    console.log(availableYears);
-  }, [availableYears]);
-
-  useEffect(() => {
-    console.log(selectedIndicators);
-  }, [selectedIndicators]);
-
-  useEffect(() => {
-    console.log(selectedFramework);
-  }, [selectedFramework]);
-
-  useEffect(() => {
-    console.log(allIndicatorsInfo);
-  }, [allIndicatorsInfo]);
-
-  console.log(metricScores);
 
   const findIndicatorValue = (indicatorName) => {
     if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
@@ -92,10 +66,6 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
     setPredictedScore(allPredictedScores);
   }
 
-  useEffect(() => {
-    console.log(predictedScore);
-  }, [predictedScore]);
-
   const getName = (name) => {
     if (name === 'Yes/No') {
       return '1/0';
@@ -115,9 +85,6 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
           <h2>{companyName}</h2>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '30px'}}>
             {availableYears.map((year) => (
-              // <Button key={year} onClick={() => handleYearChange(year)}>
-              //   {year}
-              // </Button>
               <Button
                 key={year}
                 onClick={() => handleYearChange(year)}

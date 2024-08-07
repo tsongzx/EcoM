@@ -11,8 +11,7 @@ import {
   deleteFromFavourites
 } from '../helper.js';
 const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, isInFavs, 
-  setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany,
-  sliderValuesIndicator, selectedMetrics
+  setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany
 }) => {
 
   console.log(indicatorsCompany);
