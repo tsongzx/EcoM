@@ -6,7 +6,6 @@ import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
 import Navbar from "../navbar/Navbar";
 import CustomTextarea from "./CustomTextarea";
-import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
 import { fetchCompanyInfo, getDetailedCompanyInformation } from "../helper";
 import SimpleLineChart from "../SimpleLineChart";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";

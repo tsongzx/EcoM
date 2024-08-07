@@ -9,6 +9,7 @@
     display: flex;
     padding: 0;
     margin: 0;
+    list-style-type: none;
 }
 
 .navbar-li {
@@ -27,7 +28,7 @@ a {
     text-decoration: none;
     font-family: Inter;
     font-weight: bold;
-    color: #B4B2FC;
+    color: #0c3960;
     cursor: pointer;
 }
 
@@ -64,6 +65,7 @@ a {
     flex-direction: column;
     gap: 10px;
     margin-top: 5px;
+    overflow-y: hidden;
 }
 
 .pfpName-display h1{

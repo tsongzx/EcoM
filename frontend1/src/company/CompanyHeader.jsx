@@ -69,7 +69,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
         <Typography align="center">ESG Score</Typography>
       </Stack>
       <Button onClick={handleClickReport}>Save Report</Button>
-      <Button onClick={openReportModal}>Save Report</Button>
+      {/* <Button onClick={openReportModal}>Save Report</Button> */}
       <Button onClick={openWatchlistModal}>Add to List</Button>
       <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
     </Stack>

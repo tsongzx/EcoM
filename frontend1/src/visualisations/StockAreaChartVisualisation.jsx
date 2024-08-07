@@ -11,19 +11,30 @@ const StockAreaChartVisualisation = ({companyName, period, ticker}) => {
     useEffect(() => {
         const initData = async() => {
             const dataresponse = await getCompanyHistory(ticker, period);
-            if (dataresponse) {
+            if (dataresponse.High && Object.keys(dataresponse.High).length !== 0) {
+                console.log('DATA RESPONSE HIGH');
+                console.log(dataresponse.High);
                 const convertedData = Object.entries(dataresponse.High).map(([datetime, value]) => ({date: datetime.split('T')[0] , value}));
+                console.log('STOCK VIS DATA');
+                console.log(convertedData);
                 setCompanyData(convertedData);
             } else {
                 return null;
             }
         }
+        console.log('ticker', ticker);
         initData();
     },[companyName, period]);
 
+    if (!companyData || companyData.length === 0) {
+        return (
+            <div ><p className='nodataavail-return'>No data available</p></div>
+        )
+    }
+
     return (
         <ResponsiveContainer width="100%" height="100%">
-            <AreaChart width={500} height={400} data={companyData}>
+            <AreaChart width="100%" height={400} data={companyData}>
                 <defs>
                     <linearGradient id='stockchrtgradient' x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#BFC5FC" stopOpacity={0.4}></stop>
@@ -35,7 +46,7 @@ const StockAreaChartVisualisation = ({companyName, period, ticker}) => {
 
                 <XAxis dataKey="date" tickFormatter={str => {
                     const date = parseISO(str);
-                    if (date.getDate() % 3 === 0) {
+                    if (date.getDate() % 1 === 0) {
                         return format(date, "d MMMM");
                     }
                     return "";

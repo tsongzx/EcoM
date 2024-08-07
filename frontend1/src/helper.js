@@ -950,7 +950,7 @@ export const getDetailedCompanyInformation = async(companyCode) => {
 
 export const getCompanyHistory = async(companyCode, period) => {
     try {
-        const response = await axios.get(`http://127.0.0.1:8000/company/information/${companyCode},${period}`, 
+        const response = await axios.get(`http://127.0.0.1:8000/company/history/${companyCode},${period}`, 
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -963,8 +963,8 @@ export const getCompanyHistory = async(companyCode, period) => {
             } 
         );
           //if successful
-          console.log('Successfully fetched history for ', companyCode);
-          console.log(response.data);
+          console.log('Successfully fetched history for ', companyCode, ' period', period);
+          console.log(response);
           return response.data;
     } catch (error) {
         console.log('error getting company history: ', error);
@@ -1069,3 +1069,15 @@ export const replaceUnderScores = (text) => {
     const replacedText = text.replace(/_/g, ' ');
     return replacedText.charAt(0).toUpperCase() + replacedText.slice(1).toLowerCase();
 };
+
+export const bigNumberFormatter = (number) => {
+    if (number >= 1e12) {
+        return (number / 1e12).toFixed(2) + 'T';
+      } else if (number >= 1e9) {
+        return (number / 1e9).toFixed(2) + 'B';
+      } else if (number >= 1e6) {
+        return (number / 1e6).toFixed(2) + 'M';
+      } else {
+        return number.toFixed(2);
+      }
+}
