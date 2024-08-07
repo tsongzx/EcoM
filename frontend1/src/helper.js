@@ -1063,7 +1063,70 @@ export const putFrameworkModifyMetrics = async (frameworkId, metrics, categoryWe
     }
 };
 
+// get headquarter countries
+export const getHeadquarterCountries = async() => {
+  try {
+      const response = await axios.get('http://127.0.0.1:8000/headquarter_countries', 
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      return response.data;
+  } catch (error) {
+      console.log(`error getting headquarter countries: ${error}`);
+  }
+}
 
+export const getCompanyByCountryByIndustry = async(industry, countries, page) => {
+  try {
+      const response = await axios.post(`http://127.0.0.1:8000/companies/${industry}`, 
+          {
+            countries: countries,
+            industry: industry,
+            page: page
+          },
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      return response.data;
+  } catch (error) {
+      console.log(`error getting headquarter countries: ${error}`);
+      return {
+        total: 0,
+        companies: []
+      }
+  }
+}
 
+export const getIndustryInfo = async(industry) => {
+  try {
+      const response = await axios.get(`http://127.0.0.1:8000/industry/info/${industry}`, 
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      if (response.data == null) {
+        return {
+          industry: industry,
+          description: ''
+        }
+      }
+      return response.data;
+  } catch (error) {
+      console.log(`error getting industry info: ${error}`);
+  }
+}
 
-
+export const getIndustryAverages = async(industry) => {
+  try {
+      const response = await axios.get(`http://127.0.0.1:8000/industry/averages/${industry}`, 
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      return response.data;
+  } catch (error) {
+      console.log(`error getting industry info: ${error}`);
+  }
+}
