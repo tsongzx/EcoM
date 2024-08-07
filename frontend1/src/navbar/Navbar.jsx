@@ -4,6 +4,7 @@ import './Navbar.css';
 import Cookies from 'js-cookie';
 import Profile from '../Profile';
 import { AppBar, Stack, Toolbar } from '@mui/material';
+import CreateFramework from '../company/CreateFramework';
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -19,6 +20,13 @@ const Navbar = () => {
         navigate('/dashboard');
     }
 
+    const handleCompare = () => {
+      navigate('/compare', { state: { companiesList: [], selectedFramework: null } });
+    }
+
+    const handleCreateFramework = () => {
+      navigate('/create');
+    }
     return (
     <>
       <AppBar position="fixed"
@@ -39,9 +47,13 @@ const Navbar = () => {
           <Stack direction="row" justifyContent="space-between" width="100%">
             <Stack direction="row" spacing={3}>
               <li className='navbar-button' id='home'><a href="/dashboard" onClick={handleHome}>Home</a></li>
-              <li className='navbar-button' id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>
+              <li className='navbar-button' id='create'><a href="/create" onClick={handleCreateFramework}>Create Framework</a></li>
+              <li className='navbar-button' id='compare'><a href="/compare" onClick={handleCompare}>Compare Companies</a></li>
             </Stack>
-            <li className='navbar-button' id='profile'><a onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</a></li>
+            <Stack direction="row" spacing={3}>
+              <li className='navbar-button' id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>
+              <li className='navbar-button' id='profile'><a onClick={() => {setIsProfileOpen(!isProfileOpen)}}>Profile</a></li>
+            </Stack>
           </Stack>
         </Toolbar>
       </AppBar>

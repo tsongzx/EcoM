@@ -3,7 +3,7 @@
 .nav-placeholder {
     height: 50px;
 }
-
+/* 
 .navbar-ul {
     list-style-type: none;
     display: flex;
@@ -18,7 +18,7 @@
     padding: 10px;
     color: #B4B2FC;
     list-style-type: none;  
-}
+} */
 
 #home {
     color: #B4B2FC;
@@ -28,7 +28,7 @@ a {
     text-decoration: none;
     font-family: Inter;
     font-weight: bold;
-    color: #0c3960;
+    color: #B4B2FC;
     cursor: pointer;
 }
 
