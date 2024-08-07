@@ -1,29 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Tabs, Tab, Box, Typography, Paper } from '@mui/material';
+import { Box, Typography, Paper } from '@mui/material';
+import { DataGrid } from '@mui/x-data-grid';
 import { getIndustryAverages, getIndustryInfo, getIndicatorsInfoByName } from '../helper';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import NumericLabel from 'react-pretty-numbers';
 
-const IndustryOverview = ({selectedIndustry}) => {
-
+const IndustryOverview = ({ selectedIndustry }) => {
   const [description, setDescription] = useState('');
   const [indicatorAverages, setIndicatorAverages] = useState({});
   const [indicatorInfo, setIndicatorInfo] = useState({});
-
-  const roundValue = (value) => {
-    let formattedScore;
-    if (value.countDecimals() > 3) {
-      formattedScore = value.toExponential(3); 
-    } else {
-      formattedScore = value.toPrecision(3); 
-    }
-    return formattedScore
-  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +15,7 @@ const IndustryOverview = ({selectedIndustry}) => {
       setDescription(industryInfo.description);
 
       const averages = await getIndustryAverages(selectedIndustry);
-      
+
       let info = null;
       if (Object.keys(indicatorInfo || {}).length === 0) {
         info = await getIndicatorsInfoByName();
@@ -42,80 +26,87 @@ const IndustryOverview = ({selectedIndustry}) => {
       }
 
       for (const indicator in averages) {
-        const curValue = averages[indicator]
+        const curValue = averages[indicator];
         if (info[indicator].unit === 'Yes/No') {
           averages[indicator] = Math.round(curValue) === 0 ? 'No' : 'Yes';
         } else {
-          // round it 
-          // averages[indicator] = roundValue(curValue)
+          averages[indicator] = curValue; // You can format it if needed
         }
       }
       setIndicatorAverages(averages);
-    }
+    };
     fetchData();
   }, [selectedIndustry]);
 
   useEffect(() => {
-    const getIndicatorInfo = async() => {
+    const getIndicatorInfo = async () => {
       const info = await getIndicatorsInfoByName();
       console.log(info);
       setIndicatorInfo(info);
-    }
+    };
     getIndicatorInfo();
   }, []);
+
+  // Prepare data for DataGrid
+  const rows = Object.keys(indicatorAverages).map((indicator) => ({
+    id: indicator, // Unique identifier
+    indicator,
+    source: indicatorInfo[indicator]?.source,
+    pillar: indicatorInfo[indicator]?.pillar,
+    unit: indicatorInfo[indicator]?.unit,
+    average: indicatorAverages[indicator]
+  }));
+
+  const columns = [
+    { field: 'indicator', headerClassName: 'header', headerName: 'Indicator', flex: 3},
+    { field: 'source', headerClassName: 'header', headerName: 'Source', flex: 1, align: 'right' },
+    { field: 'pillar', headerClassName: 'header', headerName: 'Pillar', flex: 1, align: 'right' },
+    { field: 'unit', headerClassName: 'header', headerName: 'Unit', flex: 2, align: 'right' },
+    { field: 'average', headerClassName: 'header', headerName: 'Average', flex: 2, align: 'right',
+      renderCell: (params) => {
+        const unit = indicatorInfo[params.row.indicator]?.unit;
+        return unit === 'Yes/No' ? params.value : <NumericLabel>{params.value}</NumericLabel>;
+      }
+    },
+  ];
 
   return (
     <Box
       sx={{
-        height: 'calc(67vh - 50px)'
+        height: 'calc(67vh - 50px)',
+        width: '100%',
+        padding: 2,
+        boxSizing: 'border-box',
       }}
     >
-      <Typography variant="h4">Description</Typography>
-      <Typography>{description}</Typography>  
+      <Typography variant="h5">Industry Overview</Typography>
+      <Typography>{description}</Typography>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead
-            sx={{
-              '& .MuiTableCell-root': {
-                fontWeight: 'bold',
-                color: 'white',
-                backgroundColor: '#7653bd',
-              }
-            }}
-          >
-            <TableRow>
-              <TableCell>Indicator</TableCell>
-              <TableCell align="right">Source</TableCell>
-              <TableCell align="right">Pillar</TableCell>
-              <TableCell align="right">Unit</TableCell>
-              <TableCell align="right">Average</TableCell>
-              {/* <TableCell align="right">ESG Score</TableCell> */}
-            </TableRow>
-          </TableHead>
-          {Object.keys(indicatorInfo).length > 0 && <TableBody>
-            {Object.keys(indicatorAverages)?.map((indicator, index) => (
-              <TableRow key={index}
-                // onClick={() => handleRowClick(company.id, company.company_name)} 
-                // hover
-                // style={{ cursor: 'pointer' }}
-              >
-                <TableCell>{indicator}</TableCell>
-                <TableCell align="right">{indicatorInfo[indicator].source}</TableCell>                
-                <TableCell align="right">{indicatorInfo[indicator].pillar}</TableCell>
-                <TableCell align="right">{indicatorInfo[indicator].unit}</TableCell>
-                <TableCell align="right">
-                  {indicatorInfo[indicator]?.unit === 'Yes/No'
-                    ? indicatorAverages[indicator]
-                    : <NumericLabel>{indicatorAverages[indicator]}</NumericLabel>}
-                </TableCell>              
-              </TableRow>
-            ))}
-          </TableBody>}
-        </Table>
-      </TableContainer>    
+      <Paper 
+        style={{ height: '100%', width: '100%' }}
+      >
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          // pageSize={10}
+          // rowsPerPageOptions={[5, 10, 25]}
+          // hideFooter={true}
+          hideFooterPagination={true}
+          disableSelectionOnClick
+          sx={{
+            '& .header': {
+              backgroundColor: '#7653bd', 
+              color: 'white', 
+              fontWeight: 'bold', 
+            },
+            '& .MuiDataGrid-cell': {
+              // padding: '0 16px', 
+            }
+          }}
+        />
+      </Paper>
     </Box>
   );
-}
+};
 
 export default IndustryOverview;
