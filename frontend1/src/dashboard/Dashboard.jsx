@@ -10,6 +10,7 @@ import './Dashboard.css'
 import DashboardBody from './DashboardBody.jsx';
 import IndustryPage from './IndustryPage.jsx';
 import { AsyncPaginate } from 'react-select-async-paginate';
+import IndustryTab from './IndustryTab.jsx';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -120,7 +121,7 @@ const Dashboard = () => {
             </Stack>
           </Stack>
           
-          {selectedIndustry ? <IndustryPage></IndustryPage> : <DashboardBody setSelectedCompany={setSelectedCompany}/>}
+          {selectedIndustry ? <IndustryTab selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany}></IndustryTab> : <DashboardBody setSelectedCompany={setSelectedCompany}/>}
         </Box>
       <ChatFeature/>
     </>
