@@ -2,62 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Button, Paper } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Select from 'react-select';
-import { fetchCompanies, fetchIndustries, getCompaniesOfIndustry } from '../helper';
+import { fetchCompanies, fetchIndustries, getCompaniesOfIndustryByBatch } from '../helper';
 import { useNavigate } from 'react-router-dom';
+import { AsyncPaginate } from 'react-select-async-paginate';
 
 const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCompareModalOpen, selectedFramework }) => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [selectedCompanies, setSelectedCompanies] = useState([{ value: companyId, label: companyName }]);
-  const [allCompanies, setAllCompanies] = useState([]);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [listOfIndustries, setListOfIndustries] = useState([]);
-  const [page, setPage] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(companyName);
-  }, []);
-
-  useEffect(() => {
-    console.log(selectedCompanies);
-  }, [selectedCompanies]);
-
-  useEffect(() => {
-    const fetchCompany = async () => {
-      setLoading(true);
-      try {
-        const completeIndustryList = await fetchIndustries();
-        setListOfIndustries(completeIndustryList);
-
-        const completeCompanyList = await fetchCompanies(page);
-        const filteredCompanyList = completeCompanyList.filter(company => company.company_name !== companyName);
-        console.log(filteredCompanyList);
-        setAllCompanies(prevCompanies => [...prevCompanies, ...filteredCompanyList]);
-        setHasMore(completeCompanyList.length > 0);
-      } catch (error) {
-        console.error('Error fetching companies:', error);
-      }
-      setLoading(false);
+    const fetchData = async () => {
+      const completeIndustryList = await fetchIndustries();
+      setListOfIndustries(completeIndustryList);
     };
-    fetchCompany();
-  }, [page]);
-  
-  useEffect(() => {
-    const someFunction = async() => {
-      if (selectedIndustry) {
-        console.log(selectedIndustry);
-        const companyOfIndustry = await getCompaniesOfIndustry(selectedIndustry.label);
-        console.log(companyOfIndustry);
-        const companyOfIndustryFiltered = companyOfIndustry.filter(company => company !== companyName);
-        setAllCompanies(companyOfIndustryFiltered);
-      }
-    }
-
-    someFunction();
-  }, [selectedIndustry]);
+    fetchData();
+  }, []);
 
   const handleClose = () => {
     setCompareModalOpen(false);
@@ -80,12 +43,6 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
   const handleDelete = (companyToDelete) => {
     setSelectedCompanies(selectedCompanies.filter(company => company.value !== companyToDelete));
     setError(null);
-  };
-
-  const handleMenuScrollToBottom = () => {
-    if (!loading && hasMore) {
-      setPage(prevPage => prevPage + 1);
-    }
   };
 
   //set default framework if Framework is NULL
@@ -150,18 +107,29 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
             </Box>
             <Box style={{ display: 'flex', flexDirection: 'column', marginTop: '30px', width: '100%' }}>
               <Typography variant="h6" component="h1" fontWeight="bold">Add Companies</Typography>
-              <Select
+              <AsyncPaginate
+                key={selectedIndustry ? `industry-${selectedIndustry.label}` : 'all-companies'}
                 value={selectedCompany}
-                onChange={handleSelectChange}
-                options={allCompanies.map(company => ({ value: company.id, label: company.company_name }))}
+                id='companyfilter'
                 placeholder="Select a company..."
-                styles={{
-                  container: base => ({ ...base, width: '73%' }),
-                  menu: base => ({ ...base, maxHeight: '100px' }), // Set max height for the menu
-                  menuList: base => ({ ...base, maxHeight: '100px', overflowY: 'auto' }) // Ensure only menuList has scroll
+                maxMenuHeight={100}
+                loadOptions={(search, loadedOptions, additional) => {
+                  return selectedIndustry 
+                    ? getCompaniesOfIndustryByBatch(search, loadedOptions, additional, selectedIndustry.label)
+                    : fetchCompanies(search, loadedOptions, additional);
                 }}
-                onMenuScrollToBottom={handleMenuScrollToBottom}
-              />
+                cacheOptions
+                // getOptionValue={getOptionValue}
+                // getOptionLabel={getOptionLabel}
+                onChange={handleSelectChange}
+                // styles={{
+                //   container: base => ({ ...base, width: '73%' }),
+                //   menu: base => ({ ...base, maxHeight: '100px' }), // Set max height for the menu
+                //   menuList: base => ({ ...base, maxHeight: '100px', overflowY: 'auto' }) // Ensure only menuList has scroll
+                // }}
+                additional={{
+                  page: 1,
+              }}></AsyncPaginate>
               {error && (
                 <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
                   {error}

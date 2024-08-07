@@ -4,9 +4,11 @@ import './Report.css'
 import {closestCorners, DndContext} from '@dnd-kit/core';
 import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
-import Navbar from "../Navbar";
+import Navbar from "../navbar/Navbar";
 import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
+import { fetchCompanyInfo, getDetailedCompanyInformation } from "../helper";
+import SimpleLineChart from "../SimpleLineChart";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
 import { getPrediction, getIndicatorsInfoByName } from "../helper";
@@ -160,7 +162,7 @@ const Report = () => {
 // }
 const getCompanyMetaInformation = async () => {
     console.log('Getting company Information for Company');
-    const companyInfo = await getCompanyFromRecentlyViewed(parseInt(companyId));
+    const companyInfo = await fetchCompanyInfo(parseInt(companyId));
 
     const detailedCompanyInfo = await getDetailedCompanyInformation(ticker);
 

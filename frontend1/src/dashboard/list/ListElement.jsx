@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { fetchCompaniesInList } from "./helper.js";
+import { fetchCompaniesInList } from "../../helper.js";
 import CompanyElement from "./CompanyElement.jsx";
 /**
  * 

@@ -4,7 +4,7 @@ import { Box, Typography, Button, Paper, TextField } from '@mui/material';
 import Cookies from "js-cookie";
 import { Page, Text, View, Document, StyleSheet, PDFDownloadLink } from '@react-pdf/renderer';
 import {
-    getCompanyFromRecentlyViewed,
+    fetchCompanyInfo,
     getCompanyMetrics,
     getIndicatorInfo,
   } from '../helper.js';
@@ -22,7 +22,7 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
 
     useEffect(() => {
       const setData = async() => {
-        const company_info = await getCompanyFromRecentlyViewed(companyId);
+        const company_info = await fetchCompanyInfo(companyId);
         const company_metrics = await getCompanyMetrics(companyName);
         console.log(company_metrics);
         setMetrics(company_metrics);
@@ -31,7 +31,7 @@ const ReportModal = ({ isOpen, handleClose, companyId, companyName }) => {
     }, [])
     useEffect(() => {
         const someFunction = async() => {
-            const company_info = await getCompanyFromRecentlyViewed(companyId);
+            const company_info = await fetchCompanyInfo(companyId);
             const company_metrics = await getCompanyMetrics(companyName);
             console.log(company_metrics);
             setMetrics(company_metrics);

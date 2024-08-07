@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getCompaniesOfIndustry, getIndustry, getFavouritesList } from "../helper";
+import { getRecommendedCompanies, getIndustry, getFavouritesList } from "../helper";
 import { useNavigate } from "react-router-dom";
 import './company_css/Recommendations.css';
 import { Button, Stack } from "@mui/material";
@@ -7,21 +7,18 @@ import { Button, Stack } from "@mui/material";
 
 const Recommendations = ({companyId}) => {
     const [reccs, setReccs] = useState([]);
-    // const [industryName, setIndustryName] = ('');
-    //const [companies, setCompanies] = useState([]);
     //get the industry of the company
     useEffect(() => {
         const initialiseRecommendations = async(cId) => {
             const indName = await getIndustry(cId);
             console.log(`Industry is ${indName}`);
             if (indName) {
-                const comp = await getCompaniesOfIndustry(indName);
-                console.log('companies in industry');
-                console.log(comp);
+                // later could randomly generate page number
+                const comp = await getRecommendedCompanies(indName);
                 const newList = comp.filter(company => company.id !== companyId);
                 const newReccs = getRandom(newList);
-                console.log(newReccs);
                 setReccs(newReccs);
+                console.log(newReccs);
             } else {
                 console.log('no industry :( so imma get ur favs');
                 const favs = getFavouritesList();

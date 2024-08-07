@@ -19,8 +19,8 @@ const ChatFeature = () => {
           }
         }
       );
-      console.log(response.data);
-      await params.injectMessage(response.data);
+      console.log(response.data.response);
+      await params.injectMessage(response.data.response);
     } catch (error) {
       console.log(error);
       await params.injectMessage('Sorry, I am unable to answer this.');
@@ -48,7 +48,7 @@ const ChatFeature = () => {
 		}
 	}
 	return (
-    // <Box className='chatbot-container'>
+    <Box className='chatbot-container'>
       <ChatBot options={{
           theme: {}, 
           chatHistory: {storageKey: 'chatHistory'},
@@ -70,8 +70,8 @@ const ChatFeature = () => {
             // flexDirection: 'column'
           }
         }
-    } flow={flow}/>
-    // </Box>
+      } flow={flow}/>
+    </Box>
 	);
 }
 

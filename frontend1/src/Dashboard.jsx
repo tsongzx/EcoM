@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button } from '@mui/material';
+import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Autocomplete } from '@mui/material';
+import { TextField, List, ListItem, ListItemText } from '@mui/material';
 import Navbar from './Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
-import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList, deleteList } from './helper.js';
+import { fetchLists, fetchCompanies, getRecentlyViewed, getCompanyFromRecentlyViewed, fetchIndustries, getCompaniesOfIndustry, getOfficialFrameworks, getFavouritesList, deleteList, getAllCompanies } from './helper.js';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import ListModal from './ListModal.jsx';
 import './Dashboard.css'
 import ChatFeature from './chatbot/Chatbot.jsx';
 import './Dashboard.css'
+import { debounce } from 'lodash';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -30,6 +32,8 @@ const Dashboard = () => {
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [error, setError] = useState(false);
   const [favsList, setFavsList] = useState([]);
+  const [allCompanies, setAllCompanies] = useState([]);
+
 
   const setIndustryAndCompany = async() => {
     if (selectedIndustry) {

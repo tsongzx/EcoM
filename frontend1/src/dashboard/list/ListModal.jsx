@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Typography, Grid, Paper, Card, CardContent, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
-import { fetchCompaniesInList, getCompanyFromRecentlyViewed, removeCompanyFromList } from './helper';
+import { fetchCompaniesInList, fetchCompanyInfo, removeCompanyFromList } from '../../helper';
 import { useNavigate } from 'react-router-dom';
 
 const ListModal = ({ isOpen, onClose, list, setSelectedCompany }) => {
@@ -24,7 +24,7 @@ const ListModal = ({ isOpen, onClose, list, setSelectedCompany }) => {
     const getCompanyNames = async() => {
       const newCompanyNames = {};
       for (let id of companiesInList) {
-        const companyInterest = await getCompanyFromRecentlyViewed(id);
+        const companyInterest = await fetchCompanyInfo(id);
         newCompanyNames[id] = companyInterest.company_name;
       }
       setCompanyNames(newCompanyNames);

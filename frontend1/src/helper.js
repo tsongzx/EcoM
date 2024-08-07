@@ -47,7 +47,7 @@ export const fetchLists = async() => {
 }
 
 // Gets 20 companies at a time when the user first goes into the dashboard
-export const fetchCompanies = async(page) => {
+export const fetchCompanies = async(search, loadedOptions, { page }) => {
     console.log('Getting all the companies available');
     try {
         const response = await axios.get('http://127.0.0.1:8000/company', 
@@ -57,16 +57,32 @@ export const fetchCompanies = async(page) => {
                     'Authorization': `Bearer ${Cookies.get('authToken')}`
                 },
                 params: {
-                    page: page
+                    page: page,
+                    search: search 
                 }
             }
         );
-        const companies = response.data.slice(0, 20);
-        return companies;
-    } catch (error) {
-        console.log('Error fetching the companies', error);
-        return [];
-    }
+
+        const filteredOptions = response.data
+          .map(company => ({
+            value: company.id,
+            label: company.company_name,
+          }));
+        
+        return {
+          options: filteredOptions,
+          hasMore: response.data.length >= 20, // there might be more data if we get results
+          additional: {
+            page: page + 1,
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching companies:', error);
+        return {
+          options: [],
+          hasMore: false,
+        };
+      }
 }
 
 export const fetchIndustries = async() => {
@@ -134,8 +150,7 @@ export const getAllCompanies = async() => {
     }
 }
 
-//this function is not appropiately named
-export const getCompanyFromRecentlyViewed = async (companyId) => {
+export const fetchCompanyInfo = async (companyId) => {
     try {
         const response = await axios.get(`http://127.0.0.1:8000/company/${companyId}`, 
             {
@@ -186,7 +201,7 @@ export const fetchCompaniesInList = async(listId) => {
             }
         });
         console.log(response.data);
-        const companyIds = response.data.map(company => company.id);
+        const companyIds = response.data.map(company => company.company_id);
         console.log(`List: ${listId}, companies: ${companyIds}`);
         return companyIds;
 
@@ -478,39 +493,14 @@ export const getIndicatorsInfoByName = async() => {
   }
 }
 
-export const getCompaniesOfIndustry = async(industryName) => {
-    // const cacheURL = `http://127.0.0.1:8000/industry/companies?industry=${industryName}`;
-    
-    // try {
-    //     const cache = await caches.open('companiesInIndustry');
-    //     const cachedResponse = await cache.match(cacheURL);
-    //     if (cachedResponse) {
-    //         console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-    //         console.log(cachedResponse.json());
-    //         return await cachedResponse.json();
-    //     }
-    //     const response = await axios.get('http://127.0.0.1:8000/industry/companies', {
-    //         params: { industry: industryName },
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //             'Authorization': `Bearer ${Cookies.get('authToken')}`
-    //         }
-    //     });
-    //     const responseClone = new Response(JSON.stringify(response.data));
-    //     cache.put(cacheURL, responseClone);
-    //     console.log('GOT CACHE FOR INDUSTRY COMPANIES');
-    //     console.log(response.data);
-    //     return response.data;
-    // } catch (error) {
-    //     console.error(`Error getting companies: ${error}`);
-    //     return [];
-    // }
-
+export const getCompaniesOfIndustryByBatch = async(search, loadedOptions, { page }, industryName) => {
     try {
         const response = await axios.get('http://127.0.0.1:8000/industry/companies', 
         {
             params: {
-                industry: industryName
+                industry: industryName,
+                page: page,
+                search: search 
             },             
             
             headers: {
@@ -518,15 +508,49 @@ export const getCompaniesOfIndustry = async(industryName) => {
                 'Authorization': `Bearer ${Cookies.get('authToken')}`
             }
         });
-        console.log('Searching for companies in industry, ', industryName);
-        console.log(response.data);
-        return response.data;
+        const filteredOptions = response.data
+            .map(company => ({
+              value: company.id,
+              label: company.company_name,
+            })
+        );
+
+        return {
+            options: filteredOptions,
+            hasMore: response.data.length >= 20, // there might be more data if we get results
+            additional: {
+              page: page + 1,
+            }
+        }
     } catch (error) {
-        console.log(`Error getting metric: ${error}`);
-        return [];
+        console.error('Error fetching companies:', error);
+        return {
+          options: [],
+          hasMore: false,
+        };
     }
 }
 
+export const getRecommendedCompanies = async(industryName) => {
+  try {
+      const response = await axios.get('http://127.0.0.1:8000/industry/companies/recommended', 
+      {
+          params: {
+              industry: industryName,
+          },             
+          
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }
+      });
+
+      return response.data;
+  } catch (error) {
+      console.error('Error fetching companies:', error);
+      return [];
+  }
+}
 // Given a framework already, requires company Indicators by metric
 // indicators List of json objects {id, indicator_id, indicator_name (string), metric_id, weighting (float)}
 // used pre-stored data from the json file to avoid continuously accessing it

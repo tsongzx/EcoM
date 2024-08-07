@@ -263,9 +263,9 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                     {(selectedYear !== 'Predicted') && Object.values(indicatorsCompany[selectedYear]).map((indicator, index) => (
                       
                       <TableRow key={index}>
-                        <TableCell>{indicator.indicator_name}</TableCell>
-                        <TableCell>{getName(Object.values(allIndicatorsInfo).find(item => item.name === indicator.indicator_name).unit)}</TableCell>
-                        <TableCell align="right">{indicator.indicator_value}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>{indicator.indicator_name}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>{getName(Object.values(allIndicatorsInfo).find(item => item.name === indicator.indicator_name).unit)}</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }} align="right">{indicator.indicator_value}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
