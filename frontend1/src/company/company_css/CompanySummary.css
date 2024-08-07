@@ -6,4 +6,15 @@
 .company-summary-container{
     display: flex;
     flex-direction: row;
+    background-color: bisque;
+    max-width: 53vw;
+    height: 400px;
+}
+
+.company-long-summary{
+    overflow-y: scroll;
+}
+
+.company-live-metadata {
+    overflow-y: scroll;
 }

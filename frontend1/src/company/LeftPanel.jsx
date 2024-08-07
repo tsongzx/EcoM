@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getIndicatorFromMetric } from "../helper";
 import CreateFramework from "./CreateFramework";
+import './company_css/LeftPanel.css'
 
 // This component includes the majority of the left bar of the company page.
 // It contains 3 children components 
@@ -67,14 +68,14 @@ const LeftPanel = ({
         overflow: "hidden",
         overflowY: "scroll",
       }}>
-        <Button sx={{width: '100%'}}
+        <Button className="left-panel-button" sx={{width: '100%'}}
           variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
           Return to Dashboard
         </Button>
-        <Button variant="contained" 
+        <Button className="left-panel-button" variant="contained" 
           sx={{width: '100%', margin: '1vh 0'}} 
           onClick={openCompareModal}>Compare</Button>
-        <Button variant="contained" 
+        <Button className="left-panel-button" variant="contained" 
           sx={{width: '100%', margin: '1vh 0'}} 
           onClick={() => setExitFramework(!exitFramework)}>Exit Framework View</Button>
         <div style={{ 

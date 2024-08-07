@@ -1,8 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+
 .stockareachart-tooltip {
     border-radius: 0.25rem;
     background-color: aliceblue;
     color: black;
-    padding: 1rem;
-    box-shadow: 15px 30px 40px 5px black;
+    padding: 2px;
+    box-shadow: 5px 3px 3px 1px #0c3960;
     text-align: center;
+    border: solid 2px #0c3960;
+}
+
+.nodataavail-return {
+    margin-top: 5px;
+    font-family: Inter;
+}
+
+.Stockareachartvis{
+    margin-top: 5px;
+    margin-bottom: 10px;
 }
