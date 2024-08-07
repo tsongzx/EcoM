@@ -30,8 +30,8 @@ const IndustryTab = ({selectedIndustry, setSelectedCompany}) => {
         <Tab label="Overview" value="overview" />
       </Tabs>
       {/* Rendering content based on the selected tab */}
-        {tab === 'companies' && <IndustryPage selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany}/>};
-        {tab === 'overview' && <IndustryOverview></IndustryOverview>};
+        {tab === 'companies' && <IndustryPage selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany}/>}
+        {tab === 'overview' && <IndustryOverview selectedIndustry={selectedIndustry}></IndustryOverview>}
       </Box>
   );
 }

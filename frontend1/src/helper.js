@@ -1098,3 +1098,35 @@ export const getCompanyByCountryByIndustry = async(industry, countries, page) =>
       }
   }
 }
+
+export const getIndustryInfo = async(industry) => {
+  try {
+      const response = await axios.get(`http://127.0.0.1:8000/industry/info/${industry}`, 
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      if (response.data == null) {
+        return {
+          industry: industry,
+          description: ''
+        }
+      }
+      return response.data;
+  } catch (error) {
+      console.log(`error getting industry info: ${error}`);
+  }
+}
+
+export const getIndustryAverages = async(industry) => {
+  try {
+      const response = await axios.get(`http://127.0.0.1:8000/industry/averages/${industry}`, 
+          {headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Cookies.get('authToken')}`
+          }});
+      return response.data;
+  } catch (error) {
+      console.log(`error getting industry info: ${error}`);
+  }
+}

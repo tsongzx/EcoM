@@ -105,13 +105,6 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
         }}
       >
         <Pagination page={curPage} count={numPages} onChange={(event, value) => {console.log(value);setCurPage(value);}} color="secondary"/>
-        {/* {companies.map(company => {
-          return (
-            <Paper>
-              {company.company_name}
-            </Paper>
-          )
-        })} */}
         <TableContainer component={Paper}>
           <Table>
             <TableHead
@@ -126,6 +119,7 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
               <TableRow>
                 <TableCell>Company</TableCell>
                 <TableCell align="right">Headquarter country</TableCell>
+                <TableCell align="right">Ticker</TableCell>
                 <TableCell align="right">Current Price</TableCell>
                 <TableCell align="right">ESG Score</TableCell>
               </TableRow>
@@ -139,6 +133,7 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
                 >
                   <TableCell>{company.company_name}</TableCell>
                   <TableCell align="right">{company.headquarter_country}</TableCell>
+                  <TableCell align="right">{company.ticker}</TableCell>
                   <TableCell align="right">Current Price</TableCell>
                   <TableCell align="right">ESG Score</TableCell>                
                 </TableRow>
