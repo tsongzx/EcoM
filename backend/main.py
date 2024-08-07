@@ -681,10 +681,10 @@ async def get_companies_by_industry_by_country(
         company_models.Company.industry == industry
       )
       
-    if filter.countries:
-      query = query.filter(
-        company_models.Company.headquarter_country.in_(filter.countries)
-      )
+    # if filter.countries:
+    query = query.filter(
+      company_models.Company.headquarter_country.in_(filter.countries)
+    )
     return {'total': query.count(), 'companies': query.offset(offset).limit(20).all()}
 # ***************************************************************
 #                        Framework Apis

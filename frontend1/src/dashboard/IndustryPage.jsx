@@ -1,9 +1,7 @@
-import {React, useEffect, useState} from 'react';
-import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Container, Box, Stack, FormGroup, FormControlLabel, Checkbox, Pagination } from '@mui/material';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { fetchLists, getRecentlyViewed, fetchCompanyInfo, getFavouritesList, deleteList, getHeadquarterCountries, getCompanyByCountryByIndustry } from '../helper.js';
+import React, { useEffect, useState } from 'react';
+import { Grid, Paper, Typography, Box, FormGroup, FormControlLabel, Checkbox, Pagination, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ListModal from './list/ListModal.jsx';
+import { getHeadquarterCountries, getCompanyByCountryByIndustry } from '../helper.js';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 
-const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
+const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   const navigate = useNavigate();
 
   const [headquarterCountries, setHeadquarterCountries] = useState([]);
@@ -21,23 +19,23 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
   const [curPage, setCurPage] = useState(1);
 
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchData = async () => {
       const countries = await getHeadquarterCountries();
       setHeadquarterCountries(countries);
-    }
+      // initially select all countries
+      setSelectedCountries(countries);
+    };
     fetchData();
   }, []);
 
   useEffect(() => {
-    const fetchData = async() => {
+    const fetchData = async () => {
       const companies = await getCompanyByCountryByIndustry(selectedIndustry, selectedCountries, curPage);
-      console.log(companies);
       setCompanies(companies.companies);
       setNumPages(Math.ceil(companies.total / 20));
-      console.log(companies.total);
-    }
+    };
     fetchData();
-  }, [selectedCountries, selectedIndustry, curPage])
+  }, [selectedCountries, selectedIndustry, curPage]);
 
   const handleCheckboxChange = (event) => {
     const { name, checked } = event.target;
@@ -47,7 +45,6 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
   };
 
   const handleRowClick = (companyId, companyName) => {
-    console.log('Clicked company Name at ', companyId);
     navigate(`/company/${encodeURIComponent(companyId)}`, 
       { state: { 
           companyId, 
@@ -55,30 +52,32 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
           initialFramework: null
         } 
       });
-  }
+  };
+
+  const handleSelectAll = () => {
+    setSelectedCountries(headquarterCountries);
+  };
+
+  const handleDeselectAll = () => {
+    setSelectedCountries([]);
+  };
 
   return (
-    <Box sx={{display: 'flex', height: 'calc(67vh - 50px)'}}>
+    <Box sx={{ display: 'flex', height: 'calc(67vh - 50px)' }}>
       <Box
         sx={{
-          width: '25%',
+          width: '20%',
           height: 'calc(67vh - 50px)',
-          // height: '100%',
           backgroundColor: 'white',
           padding: '20px',
-          overflow: "hidden",
-          overflowY: "scroll",
+          overflowY: 'scroll',
         }}
       >
         <Typography variant="h6">Headquarter country</Typography>
+        <Button variant="contained" onClick={handleSelectAll} sx={{ marginBottom: 1, marginRight: 1 }}>Select All</Button>
+        <Button variant="contained" onClick={handleDeselectAll} sx={{ marginBottom: 1 }}>Deselect All</Button>
         {headquarterCountries && (
-          <FormGroup
-            sx={{
-              // height: '40vh',
-              overflow: "hidden",
-              overflowY: "scroll",
-            }}
-          >
+          <FormGroup>
             <Grid container spacing={2}>
               {headquarterCountries.map((country, index) => (
                 <Grid item xs={6} key={index}>
@@ -96,15 +95,13 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
           </FormGroup>
         )}
       </Box>
-      <Box
+      <Stack alignItems="center"
         sx={{
-          width: '75%',
-          // height: '100%',
-          overflow: "hidden",
-          overflowY: "scroll",
+          width: '80%',
+          overflowY: 'scroll',
         }}
       >
-        <Pagination page={curPage} count={numPages} onChange={(event, value) => {console.log(value);setCurPage(value);}} color="secondary"/>
+        <Pagination page={curPage} count={numPages} onChange={(event, value) => setCurPage(value)} color="secondary"/>
         <TableContainer component={Paper}>
           <Table>
             <TableHead
@@ -141,7 +138,7 @@ const IndustryPage = ({selectedIndustry, setSelectedCompany}) => {
             </TableBody>
           </Table>
         </TableContainer>
-      </Box>
+      </Stack>
     </Box>
   );
 }
