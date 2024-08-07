@@ -12,7 +12,7 @@ import {
   Box
 } from '@mui/material';
 import Select from 'react-select';
-import Navbar from '../Navbar';
+import Navbar from '../navbar/Navbar.jsx';
 import { getOfficialFrameworks, getMetricForFramework, getMetricName, calculateMetricScore } from '../helper';
 import ContextMenu from './ContextMenu';
 import SearchMetricsModal from './SearchMetricsModal';

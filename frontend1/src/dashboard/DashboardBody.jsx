@@ -3,7 +3,7 @@ import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem,
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { fetchLists, getRecentlyViewed, fetchCompanyInfo, getFavouritesList, deleteList } from '../helper.js';
 import { useNavigate } from 'react-router-dom';
-import ListModal from './ListModal.jsx';
+import ListModal from './list/ListModal.jsx';
 
 const DashboardBody = ({page, setSelectedCompany}) => {
   const navigate = useNavigate();
@@ -65,6 +65,10 @@ const DashboardBody = ({page, setSelectedCompany}) => {
   const handleDeleteList = (listId) => {
     // Implement logic to delete the list
     deleteList(listId);
+
+    // remove list from userLists on frontend
+    const newLists = lists.filter(list => list.id !== listId);
+    setLists(newLists);
 
   };
 

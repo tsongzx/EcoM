@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Container, Box, Stack } from '@mui/material';
-import Navbar from '../Navbar.jsx';
+import Navbar from '../navbar/Navbar.jsx';
 import { useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { fetchLists, fetchCompanies, getRecentlyViewed, fetchCompanyInfo, fetchIndustries, getCompaniesOfIndustryByBatch, getOfficialFrameworks, getFavouritesList, deleteList } from '../helper.js';

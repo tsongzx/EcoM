@@ -201,7 +201,7 @@ export const fetchCompaniesInList = async(listId) => {
             }
         });
         console.log(response.data);
-        const companyIds = response.data.map(company => company.id);
+        const companyIds = response.data.map(company => company.company_id);
         console.log(`List: ${listId}, companies: ${companyIds}`);
         return companyIds;
 

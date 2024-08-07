@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import Cookies from 'js-cookie';
-import Profile from './Profile';
+import Profile from '../Profile';
 import { AppBar, Stack, Toolbar } from '@mui/material';
 
 const Navbar = () => {
