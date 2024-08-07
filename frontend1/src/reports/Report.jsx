@@ -9,8 +9,9 @@ import CustomTextarea from "./CustomTextarea";
 import { getCompanyFromRecentlyViewed, getDetailedCompanyInformation } from "../helper";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
-import { getPrediction } from "../helper";
+import { getPrediction, getIndicatorsInfoByName } from "../helper";
 import FrameworkTable from "../company/FrameworkTable";
+import IndicatorVisualisations from "../company/IndicatorVisualisations";
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
@@ -22,10 +23,15 @@ const Report = () => {
     const [ components , setComponents ] = useState([]);
     const [ showAddText, setShowAddText] = useState(false);
     const [predictedScore, setPredictedScore] = useState({});
+
+    //FOR INDICATOR GRAPHING
+    const [indicatorInfo, setIndicatorInfo] = useState({});
+    const [graphValues, setGraphValues] = useState({});
+
     const [key, setKey] = useState(0);
     const ref = useRef();
     const location = useLocation();
-    const { id, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo } = location.state || {};
+    const { id, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, graphStateChange, selectedMetrics, ticker } = location.state || {};
     // set Components to be a list of JSON objects {id: int, type: '', name: ''}, 
     useEffect(() => {
         console.log('Inside Reporing for company: ', parseInt(companyId));
@@ -58,14 +64,53 @@ const Report = () => {
             }
             setPredictedScore(allPredictedScores);
           }
-          aiPredict();
+        
+          const getIndicatorInfo = async() => {
+            const info = await getIndicatorsInfoByName();
+            console.log('REPORT JSX INFO');
+            console.log(info);
+            setIndicatorInfo(info);
+          }
 
+          const get_graph_values = () => {
+            const graph_data = {};
+            for (const [year, data] of Object.entries(indicatorsCompany)) {  
+              for (const [indicator_name, indicator_data] of Object.entries(data)) {
+                // Check if within selected years
+                if (!Object.keys(indicatorsCompany).includes(indicator_data.indicator_year_int.toString())) {
+                  // console.log(`Skipping year ${indicator_data.indicator_year_int} as it is not in selectedYears`);
+                  continue;
+                }
+          
+                if (!(indicator_name in graph_data)) {
+                  graph_data[indicator_name] = [];
+                }
+          
+                graph_data[indicator_name].push({
+                  indicator: indicator_name,
+                  year: year,
+                  [companyName]: indicator_data.indicator_value,
+                  // company: companyName,
+                });
+              }
+            }
+            console.log('REPORT JSX graph_data:', graph_data);
+            setGraphValues(graph_data);
+            // return graph_data;
+          };
+
+          aiPredict();
+          getIndicatorInfo();
+          get_graph_values();
 
 
         // Get Data for each E, S and G Category in the format:
         // {indicator_name, indicator_unit, indicator_value}
 
         //get graphing data
+
+        //For Indicators:
+
     },[companyId]);
     // name will be the string content, id is auto populated.
 
@@ -117,7 +162,7 @@ const getCompanyMetaInformation = async () => {
     console.log('Getting company Information for Company');
     const companyInfo = await getCompanyFromRecentlyViewed(parseInt(companyId));
 
-    const detailedCompanyInfo = await getDetailedCompanyInformation(companyName);
+    const detailedCompanyInfo = await getDetailedCompanyInformation(ticker);
 
     const newCompanyComponents = [
         { id: 1, type: 'title', name: companyInfo.company_name, isDisplayed: true },
@@ -139,10 +184,21 @@ const getCompanyMetaInformation = async () => {
         type: 'table',
         name: 'Indicators Table',
         isDisplayed: true,
-    }] : [{
+    },{
+        id: newCompanyComponents.length + 3,
+        type: 'iGraph',
+        name: 'Indicators Graphs',
+        isDisplayed: true,
+    }
+] : [{
         id: newCompanyComponents.length + 1,
         type: 'table',
         name: 'Indicators Table',
+        isDisplayed: true,
+    },{
+        id: newCompanyComponents.length + 2,
+        type: 'iGraph',
+        name: 'Indicators Graphs',
         isDisplayed: true,
     }]),
     ];
@@ -201,6 +257,7 @@ const getCompanyMetaInformation = async () => {
                         metricScores={metricScores}
                         allIndicatorsInfo={allIndicatorsInfo}
                     />
+                    <IndicatorVisualisations companyIndicators={indicatorsCompany} companyName={companyName}/>
                 </div>
 
 
@@ -229,6 +286,11 @@ const getCompanyMetaInformation = async () => {
                         metricScores={metricScores}
                         allIndicatorsInfo={allIndicatorsInfo}
                         predictedScore={predictedScore}
+                        graphStateChange={graphStateChange}
+                        selectedMetrics={selectedMetrics}
+
+                        indicatorInfo={indicatorInfo}
+                        graphValues={graphValues}
                         />} fileName={`${companyName}.pdf`}>
                             {({ blob, url, loading, error }) =>
                             loading ? 'Loading document...' : 'Download PDF'

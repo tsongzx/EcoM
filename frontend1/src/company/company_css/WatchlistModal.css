@@ -26,7 +26,7 @@
 .modifyWatchlists {
     position: absolute;
     bottom: 0;
-    background-color: rgb(224, 224, 224);
+    background-color: #bed4e9;
     height: 50px;
     padding: 3px 5px;
     display: flex;
@@ -69,7 +69,7 @@
 }
 
 .watchList-button:hover {
-    border: solid 2px blue;
+    border: solid 2px #3373b0;
     padding: 19px 15px;
 }
 
@@ -95,7 +95,7 @@
 }
 
 #addNewlistButton:hover {
-    background-color: rgb(102, 102, 184);
+    background-color: #0c3960;
     color: white;
 }
 

@@ -1041,7 +1041,7 @@ export const putFrameworkModifyMetrics = async (frameworkId, metrics, categoryWe
     }
 };
 
-
-
-
-
+export const replaceUnderScores = (text) => {
+    const replacedText = text.replace(/_/g, ' ');
+    return replacedText.charAt(0).toUpperCase() + replacedText.slice(1).toLowerCase();
+};

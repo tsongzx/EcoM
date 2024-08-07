@@ -393,6 +393,10 @@ const Company = () => {
             allIndicators={allIndicators}
             metricScores={metricScores}
             allIndicatorsInfo={allIndicatorsInfo}
+
+            graphStateChange={graphStateChange}
+
+            ticker={ticker}
           />
           <CompanyBody 
             companyId={companyId}

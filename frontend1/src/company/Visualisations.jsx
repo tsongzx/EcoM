@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { getIndicatorsInfoByName } from '../helper';
-import VisualisationsTab from '../visualisations/VisualisationsTab';
 import { Box } from '@mui/material';
 import MetricVisualisations from './MetricVisualisations.jsx'
 import IndicatorVisualisations from './IndicatorVisualisations.jsx'
