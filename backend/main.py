@@ -13,6 +13,7 @@ from user import get_user_using_id, get_user_object_using_id
 from sqlalchemy.orm import Session
 from route_tags import tags_metadata
 import schemas.user_schemas as user_schemas
+import schemas.industry_schemas as industry_schemas
 import schemas.list_schemas as list_schemas
 import schemas.graph_schemas as graph_schemas
 import schemas.framework_schemas as framework_schemas
@@ -24,6 +25,7 @@ import models.framework_models as framework_models
 import models.list_models as list_models
 import models.metrics_models as metrics_models
 import models.user_models as user_models
+import models.industry_models as industry_models
 import json
 from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
@@ -536,14 +538,14 @@ async def get_company_by_batch(
     return companyData
 
 
-@app.get("/company/all", tags=["company"])
-async def get_all_company(
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-):
-    companyData = session.query(
-        company_models.Company).all()
-    return companyData
+# @app.get("/company/all", tags=["company"])
+# async def get_all_company(
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ):
+#     companyData = session.query(
+#         company_models.Company).all()
+#     return companyData
 
 
 @app.get("/company/all", tags=["company"])
@@ -634,7 +636,6 @@ async def get_company_info(
 # Get the Company's Stock Price history, period is how far the history
 # will date back into for example: 1 month is "1mo", 5 days would be "5d"
 
-
 @app.get("/company/history/{company_code},{period}", tags=["company"])
 async def get_company_history(
     company_code: str,
@@ -650,7 +651,6 @@ async def get_company_history(
 # exampleReturnSustainbility.txt file to see an example
 # If you would like me to return any value please let me (Geoffrey) know
 
-
 @app.get("/company/sustainability/{company_code}", tags=["company"])
 async def get_company_sustainability(
     company_code: str,
@@ -661,6 +661,31 @@ async def get_company_sustainability(
     return sustainability
 
 
+@app.post("/companies/{industry}", tags=["company"])
+async def get_companies_by_industry_by_country(
+    industry: str, 
+    filter: industry_schemas.CompanyFilter,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    offset = (filter.page - 1) * 20
+    
+    print(f'page: {filter.page}')
+
+    if industry == 'Unknown':
+      query = session.query(company_models.Company).filter(
+        company_models.Company.industry == None
+      )
+    else:
+      query = session.query(company_models.Company).filter(
+        company_models.Company.industry == industry
+      )
+      
+    # if filter.countries:
+    query = query.filter(
+      company_models.Company.headquarter_country.in_(filter.countries)
+    )
+    return {'total': query.count(), 'companies': query.offset(offset).limit(20).all()}
 # ***************************************************************
 #                        Framework Apis
 # ***************************************************************
@@ -1049,17 +1074,6 @@ async def get_indicator(
 #                        Metric Apis
 # ***************************************************************
 
-
-# @app.get("/metric", response_model=str, tags=["Metrics"])
-# async def get_metric_name(
-#     metric_id: int,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     metric = session.query(metrics_models.Metrics).filter_by(
-#         id=metric_id).first()
-
-#     return {'name': metric.name}
 @app.get("/metric", tags=["Metrics"])
 async def get_metric_name(
     metric_id: int,
@@ -1187,6 +1201,16 @@ async def get_industry(
         id=company_id).first()
     return "Unknown" if company.industry is None else company.industry
 
+
+@app.get("/industry/info/{industry}", tags=["Industry"])
+async def get_industry_info(
+    industry: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    return session.query(industry_models.Industry).filter_by(
+        industry=industry).first()
+    
 
 @app.get("/industries", tags=["Industry"])
 async def get_industries(
@@ -1316,38 +1340,62 @@ async def get_framework_company_average(
 
 #     return score / len(companies) if companies else 0
 
-@app.get("/industry/indicator/average/", tags=["Industry"])
+@app.get("/industry/averages/{industry}", tags=["Industry"])
 async def get_indicator_industry_averages(
-    indicators: List[str],
-    year: int,
-    companies: List[company_models.Company] = Depends(
-        get_companies_in_industry),
+    industry: str,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    # fix - get average for an industry for a framework
-    """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
+    """_summary_: Retrieves indicator average for an industry
     """
-    score = 0
-    company_names = [company.company_name for company in companies]
-
-    values = session.query(company_models.CompanyData).filter(
-        company_models.CompanyData.company_name.in_(company_names),
-        company_models.CompanyData.indicator_year_int == year,
-        company_models.CompanyData.indicator_name.in_(indicators),
+    
+    # results = session.query(
+    #     company_models.CompanyData.indicator_name,
+    #     func.avg(company_models.CompanyData.indicator_value).label('average_indicator_value')
+    # ).join(
+    #     company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
+    # ).join(
+    #     metrics_models.Indicators, metrics_models.Indicators.name == company_models.CompanyData.indicator_name
+    # ).filter(
+    #     company_models.Company.industry == industry,
+    #     metrics_models.Indicators.unit != 'Yes/No'
+    # ).group_by(
+    #     company_models.CompanyData.indicator_name
+    # ).all()
+    
+    results = session.query(
+        company_models.CompanyData.indicator_name,
+        func.avg(company_models.CompanyData.indicator_value).label('average_indicator_value')
+    ).join(
+        company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
+    ).filter(
+        company_models.Company.industry == industry,
+    ).group_by(
+        company_models.CompanyData.indicator_name
     ).all()
-
-    # Organise data by indicator
-    indicator_values = {}
-    for value in values:
-        if value.indicator_name not in indicator_values:
-            indicator_values[value.indicator_name] = 0
-        indicator_values[value.indicator_name] += value.indicator_value
-
-    num_companies = len(companies)
-    indicator_averages = {indicator_name: total /
-                          num_companies for indicator_name, total in indicator_values.items()}
-    return indicator_averages
+    
+    average_dict = {}
+    for result in results:
+      average_dict[result.indicator_name] = result.average_indicator_value
+    
+    # results = session.query(
+    #     company_models.CompanyData.indicator_name,
+    #     func.count(company_models.CompanyData.indicator_value).label('count')
+    # ).join(
+    #     company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
+    # ).join(
+    #     metrics_models.Indicators, metrics_models.Indicators.name == company_models.CompanyData.indicator_name
+    # ).filter(
+    #     company_models.Company.industry == industry,
+    #     metrics_models.Indicators.unit == 'Yes/No'
+    # ).group_by(
+    #     company_models.CompanyData.indicator_name
+    # ).all()
+    
+    # for result in results:
+    #   average_dict[result.indicator_name] = result.count
+    
+    return average_dict
 
 # ***************************************************************
 #                        Chatbot Apis
@@ -1603,7 +1651,6 @@ async def get_years(
 #                        Company view Scoring Apis
 # ***************************************************************
 
-
 @app.post("/company/metric/", tags=["Company scores"])
 async def calculate_metric_company_view(
     # company_indicators: Dict[str, Any],
@@ -1619,10 +1666,19 @@ async def calculate_metric_company_view(
     """
     return metrics.calculate_metric(company_indicators, indicators)
 
-# @app.post("/company/score/", tags=["Company scores"])
-# async def find_weighted_average(
-#     values: List[score_schemas.Value],
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) -> float:
-#     return sum(value.score * value.weighting for value in values)
+# ***************************************************************
+#                        Headquarter country Apis
+# ***************************************************************
+
+@app.get("/headquarter_countries/", tags=["Headquarter Countries"])
+async def get_headquarter_countries(
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    companies = session.query(company_models.Company.headquarter_country)\
+        .distinct()\
+        .all()
+
+    countries = [company.headquarter_country for company in companies]
+
+    return sorted(countries)

@@ -115,7 +115,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     <>
       <Stack sx={{
           marginTop: '20px',
-          width: '100vw'
+          width: '100vw',
         }}
           alignItems={'center'} 
           spacing={2}>

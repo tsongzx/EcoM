@@ -97,4 +97,8 @@ a {
 
 .navbar-button {
   border-radius: 10px;
+  background-color: #0D2149;
+  padding: 10px;
+  color: #B4B2FC;
+  list-style-type: none;  
 }
