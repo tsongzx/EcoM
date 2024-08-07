@@ -1,7 +1,7 @@
 {
     "themes": [
         {
-            "name" : "Main Theme",
+            "name" : "Default",
             "colors" : [
                 {"name": "a", "value": "#e7f1fb"},
                 {"name": "b", "value": "#bed4e9"},

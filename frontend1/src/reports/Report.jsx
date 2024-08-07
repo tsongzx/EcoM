@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import './Report.css'
-import Switch from '@mui/material/Switch';
 import {closestCorners, DndContext} from '@dnd-kit/core';
 import { DraggableElements } from "./DraggableElements";
 import { arrayMove } from "@dnd-kit/sortable";
@@ -11,20 +10,29 @@ import { fetchCompanyInfo, getDetailedCompanyInformation } from "../helper";
 import SimpleLineChart from "../SimpleLineChart";
 import { PDFDownloadLink, ReactPDF } from "@react-pdf/renderer";
 import { ReportDoc } from "./Document";
-
+import { getPrediction, getIndicatorsInfoByName } from "../helper";
+import FrameworkTable from "../company/FrameworkTable";
+import IndicatorVisualisations from "../company/IndicatorVisualisations";
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
- * 
+ * In future can change key inside a useEffect so it ensures that the key changes after the components is set
  * @returns {React}
  */
 const Report = () => {
     const { companyId } = useParams();
     const [ components , setComponents ] = useState([]);
     const [ showAddText, setShowAddText] = useState(false);
+    const [predictedScore, setPredictedScore] = useState({});
+
+    //FOR INDICATOR GRAPHING
+    const [indicatorInfo, setIndicatorInfo] = useState({});
+    const [graphValues, setGraphValues] = useState({});
+
+    const [key, setKey] = useState(0);
     const ref = useRef();
     const location = useLocation();
-    const { id, companyName, framework, year } = location.state || {};
+    const { id, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, graphStateChange, selectedMetrics, ticker } = location.state || {};
     // set Components to be a list of JSON objects {id: int, type: '', name: ''}, 
     useEffect(() => {
         console.log('Inside Reporing for company: ', parseInt(companyId));
@@ -36,8 +44,93 @@ const Report = () => {
         //     {id: 7, type: "text", name: "fourthelement", isDisplayed: true},
         //     {id: 8, type: "text", name: "fifthelement", isDisplayed: true},
         // ])
+        logAllParams();
+        // Get the indicators for the company for the selected year
+        const aiPredict = async () => {
+            let allPredictedScores = {};
+            console.log('ALL INDICATOR INFORMATIOn');
+            console.log(allIndicatorsInfo);
+            if (!allIndicatorsInfo){
+                return;
+            }
+            for (const indicator of Object.values(allIndicatorsInfo)) {
+              let score = await getPrediction(indicator.name, indicator.unit, companyName);
+              if (score) {
+                let newObj = {};
+                newObj['id'] = indicator.id; 
+                newObj['indicator_name'] = score.indicator_name;
+                newObj['prediction'] = score.prediction;
+                allPredictedScores[score.indicator_id] = newObj;
+              }
+            }
+            setPredictedScore(allPredictedScores);
+          }
+        
+          const getIndicatorInfo = async() => {
+            const info = await getIndicatorsInfoByName();
+            console.log('REPORT JSX INFO');
+            console.log(info);
+            setIndicatorInfo(info);
+          }
+
+          const get_graph_values = () => {
+            const graph_data = {};
+            for (const [year, data] of Object.entries(indicatorsCompany)) {  
+              for (const [indicator_name, indicator_data] of Object.entries(data)) {
+                // Check if within selected years
+                if (!Object.keys(indicatorsCompany).includes(indicator_data.indicator_year_int.toString())) {
+                  // console.log(`Skipping year ${indicator_data.indicator_year_int} as it is not in selectedYears`);
+                  continue;
+                }
+          
+                if (!(indicator_name in graph_data)) {
+                  graph_data[indicator_name] = [];
+                }
+          
+                graph_data[indicator_name].push({
+                  indicator: indicator_name,
+                  year: year,
+                  [companyName]: indicator_data.indicator_value,
+                  // company: companyName,
+                });
+              }
+            }
+            console.log('REPORT JSX graph_data:', graph_data);
+            setGraphValues(graph_data);
+            // return graph_data;
+          };
+
+          aiPredict();
+          getIndicatorInfo();
+          get_graph_values();
+
+
+        // Get Data for each E, S and G Category in the format:
+        // {indicator_name, indicator_unit, indicator_value}
+
+        //get graphing data
+
+        //For Indicators:
+
     },[companyId]);
     // name will be the string content, id is auto populated.
+
+    const logAllParams = () => {
+        console.log('LOGGING ALL PARAMS FOR REPORT.JSX');
+        console.log('id: ', id, ' company name: ', companyName, ' framework', framework, ' year', year);
+        console.log('indicatorsCompany');
+        console.log(indicatorsCompany);
+        console.log('Selected Indicators');
+        console.log(selectedIndicators);
+        console.log('metric names');
+        console.log(metricNames);
+        console.log('AllIndicators');
+        console.log(allIndicators);
+        console.log('metricScores');
+        console.log(metricScores);
+        console.log('AllIndicatorsInfo');
+        console.log(allIndicatorsInfo);
+    }
 
     // report container will go through the list of components everytime and check what kind of 
     // object it is and render based on it
@@ -46,6 +139,7 @@ const Report = () => {
     const getComponentPos = (id) => {
         return components.findIndex(c => c.id === id);
     }
+
     const handleDragEnd = (event) => {
         const {active, over} = event;
         if (active.id === over.id) return;
@@ -55,6 +149,7 @@ const Report = () => {
 
             return arrayMove(components, originalPosition, newPosition);
         });
+        setKey(prevKey => prevKey + 1);
     }
 
     //{
@@ -68,7 +163,7 @@ const getCompanyMetaInformation = async () => {
     console.log('Getting company Information for Company');
     const companyInfo = await fetchCompanyInfo(parseInt(companyId));
 
-    const detailedCompanyInfo = await getDetailedCompanyInformation(companyName);
+    const detailedCompanyInfo = await getDetailedCompanyInformation(ticker);
 
     const newCompanyComponents = [
         { id: 1, type: 'title', name: companyInfo.company_name, isDisplayed: true },
@@ -85,12 +180,34 @@ const getCompanyMetaInformation = async () => {
         type: 'longSummary',
         name: detailedCompanyInfo.longBusinessSummary,
         isDisplayed: true
-    }] : []),
+    },{
+        id: newCompanyComponents.length + 2,
+        type: 'table',
+        name: 'Indicators Table',
+        isDisplayed: true,
+    },{
+        id: newCompanyComponents.length + 3,
+        type: 'iGraph',
+        name: 'Indicators Graphs',
+        isDisplayed: true,
+    }
+] : [{
+        id: newCompanyComponents.length + 1,
+        type: 'table',
+        name: 'Indicators Table',
+        isDisplayed: true,
+    },{
+        id: newCompanyComponents.length + 2,
+        type: 'iGraph',
+        name: 'Indicators Graphs',
+        isDisplayed: true,
+    }]),
     ];
 
     //Add whatever components we fetched
     console.log(newComponents);
     setComponents([...components, ...newComponents]);
+    setKey(prevKey => prevKey + 1);
 };
 
 
@@ -108,6 +225,7 @@ const getCompanyMetaInformation = async () => {
         }];
         console.log(newComponents);
         setComponents(newComponents);
+        setKey(prevKey => prevKey + 1);
     }
 
     const toggleDisplay = (id) => {
@@ -117,6 +235,7 @@ const getCompanyMetaInformation = async () => {
                 c.id === id ? { ...c, isDisplayed: !c.isDisplayed } : c
             )
         );
+        setKey(prevKey => prevKey + 1);
     };
     
 
@@ -126,6 +245,20 @@ const getCompanyMetaInformation = async () => {
             <div className="reportContainer">
                 <div className="reportContent">
                     {/* components.map goes here, currently just some placeholder code*/}
+                    <FrameworkTable 
+                        indicatorsCompany={indicatorsCompany}
+                        selectedYear={year}
+                        setSelectedYear={toggleDisplay}
+                        companyName={companyName}
+                        availableYears={[2018, 2019, 2020, 2021, 2022, 2023, 2024]}
+                        selectedFramework={framework}
+                        selectedIndicators={selectedIndicators}
+                        metricNames={metricNames}
+                        allIndicators={allIndicators}
+                        metricScores={metricScores}
+                        allIndicatorsInfo={allIndicatorsInfo}
+                    />
+                    <IndicatorVisualisations companyIndicators={indicatorsCompany} companyName={companyName}/>
                 </div>
 
 
@@ -139,10 +272,30 @@ const getCompanyMetaInformation = async () => {
                         <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
                         {showAddText && <CustomTextarea handleClose={handleClose}/>}
                     </div>
-                    <PDFDownloadLink document={<ReportDoc contentList={components} companyId={id} companyName={companyName} framework={framework} year={year}/>} fileName={`${companyName}.pdf`}>
-                        {({ blob, url, loading, error }) =>
-                        loading ? 'Loading document...' : 'Download PDF'
-                        }
+                    <PDFDownloadLink 
+                        key={key}
+                        document={<ReportDoc 
+                        contentList={components} 
+                        companyId={id}
+                        companyName={companyName}
+                        framework={framework}
+                        year={year}
+                        indicatorsCompany = {indicatorsCompany}
+                        selectedIndicators = {selectedIndicators}
+                        metricNames={metricNames}
+                        allIndicators={allIndicators}
+                        metricScores={metricScores}
+                        allIndicatorsInfo={allIndicatorsInfo}
+                        predictedScore={predictedScore}
+                        graphStateChange={graphStateChange}
+                        selectedMetrics={selectedMetrics}
+
+                        indicatorInfo={indicatorInfo}
+                        graphValues={graphValues}
+                        />} fileName={`${companyName}.pdf`}>
+                            {({ blob, url, loading, error }) =>
+                            loading ? 'Loading document...' : 'Download PDF'
+                            }
                     </PDFDownloadLink>
                     </div>
                 </div>

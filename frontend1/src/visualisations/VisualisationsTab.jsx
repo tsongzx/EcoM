@@ -5,6 +5,11 @@ import { Tabs, Tab, Box } from '@mui/material';
 const VisualisationsTab = ({ graphValues, info, categories, filterColumn, displayInfoCard }) => {
   const [filter, setFilter] = useState("E");
 
+  console.log('INSIDE REPORT VISUALISATION TAB ________---_-_-_--_---');
+  console.log(graphValues);
+  console.log(info);
+  console.log(categories);
+
   console.log(graphValues);
 
   const handleChange = (event, newValue) => {
