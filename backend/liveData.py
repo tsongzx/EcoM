@@ -1,134 +1,21 @@
 import yfinance as yf
 
 
-code_to_country_map = {
-    "3M": "MMM",
-    "Abbott": "ABT",
-    "AbbVie": "ABBV",
-    "Accenture": "ACN",
-    "Adobe": "ADBE",
-    "Advanced Micro Devices": "AMD",
-    "Alphabet": "GOOGL",
-    "Amazon": "AMZN",
-    "American Express": "AXP",
-    "Amgen": "AMGN",
-    "Apple": "AAPL",
-    "Applied Materials": "AMAT",
-    "AT&T": "T",
-    "Bank of America": "BAC",
-    "Berkshire Hathaway": "BRK.B",
-    "Boeing": "BA",
-    "Bristol-Myers Squibb": "BMY",
-    "Broadcom": "AVGO",
-    "Capital One": "COF",
-    "Cardinal Health": "CAH",
-    "Caterpillar": "CAT",
-    "Charles Schwab": "SCHW",
-    "Chevron": "CVX",
-    "Cisco Systems": "CSCO",
-    "Citigroup": "C",
-    "Coca-Cola": "KO",
-    "Comcast": "CMCSA",
-    "ConocoPhillips": "COP",
-    "Costco": "COST",
-    "Danaher": "DHR",
-    "Dell Technologies": "DELL",
-    "Duke Energy": "DUK",
-    "eBay": "EBAY",
-    "Emerson Electric": "EMR",
-    "ExxonMobil": "XOM",
-    "Facebook": "META",
-    "Ford": "F",
-    "General Dynamics": "GD",
-    "General Electric": "GE",
-    "General Motors": "GM",
-    "Goldman Sachs": "GS",
-    "HCA Healthcare": "HCA",
-    "Honeywell": "HON",
-    "HP": "HPQ",
-    "IBM": "IBM",
-    "Intel": "INTC",
-    "Johnson & Johnson": "JNJ",
-    "JPMorgan Chase": "JPM",
-    "Kellogg": "K",
-    "Kimberly-Clark": "KMB",
-    "Lockheed Martin": "LMT",
-    "Lowe's": "LOW",
-    "Mastercard": "MA",
-    "McDonald's": "MCD",
-    "Medtronic": "MDT",
-    "Merck": "MRK",
-    "Meta Platforms": "META",
-    "Microsoft": "MSFT",
-    "Morgan Stanley": "MS",
-    "Netflix": "NFLX",
-    "Nike": "NKE",
-    "NVIDIA": "NVDA",
-    "Oracle": "ORCL",
-    "PayPal": "PYPL",
-    "PepsiCo": "PEP",
-    "Pfizer": "PFE",
-    "Philip Morris": "PM",
-    "Procter & Gamble": "PG",
-    "Qualcomm": "QCOM",
-    "Raytheon Technologies": "RTX",
-    "Salesforce": "CRM",
-    "SAP": "SAP",
-    "Schlumberger": "SLB",
-    "Southern Company": "SO",
-    "Starbucks": "SBUX",
-    "Target": "TGT",
-    "Texas Instruments": "TXN",
-    "Thermo Fisher Scientific": "TMO",
-    "Tesla": "TSLA",
-    "Twitter": "TWTR",
-    "Tyson Foods": "TSN",
-    "Uber": "UBER",
-    "United Airlines": "UAL",
-    "UnitedHealth Group": "UNH",
-    "UPS": "UPS",
-    "Verizon": "VZ",
-    "Visa": "V",
-    "Walmart": "WMT",
-    "Walt Disney": "DIS",
-    "Warner Bros Discovery": "WBD",
-    "Wells Fargo": "WFC",
-    "WestRock": "WRK",
-    "Whirlpool": "WHR",
-    "Williams Companies": "WMB",
-    "Workday": "WDAY",
-    "Xerox": "XRX",
-    "Zoom Video Communications": "ZM"
-}
 # Example Code
-def getCompanyInfo (companyName):
-    companyCode = getCode(companyName)
-    if companyCode == None:
-        return None
+def getCompanyInfo (companyCode):
     company = yf.Ticker(companyCode)
     return company.info
 
 # Returns the Company History in Month/Days
-def getCompanyHist (companyName, time):
-    companyCode = getCode(companyName)
-    if companyCode == None:
-        return None
+def getCompanyHist (companyCode, time):
     company = yf.Ticker(companyCode)
     hist = company.history(period=time)
     return hist.to_dict()
 
-def getCompanyESG (companyName):
-    companyCode = getCode(companyName)
-    if companyCode == None:
-        return None
+def getCompanyESG (companyCode):
     company = yf.Ticker(companyCode)
     return company.sustainability
 
-def getCode (company):
-    if company not in code_to_country_map:
-        return None
-    else:
-        return code_to_country_map[company]
 # TODO get rid of all of this5
 # msft = yf.Ticker("AMZN")
 # f = open("demo.txt", "a")
