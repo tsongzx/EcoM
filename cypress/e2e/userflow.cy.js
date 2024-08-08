@@ -97,7 +97,7 @@ describe("Dashboard components present", () => {
 });
 
 // Ensures that user is able to search + view the company page fine
-describe("Dashboard components present", () => {
+describe("Company components present", () => {
 
 
   beforeEach(() => {

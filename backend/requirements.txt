@@ -14,4 +14,6 @@ selenium==4.23.1
 SQLAlchemy==2.0.31
 SQLAlchemy_Utils==0.41.2
 yfinance==0.2.41
+uvicorn == 0.30.5
+PyMySql==1.1.1
 # passlib[bcrypt]==1.7.4

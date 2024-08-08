@@ -23,9 +23,8 @@ COPY . .
 # Expose the backend server's port (e.g., 5000 for Flask)
 EXPOSE 8000
 
-# Set environment variables for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+ENV MODULE_NAME=main:app
+ENV HOST=0.0.0.0
+ENV PORT=8000
 
-# Start the Flask server
-CMD ["flask", "run"]
+CMD uvicorn --host $HOST --port $PORT $MODULE_NAME
