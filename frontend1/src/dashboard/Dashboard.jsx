@@ -42,11 +42,12 @@ const Dashboard = () => {
   }, []);
 
   const handleClick = () => {
+    console.log("Go clicked!");
     if (!selectedCompany) {
+      console.log("error set");
       setError('Please select a company.')
     } else {
       console.log(selectedFramework);
-      console.log(selectedCompany.id);
       console.log(selectedCompany);
       navigate(`/company/${encodeURIComponent(selectedCompany.value)}`, 
       { state: { 

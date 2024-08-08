@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import './company_css/CreateFramework.css'
-import { TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { getUserId, getAllMetrics, getOfficialFrameworks } from "../helper.js";
 import Textarea from '@mui/joy/Textarea';
 import AccordionGroup from '@mui/joy/AccordionGroup';
@@ -12,17 +12,7 @@ import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
 import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
 
-const CreateFramework = ({setSelectedFramework,
-  officialFrameworks,
-  selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
-  allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
-  sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
-  selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
-  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
-  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
-  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
-  seteScore, setsScore, setgScore, findCategoricalMetrics, setOfficialFrameworks}) => {
+const CreateFramework = ({setOfficialFrameworks, setSelectedFramework}) => {
 
     const [Emetrics, setEMetrics] = useState([]);
     const [Smetrics, setSMetrics] = useState([]);
@@ -182,8 +172,9 @@ const CreateFramework = ({setSelectedFramework,
     };
 
     return (
-      <div style={{ marginTop: '100px'}}>
-        <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
+      <div>
+        <Button variant="contained" width="100%" sx={{width: '100%', margin: '2vh 0'}} 
+          onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</Button>
         {isOpen && <div className="cfw-container">
           <div className="cfw-esgdescriptor">
             <p className="cfw-esgdescriptor-content" style={{
@@ -248,12 +239,12 @@ const CreateFramework = ({setSelectedFramework,
             </AccordionDetails>
             </Accordion>
           </AccordionGroup>
-            {!showAddName && (<button onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
+            {!showAddName && (<Button onClick={() => setShowAddName(!showAddName)}>Create Framework</Button>)}
             {showAddName && (<div>
-                <button onClick={handleClose}>X</button>
+                <Button onClick={handleClose}>X</Button>
                     <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
                     <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
-                <button onClick={() => handleSubmitNewFramework()}>save</button>
+                <Button onClick={() => handleSubmitNewFramework()}>save</Button>
             </div>)}
         </div>}
         {showMessage && <SelfExpiringMessage message={message} onExpiry={handleCloseMessage} />}

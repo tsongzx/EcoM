@@ -26,3 +26,8 @@ class CompanyIndicator(BaseModel):
 class Value(BaseModel):
     score: float
     weighting: float
+    
+class ESGScore(BaseModel):
+    companies: List[str]
+    year: int
+    

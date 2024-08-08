@@ -101,7 +101,8 @@ const IndustryOverview = ({ selectedIndustry }) => {
             },
             '& .MuiDataGrid-cell': {
               // padding: '0 16px', 
-            }
+            },
+            paddingBottom: 8
           }}
         />
       </Paper>

@@ -1,57 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Typography,
   Stack,
   Box
 } from '@mui/material';
-import SimpleLineChart from '../SimpleLineChart.jsx';
 import Recommendations from './Recommendations.jsx';
 import StockAreaChartVisualisation from '../visualisations/StockAreaChartVisualisation.jsx';
 import Button from '@mui/joy/Button';
 import './company_css/CompanyBody.css'
-import { getPrediction } from '../helper.js';
 import CompanySummary from './CompanySummary.jsx';
 import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+import FrameworkAverageVisualisation from './FrameworkAverageVisualisation.jsx';
 import ExternalLinks from './ExternalLinks.jsx';
 
-
-const CompanyBody = ({companyId,
-  setSelectedFramework,
-  officialFrameworks,
-  selectedIndicators, selectedMetrics, metricNames, setSelectedIndicators, setSelectedMetrics,
-  allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
-  sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
-  selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
-  setSliderValuesFixed, setSliderValuesIndicatorFixed, setFrameworkDisplay, setMetricNamesFixed,
-  setSelectedMetricsFixed, setAllIndicatorsFixed, setSelectedIndicatorsFixed, eScore, sScore, gScore,
-  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
-  seteScore, setsScore, setgScore, findCategoricalMetrics, companyName, ticker
-}) => {
+const CompanyBody = ({companyId, companyName, ticker}) => {
   const [period, setPeriod] = useState('1mo');
-  const [showGraph, setShowGraph] = useState(true);
-
-  console.log('ticker');
-  console.log(ticker);
-
-  const aiPredict = async () => {
-    for (let key in selectedIndicators) {
-      let array = selectedIndicators[key];
-      for (const element of array) {
-        let objOfInterest = Object.values(allIndicatorsInfo).find(obj => obj.id === element);
-  
-        if (objOfInterest) {
-          let indicatorName = objOfInterest.name;
-          let metricUnit = objOfInterest.unit;
-          let score = await getPrediction(indicatorName, metricUnit, companyName);
-          console.log(score);
-        }
-      }
-    }
-  }
+  const [view, setView] = useState('joint');
+  // const [showGraph, setShowGraph] = useState(true);
 
   return (
     <Box>
@@ -62,7 +29,8 @@ const CompanyBody = ({companyId,
           <div className='livedata-section'>
             <Tabs defaultValue={0} className='companySummaryTabs'>
               <TabList>
-                <Tab >Graph</Tab>
+                <Tab>Stock Price</Tab>
+                <Tab>ESG Performance</Tab>
                 <Tab>Summary</Tab>
                 <Tab> News </Tab>
               </TabList>
@@ -86,17 +54,19 @@ const CompanyBody = ({companyId,
               </div>
               </TabPanel>
               <TabPanel value={1}>
-              <CompanySummary companyName={companyName} ticker={ticker}/>
+                <Button size="sm" variant={`${view === 'joint' ? 'soft' : 'plain'}`} color={`${view === 'joint' ? 'primary' : 'neutral'}`} onClick={() => setView("joint")}> Joint view </Button>
+                <Button size="sm" variant={`${view === 'disjoint' ? 'soft' : 'plain'}`} color={`${view === 'disjoint' ? 'primary' : 'neutral'}`} onClick={() => setView("disjoint")}> Disjoint view </Button>
+                <FrameworkAverageVisualisation companyName={companyName} view={view}/>
               </TabPanel>
               <TabPanel value={2}>
+                <CompanySummary companyName={companyName} ticker={ticker}/>
+              </TabPanel>
+              <TabPanel value={3}>
                   <ExternalLinks ticker={"AMZN"}/>
               </TabPanel>
             </Tabs>          
           </div>
           <Recommendations companyId={companyId}/>
-        </Stack>
-        <Stack direction="row">
-          <Button onClick={aiPredict}>AI Predict</Button>
         </Stack>
       </Box>
     </Box>
