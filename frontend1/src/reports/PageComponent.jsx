@@ -24,7 +24,7 @@ export const PageComponent = ({component, toggleDisplay}) => {
         <div ref={setNodeRef} {...attributes} {...listeners} style={style} className="dragEnt">
           <p>{component.name}</p>
         </div>
-        <button className="toggleDisplayButton" onClick = {handleToggleDisplay}>click me</button>
+        <button className="toggleDisplayButton" onClick = {handleToggleDisplay}>{component.isDisplayed ? 'hide' : 'show'}</button>
       </div>
     );
 }

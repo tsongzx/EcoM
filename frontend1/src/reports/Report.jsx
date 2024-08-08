@@ -13,6 +13,9 @@ import { ReportDoc } from "./Document";
 import { getPrediction, getIndicatorsInfoByName } from "../helper";
 import FrameworkTable from "../company/FrameworkTable";
 import IndicatorVisualisations from "../company/IndicatorVisualisations";
+import SampleGraphs from "./SampleGraphs";
+import SampleTable from "./SampleTable";
+
 /**
  * This function will allow us to modify the Company page to adjust what we would like 
  * the content on our downloaded report to have
@@ -160,6 +163,7 @@ const Report = () => {
 //   "company_name": "Rey Resources Ltd"
 // }
 const getCompanyMetaInformation = async () => {
+    // const headerTypes = ['country', 'year', 'industry', 'longSummary'];
     console.log('Getting company Information for Company');
     const companyInfo = await fetchCompanyInfo(parseInt(companyId));
 
@@ -175,7 +179,7 @@ const getCompanyMetaInformation = async () => {
 
     //add any information necessary from detailedCompany
     const newComponents = [...newCompanyComponents,
-      ...(detailedCompanyInfo ? [{ 
+      ...(('longBusinessSummary' in detailedCompanyInfo) ? [{ 
         id: newCompanyComponents.length + 1,
         type: 'longSummary',
         name: detailedCompanyInfo.longBusinessSummary,
@@ -245,20 +249,33 @@ const getCompanyMetaInformation = async () => {
             <div className="reportContainer">
                 <div className="reportContent">
                     {/* components.map goes here, currently just some placeholder code*/}
-                    <FrameworkTable 
-                        indicatorsCompany={indicatorsCompany}
-                        selectedYear={year}
-                        setSelectedYear={toggleDisplay}
-                        companyName={companyName}
-                        availableYears={[2018, 2019, 2020, 2021, 2022, 2023, 2024]}
-                        selectedFramework={framework}
-                        selectedIndicators={selectedIndicators}
-                        metricNames={metricNames}
-                        allIndicators={allIndicators}
-                        metricScores={metricScores}
-                        allIndicatorsInfo={allIndicatorsInfo}
-                    />
-                    <IndicatorVisualisations companyIndicators={indicatorsCompany} companyName={companyName}/>
+                    {components.map(c => {
+                        if (c.type === 'title' && c.isDisplayed){
+                            return <h2>{c.name}</h2>
+                        }
+                        else if (['country', 'year', 'industry', 'longSummary'].includes(c.type) && c.isDisplayed) {
+                            return <p>{c.name}</p>
+                        }
+                        else if (c.type === 'text' && c.isDisplayed) {
+                            return <p style={{fontWeight: c.fw, fontStyle: c.italic}}>{c.name}</p>
+                        }
+                        else if (c.type === 'table' && c.isDisplayed) {
+                            return <SampleGraphs graphValues={graphValues} info={indicatorInfo} categories={[companyName]}/>
+                        }
+                        else if (c.type === 'table') {
+                            return <SampleTable 
+                                indicatorsCompany={indicatorsCompany}
+                                selectedYear={year}
+                                selectedFramework={framework}
+                                selectedIndicators={selectedIndicators}
+                                metricNames={metricNames}
+                                allIndicators={allIndicators}
+                                metricScores={metricScores}
+                                allIndicatorsInfo={allIndicatorsInfo}
+                                predictedScore={predictedScore}
+                            />
+                        }
+                    })}
                 </div>
 
 
@@ -270,7 +287,7 @@ const getCompanyMetaInformation = async () => {
                     <div>
                     <div>
                         <button onClick={() => setShowAddText(!showAddText)}>Add Text</button>
-                        {showAddText && <CustomTextarea handleClose={handleClose}/>}
+                        {showAddText ? <CustomTextarea handleClose={handleClose}/> : (<div style={{height: '152px'}}></div>)}
                     </div>
                     <PDFDownloadLink 
                         key={key}
@@ -295,7 +312,7 @@ const getCompanyMetaInformation = async () => {
                         />} fileName={`${companyName}.pdf`}>
                             {({ blob, url, loading, error }) =>
                             loading ? 'Loading document...' : 'Download PDF'
-                            }
+                        }
                     </PDFDownloadLink>
                     </div>
                 </div>

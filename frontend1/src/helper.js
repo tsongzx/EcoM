@@ -1207,3 +1207,24 @@ export const getIndustryAverages = async(industry) => {
       console.log(`error getting industry info: ${error}`);
   }
 }
+
+export const getSentiment = async(companyCode) => {
+    try {
+        const response = await axios.get(`http://127.0.0.1:8000/company/news/sentiment?ticker=${companyCode}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${Cookies.get('authToken')}`
+                }, 
+                params: {
+                    ticker: companyCode,
+                }
+            } 
+        );
+        console.log('got Sentiment for ', companyCode);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        console.log('Error getting sentiment on company, ', companyCode)
+    }
+}

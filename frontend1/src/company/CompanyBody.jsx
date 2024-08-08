@@ -13,6 +13,7 @@ import TabList from '@mui/joy/TabList';
 import Tab from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
 import FrameworkAverageVisualisation from './FrameworkAverageVisualisation.jsx';
+import ExternalLinks from './ExternalLinks.jsx';
 
 const CompanyBody = ({companyId, companyName}) => {
   const [period, setPeriod] = useState('1mo');
@@ -31,6 +32,7 @@ const CompanyBody = ({companyId, companyName}) => {
                 <Tab>Stock Price</Tab>
                 <Tab>ESG Performance</Tab>
                 <Tab>Summary</Tab>
+                <Tab> News </Tab>
               </TabList>
 
             
@@ -48,7 +50,7 @@ const CompanyBody = ({companyId, companyName}) => {
                   <Button size="sm" variant={`${period === '1yr' ? 'soft' : 'plain'}`} color={`${period === '1yr' ? 'primary' : 'neutral'}`} onClick={() => setPeriod("1yr")}
                     className={`period-select-button ${period === '1yr' ? 'active-psb' : ''}`}> 1y </Button>
                 </div>}
-                <StockAreaChartVisualisation className='Stockareachartvis' companyName={companyName} period={period} ticker={"AMZN"}/>
+                <StockAreaChartVisualisation className='Stockareachartvis' companyName={companyName} period={period} ticker={ticker}/>
               </div>
               </TabPanel>
               <TabPanel value={1}>
@@ -57,7 +59,10 @@ const CompanyBody = ({companyId, companyName}) => {
                 <FrameworkAverageVisualisation companyName={companyName} view={view}/>
               </TabPanel>
               <TabPanel value={2}>
-              <CompanySummary companyName={companyName} ticker={"AMZN"}/>
+                <CompanySummary companyName={companyName} ticker={ticker}/>
+              </TabPanel>
+              <TabPanel value={3}>
+                  <ExternalLinks ticker={"AMZN"}/>
               </TabPanel>
             </Tabs>          
           </div>

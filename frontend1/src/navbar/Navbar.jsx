@@ -25,10 +25,10 @@ const Navbar = () => {
       navigate('/compare', { state: { companiesList: [], selectedFramework: null } });
     }
 
-    const handleCreateFramework = (event) => {
-      event.preventDefault();
-      navigate('/create');
+    const handleAbout = () => {
+      navigate('/about');
     }
+
     return (
     <>
       <AppBar position="fixed"
@@ -49,8 +49,8 @@ const Navbar = () => {
           <Stack direction="row" justifyContent="space-between" width="100%">
             <Stack direction="row" spacing={3}>
               <li className='navbar-button' id='home'><a href="/dashboard" onClick={handleHome}>Home</a></li>
-              <li className='navbar-button' id='create'><a href="/create" onClick={handleCreateFramework}>Create Framework</a></li>
               <li className='navbar-button' id='compare'><a href="/compare" onClick={handleCompare}>Compare Companies</a></li>
+              <li className='navbar-button' id='about'> <a href="/about" onClick={handleAbout}>About</a></li>
             </Stack>
             <Stack direction="row" spacing={3}>
               <li className='navbar-button' id='logout'><a href="/" onClick={handleLogout}>Logout</a></li>

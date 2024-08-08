@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button } from '@mui/material';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
@@ -8,12 +8,14 @@ import './Home.css';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import ESGInfo from './ESGInfo';
+import FancyButton from './assets/FancyButton';
 
 const Home = () => {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [registerModalOpen, setRegisterModalOpen] = useState(false);
   const [navbar, setNavbar] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const scrollRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -121,12 +123,13 @@ const Home = () => {
     };
   }, []);
 
+  const handleScroll = () => scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+
   return (
     <div id='Home'>
-      <Card id={navbar ? 'renderedNavbar' : 'unrenderedNavbar'}>
-        <Card style={{ border: '1px solid red', width: '50%' }} />
-        <Card style={{ border: '1px solid black', width: '50%', display: 'flex', justifyContent: 'flex-end' }}>
-          <Button className="loginButton" type="submit" variant="contained" onClick={openLoginModal}>Login</Button>
+      <Card id={navbar ? 'renderedNavbar' : 'unrenderedNavbar'} style={{backgroundColor: '#B4B2FC', paddingRight: '30px', marginTop: '3px', marginBottom: '3px'}}>
+        <Card style={{ border: 'none', width: '100%', display: 'flex', justifyContent: 'flex-end', backgroundColor: '#B4B2FC'}}>
+          <Button className="loginButton" type="submit" variant="contained" onClick={openLoginModal} style={{marginRight: '3px'}}>Login</Button>
           <Button className="registerButton" type="submit" variant="contained" onClick={openRegisterModal}>Register</Button>
         </Card>
         
@@ -159,10 +162,11 @@ const Home = () => {
             <Button className="titleButton loginButton" type="submit" variant="contained" onClick={openLoginModal}>Login</Button>
             <Button className="titleButton registerButton" type="submit" variant="contained" onClick={openRegisterModal}>Register</Button>
           </div>
+          <FancyButton text={"learn more"} handleClick={handleScroll} id='fancy-home-button'/>
         </div>
       </div>
-      <div id='homeAbout'>
-        <div className='aboutContainer'>
+      <div id='homeAbout' ref={scrollRef}>
+        {/* <div className='aboutContainer'>
           <img src={imageCat} alt='placeholderImage' />
           <div className='aboutTextContainer'>
             <h2>AI Integration</h2>
@@ -193,9 +197,9 @@ const Home = () => {
           </div>
           <img src={imageCat} alt='placeholderImage' />
 
-        </div>
+        </div> */}
 
-        <ESGInfo/>
+        <ESGInfo />
 
       </div>
     </div>

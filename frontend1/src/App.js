@@ -7,7 +7,8 @@ import Company from './company/Company.jsx';
 import Compare from './compare/Compare.jsx';
 import Profile from './Profile.jsx';
 import Report from './reports/Report.jsx'
-import CreateFramework from './CreateFramework.jsx';
+import ModifiedESGInfo from './navbar/ModifiedESGInfo.jsx';
+
 function App() {
   return (
     <Router>
@@ -19,7 +20,7 @@ function App() {
           <Route path="/compare" element={<Compare/>}/>
           <Route path="/profile" element={<Profile/>}/>
           <Route path="/report/:companyId" element={<Report/>}/>
-          <Route path="/create" element={<CreateFramework/>}/>
+          <Route path="/about" element={<ModifiedESGInfo />}/>
         </Routes>
       </div>
     </Router>

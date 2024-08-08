@@ -44,7 +44,7 @@ from collections import defaultdict
 
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
-client = OpenAI(api_key = os.environ.get("OPENAI_API_KEY"))
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 alpha_client = os.getenv("ALPHA_VANTAGE_API_KEY")
 
 
@@ -524,17 +524,17 @@ async def get_company_by_batch(
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * 20
-    
+
     search = search.strip()
     print(f'page: {page}')
 
     if search:
-      query = session.query(company_models.Company).filter(
-          company_models.Company.company_name.like(f"{search}%")
-      )
+        query = session.query(company_models.Company).filter(
+            company_models.Company.company_name.like(f"{search}%")
+        )
     else:
-      query = session.query(company_models.Company)
-    
+        query = session.query(company_models.Company)
+
     # Apply pagination and limit the results
     companyData = query.offset(offset).limit(20).all()
     return companyData
@@ -559,9 +559,10 @@ async def get_all_company(
         company_models.Company).all()
     return companyData
 
-#***************************************************************
+# ***************************************************************
 #                        Report Apis
 # ***************************************************************
+
 
 @app.get("/company/news/sentiment", tags=["company"])
 async def get_company_news_sentiment(
@@ -569,19 +570,21 @@ async def get_company_news_sentiment(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    #CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
-    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
+    # CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={
+        ticker}&apikey=QO74GE9362PLVHDU'
 
     r = requests.get(url)
     data = r.json()
 
     if 'feed' not in data:
-      return {}
+        return {}
 
     print(data)
     extracted_info = []
     for info in data['feed']:
-        extracted_info.append({'Article Title': info['title'], 'URL': info['url']})
+        extracted_info.append(
+            {'Article Title': info['title'], 'URL': info['url']})
 
     return extracted_info
 
@@ -633,6 +636,7 @@ async def get_company_info(
 # Get the Company's Stock Price history, period is how far the history
 # will date back into for example: 1 month is "1mo", 5 days would be "5d"
 
+
 @app.get("/company/history/{company_code},{period}", tags=["company"])
 async def get_company_history(
     company_code: str,
@@ -648,6 +652,7 @@ async def get_company_history(
 # exampleReturnSustainbility.txt file to see an example
 # If you would like me to return any value please let me (Geoffrey) know
 
+
 @app.get("/company/sustainability/{company_code}", tags=["company"])
 async def get_company_sustainability(
     company_code: str,
@@ -660,27 +665,27 @@ async def get_company_sustainability(
 
 @app.post("/companies/{industry}", tags=["company"])
 async def get_companies_by_industry_by_country(
-    industry: str, 
+    industry: str,
     filter: industry_schemas.CompanyFilter,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     offset = (filter.page - 1) * 20
-    
+
     print(f'page: {filter.page}')
 
     if industry == 'Unknown':
-      query = session.query(company_models.Company).filter(
-        company_models.Company.industry == None
-      )
+        query = session.query(company_models.Company).filter(
+            company_models.Company.industry == None
+        )
     else:
-      query = session.query(company_models.Company).filter(
-        company_models.Company.industry == industry
-      )
-      
+        query = session.query(company_models.Company).filter(
+            company_models.Company.industry == industry
+        )
+
     # if filter.countries:
     query = query.filter(
-      company_models.Company.headquarter_country.in_(filter.countries)
+        company_models.Company.headquarter_country.in_(filter.countries)
     )
     return {'total': query.count(), 'companies': query.offset(offset).limit(20).all()}
   
@@ -1053,6 +1058,8 @@ async def delete_framework(
 
 # calculate framework score
 # CHANGE THIS CLAIRE
+
+
 @app.get("/framework/score/", tags=["Framework"])
 async def get_framework_score(
     framework_id: int,
@@ -1176,6 +1183,7 @@ async def get_indicator(
 # ***************************************************************
 #                        Metric Apis
 # ***************************************************************
+
 
 @app.get("/metric", tags=["Metrics"])
 async def get_metric_name(
@@ -1313,7 +1321,7 @@ async def get_industry_info(
 ):
     return session.query(industry_models.Industry).filter_by(
         industry=industry).first()
-    
+
 
 @app.get("/industries", tags=["Industry"])
 async def get_industries(
@@ -1338,19 +1346,20 @@ async def get_companies_in_industry(
     session: Session = Depends(get_session),
 ):
     offset = (page - 1) * 20
-    
+
     search = search.strip()
     print(f'page: {page}')
 
     query = session.query(company_models.Company).filter_by(industry=industry)
     if search:
-      query = query.filter(
-          company_models.Company.company_name.like(f"{search}%")
-      )
-    
+        query = query.filter(
+            company_models.Company.company_name.like(f"{search}%")
+        )
+
     # Apply pagination and limit the results
     companyData = query.offset(offset).limit(20).all()
     return companyData
+
 
 @app.get("/industry/companies/recommended", tags=["Industry"])
 async def get_recommended_companies(
@@ -1361,6 +1370,7 @@ async def get_recommended_companies(
     companies = session.query(company_models.Company).filter_by(industry=industry).order_by(func.rand()).limit(10).all()
     
     return companies  
+  
 
 @app.get("/industry/averages/{industry}", tags=["Industry"])
 async def get_indicator_industry_averages(
@@ -1373,7 +1383,8 @@ async def get_indicator_industry_averages(
     
     results = session.query(
         company_models.CompanyData.indicator_name,
-        func.avg(company_models.CompanyData.indicator_value).label('average_indicator_value')
+        func.avg(company_models.CompanyData.indicator_value).label(
+            'average_indicator_value')
     ).join(
         company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
     ).filter(
@@ -1381,7 +1392,7 @@ async def get_indicator_industry_averages(
     ).group_by(
         company_models.CompanyData.indicator_name
     ).all()
-    
+
     average_dict = {}
     for result in results:
       average_dict[result.indicator_name] = result.average_indicator_value
@@ -1398,7 +1409,7 @@ async def chat(
     user_query: chat_schemas.ChatQuery,
     user: user_schemas.UserInDB = Depends(get_user)
 ):
-    instructions = "You are an ESG related chatbot. You calculate various ESG scores out of 100, which is derived by the average of many metrics. Your 7 key frameworks are IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework You have over 70,000 companies in your data base. You can add companies to your watchlist, compare multiple companies at once, view industry averages etc."
+    instructions = "You are a chatbot for ESG NOW, you're purpose is to answer questions about the ESG platform and provide general desktop research using Open AI. You calculate various ESG scores out of 100, which is derived by the average of many metrics. Your 7 key frameworks are IFRS S1 Framework, Paris Agreement Framework, UNEP FI Framework, IFRS S2 Framework, TCFD Framework, TNFD Framework, APRA-CPG Framework You have over 70,000 companies in your data base. You can add companies to your watchlist, compare multiple companies at once, view industry averages etc."
     # see if this works as a way to personalise our chat bot
     prompt = """
     {}
@@ -1444,8 +1455,8 @@ def linear_regression(data: List[company_models.CompanyData]) -> float:
 @app.get("/predictive", tags=["Predictive"])
 async def get_predictive(
     indicator: str,
-    metric_unit = str,
-    company_name = str,
+    metric_unit=str,
+    company_name=str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
 ) -> PredictiveIndicators:
@@ -1469,8 +1480,8 @@ async def get_predictive(
             prediction = 'Yes'
         elif predicted_value == 0:
             prediction = 'No'
-    else: 
-        #metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
+    else:
+        # metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name=indicator, prediction=prediction)
@@ -1587,35 +1598,36 @@ async def get_metric_bar_graph(
 ):
     company_data = {}
     for company in companies:
-      data = await get_company_indicators(company, user, session)
-      company_data[company] = data
-      
+        data = await get_company_indicators(company, user, session)
+        company_data[company] = data
+
     years = await get_years(companies, user, session)
     data_by_metric = {}
 
     metrics = await get_framework_metrics(framework_id, user, session)
 
     for metric in metrics:
-      indicators = get_indicators_for_metric(metric.metric_id, user, session)
-      weights = {indicator.indicator_name: indicator.weighting for indicator in indicators}
-      data_by_metric[metric.metric_id] = []
-      for year in years:
-        print(f'printing year: {year}')
-        # company_indicators_year = company_data[year]
-        data_point = {
-          'year': year,
-          'metric': metric.metric_id,
-          'category': metric.category
-        }
-        for company in companies:
-          if year not in company_data[company]:
-            continue
-          metric_score = await calculate_metric_company_view(company_data[company][year], weights, user, session)
-          print(f'metric score: {metric_score}')
-          data_point[company] = metric_score
-       
-        data_by_metric[metric.metric_id].append(data_point)
-       
+        indicators = get_indicators_for_metric(metric.metric_id, user, session)
+        weights = {
+            indicator.indicator_name: indicator.weighting for indicator in indicators}
+        data_by_metric[metric.metric_id] = []
+        for year in years:
+            print(f'printing year: {year}')
+            # company_indicators_year = company_data[year]
+            data_point = {
+                'year': year,
+                'metric': metric.metric_id,
+                'category': metric.category
+            }
+            for company in companies:
+                if year not in company_data[company]:
+                    continue
+                metric_score = await calculate_metric_company_view(company_data[company][year], weights, user, session)
+                print(f'metric score: {metric_score}')
+                data_point[company] = metric_score
+
+            data_by_metric[metric.metric_id].append(data_point)
+
     return data_by_metric
   
 @app.get("/graph/framework/average/", tags=["Graph"])
@@ -1753,6 +1765,7 @@ async def get_years(
 #                        Company view Scoring Apis
 # ***************************************************************
 
+
 @app.post("/company/metric/", tags=["Company scores"])
 async def calculate_metric_company_view(
     # company_indicators: Dict[str, Any],
@@ -1771,6 +1784,7 @@ async def calculate_metric_company_view(
 # ***************************************************************
 #                        Headquarter country Apis
 # ***************************************************************
+
 
 @app.get("/headquarter_countries/", tags=["Headquarter Countries"])
 async def get_headquarter_countries(
