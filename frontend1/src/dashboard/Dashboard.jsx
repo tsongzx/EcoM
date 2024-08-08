@@ -65,13 +65,17 @@ const Dashboard = () => {
   const getOptionLabel = (option) => option.label;
 
   return (
-    <>
+    <Box
+      sx={{
+        height: 'calc(100vh - 50px)'
+      }}
+    >
       <Navbar />
         <Box sx={{marginTop: '-25px'}}>
           <Stack justifyContent="center" alignItems="center" spacing={3}
             sx={{
               backgroundColor: '#0D2149',
-              width: '100%',
+              width: '100vw',
               height: '30vh'
             }}
           >
@@ -125,7 +129,7 @@ const Dashboard = () => {
           {selectedIndustry ? <IndustryTab selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany}></IndustryTab> : <DashboardBody setSelectedCompany={setSelectedCompany}/>}
         </Box>
       <ChatFeature/>
-    </>
+    </Box>
   );
 };
 
