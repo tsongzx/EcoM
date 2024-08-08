@@ -92,7 +92,7 @@ const ESGInfo = () => {
         
         {/* each consits of {title, link} */}
         {links.map(l => (
-          <a href={l.link}>
+          <a href={l.link} target="_blank">
             <button className="ESGScore-ext-raise-button">
               {l.title}
             </button>

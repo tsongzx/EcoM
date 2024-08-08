@@ -60,14 +60,14 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
   return (
     <Stack id="heading" direction="row" spacing={3}>
       <Typography variant="h3">{companyName}</Typography>
-      <Stack alignItems="center" justifyContent="center">
+      {/* <Stack alignItems="center" justifyContent="center">
         <Typography align="center">58.78</Typography>
         <Typography align="center">Current Price</Typography>
       </Stack>
       <Stack alignItems="center" justifyContent="center">
         <Typography align="center">80.1</Typography>
         <Typography align="center">ESG Score</Typography>
-      </Stack>
+      </Stack> */}
       <Button onClick={handleClickReport}>Save Report</Button>
       {/* <Button onClick={openReportModal}>Save Report</Button> */}
       <Button onClick={openWatchlistModal}>Add to List</Button>

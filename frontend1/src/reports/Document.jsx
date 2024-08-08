@@ -126,7 +126,7 @@ export const ReportDoc = ({contentList, companyId, companyName, framework, year,
         {/* Title Page mapping */}
         {contentList.map(c => {
           if (c.type === 'title' && c.isDisplayed) {
-            return <Text style={styles.header} fixed>{c.name}</Text>
+            return <Text style={styles.title} fixed>{c.name}</Text>
           }
           else if (headerTypes.includes(c.type) && c.isDisplayed) {
             return <Text style={styles.subtitle}>{c.name}</Text>
