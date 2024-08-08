@@ -957,6 +957,28 @@ export const getFrameworkLineGraph = async(companyName) => {
   }
 }
 
+export const getFrameworkAvgScore = async(companies, year) => {
+  try {
+      const path = `http://127.0.0.1:8000/company/framework/average`;
+
+      const response = await axios.post(path, 
+          {
+              companies: companies,
+              year: year
+          },
+          {           
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${Cookies.get('authToken')}`
+              }
+          });
+          return response.data;
+  } catch (error) {
+      console.log(error);
+      console.log(`Error getting average score: ${error}`)
+  }
+}
+
 export const mapToTicker = async() => {
     
 }

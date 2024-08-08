@@ -684,61 +684,111 @@ async def get_companies_by_industry_by_country(
     )
     return {'total': query.count(), 'companies': query.offset(offset).limit(20).all()}
   
-  
-@app.get("/company/framework/average/", tags=["company"])
-async def get_framework_company_average(
-    company_name: str,
-    year: int,
+@app.post("/company/framework/average/", tags=["company"]) 
+async def get_framework_companies_average(
+    request: score_schemas.ESGScore,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
-) -> float:
-    
+) -> dict:
     frameworks = session.query(framework_models.Frameworks).filter(
         framework_models.Frameworks.is_official_framework == True
     ).all()
     
     if not frameworks:
-        return 0 
+        return {"error": "No frameworks found"}
 
-    scores = []
-    categories = ["E", "S", "G"]
-    
-    companyData = await get_company_indicators(company_name, user, session)
-
+    # Fetch framework metrics once and cache them
+    framework_metrics_cache = {}
     for framework in frameworks:
-        # Fetch all metrics for this framework and all categories - dont remove comments yet
-        # category_metrics = await asyncio.gather(
-        #     *[get_framework_metrics_by_category(framework.id, category, user, session) for category in categories]
-        # )
-        framework_metrics = await get_framework_metrics(framework.id, user, session)
-        
-        category_metrics = defaultdict(list)
-        for metric in framework_metrics:
-            category = metric.category
-            category_metrics[category].append(metric)
+        framework_metrics_cache[framework.id] = await get_framework_metrics(framework.id, user, session)
+
+    company_scores = {}
+
+    for company_name in request.companies:
+        scores = []
+        companyData = await get_company_indicators(company_name, user, session)
+        print(f"Company Data for {company_name}: {companyData}")
+
+        for framework in frameworks:
+            framework_metrics = framework_metrics_cache[framework.id]
             
-        framework_score = 0
-        for category, metrics in category_metrics.items():
-        # for category, metrics in zip(categories, category_metrics):
-            # Fetch all metric values concurrently
-            print(f"categry {category}")
-            print(metrics)
-            metric_values = await asyncio.gather(
-                *[calculate_metric_company_view(companyData[year], {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
-                                                user, session) for metric in metrics]
-            )
-            print(metric_values)
-            category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
-            print(category_score)
-            category_weighting = getattr(framework, category, 0)
-            framework_score += category_score * category_weighting
-            print(framework_score)
-        scores.append(framework_score)
+            category_metrics = defaultdict(list)
+            for metric in framework_metrics:
+                category = metric.category
+                category_metrics[category].append(metric)
+                
+            framework_score = 0
+            for category, metrics in category_metrics.items():
+                metric_values = await asyncio.gather(
+                    *[calculate_metric_company_view(companyData.get(request.year, {}), {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
+                                                        user, session) for metric in metrics]
+                )
+                category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+                category_weighting = getattr(framework, category, 0)
+                framework_score += category_score * category_weighting
 
-    for framework in frameworks:
-      print(framework.framework_name)
-    print(scores)
-    return sum(scores) / len(scores) if scores else 0
+            scores.append(framework_score)
+            print(f"Framework Score for {framework.framework_name} and {company_name}: {framework_score}")
+
+        company_scores[company_name] = sum(scores) / len(scores) if scores else 0
+        print(f"Company Score for {company_name}: {company_scores[company_name]}")
+
+    return company_scores
+  
+# @app.get("/company/framework/average/", tags=["company"])
+# async def get_framework_company_average(
+#     company_name: str,
+#     year: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> float:
+    
+#     frameworks = session.query(framework_models.Frameworks).filter(
+#         framework_models.Frameworks.is_official_framework == True
+#     ).all()
+    
+#     if not frameworks:
+#         return 0 
+
+#     scores = []
+#     categories = ["E", "S", "G"]
+    
+#     companyData = await get_company_indicators(company_name, user, session)
+
+#     for framework in frameworks:
+#         # Fetch all metrics for this framework and all categories - dont remove comments yet
+#         # category_metrics = await asyncio.gather(
+#         #     *[get_framework_metrics_by_category(framework.id, category, user, session) for category in categories]
+#         # )
+#         framework_metrics = await get_framework_metrics(framework.id, user, session)
+        
+#         category_metrics = defaultdict(list)
+#         for metric in framework_metrics:
+#             category = metric.category
+#             category_metrics[category].append(metric)
+            
+#         framework_score = 0
+#         for category, metrics in category_metrics.items():
+#         # for category, metrics in zip(categories, category_metrics):
+#             # Fetch all metric values concurrently
+#             print(f"categry {category}")
+#             print(metrics)
+#             metric_values = await asyncio.gather(
+#                 *[calculate_metric_company_view(companyData[year], {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
+#                                                 user, session) for metric in metrics]
+#             )
+#             print(metric_values)
+#             category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+#             print(category_score)
+#             category_weighting = getattr(framework, category, 0)
+#             framework_score += category_score * category_weighting
+#             print(framework_score)
+#         scores.append(framework_score)
+
+#     for framework in frameworks:
+#       print(framework.framework_name)
+#     print(scores)
+#     return sum(scores) / len(scores) if scores else 0
 # ***************************************************************
 #                        Framework Apis
 # ***************************************************************

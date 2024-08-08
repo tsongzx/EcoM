@@ -8,7 +8,7 @@ class Config(object):
 
     chat_prompts = [
       {"role": "system", 
-       "content": """The Crumpeteers platform is designed to assist corporations and investors in ESG 
+       "content": """The EcoM platform is designed to assist corporations and investors in ESG 
        (Environmental, Social, Governance) reporting and metrics management. The platform aligns with global
        initiatives such as the Paris Agreement, UNEP FI, IFRS, and TCFD, providing tools for
        sustainable investing."""

@@ -5,17 +5,20 @@ import {
   Stack
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import NumericLabel from 'react-pretty-numbers';
 import {
   addToFavourites,
-  deleteFromFavourites
+  deleteFromFavourites,
+  getFrameworkAvgScore
 } from '../helper.js';
+import { gridAdditionalRowGroupsSelector } from '@mui/x-data-grid/internals';
 const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, isInFavs, 
   setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany,
   sliderValuesIndicator, selectedMetrics, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, graphStateChange, ticker
 }) => {
 
-  console.log(indicatorsCompany);
+  const [esgScore, setESGScore] = useState(null);
+
   const navigate = useNavigate();
 
   const openWatchlistModal = () => {
@@ -25,6 +28,28 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
   const openReportModal = () => {
     setOpenReportModal(true);
   }
+
+  useEffect(() => {
+    const getScore = async () => {
+      if (indicatorsCompany) {
+        // Getting prev year..
+        // const years = Object.keys(indicatorsCompany);
+        // const sortedYears = [...new Set(years)].sort((a, b) => b - a);
+        // let year;
+        // if (years.length > 1) {
+        //   year = sortedYears[1];
+        // } else {
+        //   year = year[0];
+        // }
+        const year = Math.max(...Object.keys(indicatorsCompany));
+        const avgScore = await getFrameworkAvgScore([companyName], year);
+        console.log(avgScore);
+        setESGScore(avgScore[companyName]);
+      }
+    }
+    getScore();
+    
+  }, [companyName, indicatorsCompany])
 
   const handleToggleFavourite = () => {
     const companyId_int = Number(companyId);
@@ -65,7 +90,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
         <Typography align="center">Current Price</Typography>
       </Stack>
       <Stack alignItems="center" justifyContent="center">
-        <Typography align="center">80.1</Typography>
+        {esgScore && <Typography align="center"><NumericLabel>{esgScore}</NumericLabel></Typography>}
         <Typography align="center">ESG Score</Typography>
       </Stack>
       <Button onClick={handleClickReport}>Save Report</Button>
