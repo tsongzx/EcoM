@@ -149,8 +149,8 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
                 <TableCell>Company</TableCell>
                 <TableCell align="right">Headquarter country</TableCell>
                 <TableCell align="right">Ticker</TableCell>
-                <TableCell align="right">Current Price</TableCell>
-                <TableCell align="right">ESG Score</TableCell>
+                {/* <TableCell align="right">Current Price</TableCell> */}
+                {/* <TableCell align="right">ESG Score</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -163,8 +163,8 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
                   <TableCell>{company.company_name}</TableCell>
                   <TableCell align="right">{company.headquarter_country}</TableCell>
                   <TableCell align="right">{company.ticker}</TableCell>
-                  <TableCell align="right">Current Price</TableCell>
-                  <TableCell align="right">{esgScore && <Typography align="center"><NumericLabel>{esgScore[company.company_name]}</NumericLabel></Typography>}</TableCell>                
+                  {/* <TableCell align="right">Current Price</TableCell> */}
+                  {/* <TableCell align="right">{esgScore && <Typography align="center"><NumericLabel>{esgScore[company.company_name]}</NumericLabel></Typography>}</TableCell>                 */}
                 </TableRow>
               ))}
             </TableBody>
