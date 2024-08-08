@@ -1625,6 +1625,60 @@ async def get_framework_avg_line_graph(
 
     return graph_values
 
+@app.get("/graph/framework", tags=["Graph"])
+async def get_framework_line_graph(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    frameworks = session.query(framework_models.Frameworks).filter(
+        framework_models.Frameworks.is_official_framework == True
+    ).all()
+
+    if not frameworks:
+        return []
+
+    years = await get_years([company_name], user, session)
+    company_data = await get_company_indicators(company_name, user, session)
+
+    # Pre-fetch and group metrics by category for each framework
+    framework_metrics_map = defaultdict(lambda: defaultdict(list))
+    indicators_map = {}
+
+    for framework in frameworks:
+        metrics = await get_framework_metrics(framework.id, user, session)
+        for metric in metrics:
+            framework_metrics_map[framework.id][metric.category].append(metric)
+            if metric.metric_id not in indicators_map:
+                indicators_map[metric.metric_id] = {
+                    indicator.indicator_name: indicator.weighting
+                    for indicator in get_indicators(framework.id, metric.metric_id, user, session)
+                }
+
+    graph_values = []
+
+    for year in years:
+        year_scores = {
+          'year': year
+        }
+        for framework in frameworks:
+            framework_score = 0
+
+            for category, metrics in framework_metrics_map[framework.id].items():
+                metric_values = await asyncio.gather(
+                    *[calculate_metric_company_view(company_data[year], indicators_map[metric.metric_id], user, session)
+                      for metric in metrics]
+                )
+
+                category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+                category_weighting = getattr(framework, category, 0)
+                framework_score += category_score * category_weighting
+
+            year_scores[framework.framework_name] = framework_score
+            
+        graph_values.append(year_scores)
+
+    return graph_values
 # ***************************************************************
 #                        Year Apis
 # ***************************************************************

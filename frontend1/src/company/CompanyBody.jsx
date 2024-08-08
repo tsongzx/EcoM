@@ -16,6 +16,7 @@ import FrameworkAverageVisualisation from './FrameworkAverageVisualisation.jsx';
 
 const CompanyBody = ({companyId, companyName}) => {
   const [period, setPeriod] = useState('1mo');
+  const [view, setView] = useState('joint');
   // const [showGraph, setShowGraph] = useState(true);
 
   return (
@@ -51,7 +52,9 @@ const CompanyBody = ({companyId, companyName}) => {
               </div>
               </TabPanel>
               <TabPanel value={1}>
-                <FrameworkAverageVisualisation companyName={companyName}/>
+                <Button size="sm" variant={`${view === 'joint' ? 'soft' : 'plain'}`} color={`${view === 'joint' ? 'primary' : 'neutral'}`} onClick={() => setView("joint")}> Joint view </Button>
+                <Button size="sm" variant={`${view === 'disjoint' ? 'soft' : 'plain'}`} color={`${view === 'disjoint' ? 'primary' : 'neutral'}`} onClick={() => setView("disjoint")}> Disjoint view </Button>
+                <FrameworkAverageVisualisation companyName={companyName} view={view}/>
               </TabPanel>
               <TabPanel value={2}>
               <CompanySummary companyName={companyName} ticker={"AMZN"}/>
