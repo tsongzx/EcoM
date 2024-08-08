@@ -374,6 +374,7 @@ const Company = () => {
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
           overflowY: "scroll",
+          boxSizing: 'border-box',
         }}>
           <ListModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
           {/* Top center half of the screen */}

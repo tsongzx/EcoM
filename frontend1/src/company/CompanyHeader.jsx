@@ -40,7 +40,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
         if (years.length > 1) {
           year = sortedYears[1];
         } else {
-          year = year[0];
+          year = sortedYears[1];
         }
         // const year = Math.max(...Object.keys(indicatorsCompany));
         console.log(year);
