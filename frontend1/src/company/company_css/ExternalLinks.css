@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+.externalLinks-container {
+    max-width: 53vw;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: scroll;
+}
+
+.externalLink-button {
+    width: 80%;
+    border-radius: 10px;
+    font-family: Inter;
+}
+
+.externalLinks-container p {
+    font-family: Inter;
+}

@@ -14,13 +14,15 @@ const styles = StyleSheet.create({
 })
 
 const ReportGraphContainer = ({graphValues, info, categories}) => {
-    console.log('INSIDE REPORT GRAPH CONTAINER ________---_-_-_--_---');
-    console.log(graphValues);
-    console.log(info);
-    console.log(categories);
+
     return (
         <View>
             {(graphValues && Object.keys(graphValues).length > 0) ? (Object.keys(graphValues).map((graph, index) => {
+                console.log('INSIDE REPORT GRAPH CONTAINER _FOR ', info[graph].name);
+                console.log(graphValues[graph]);
+                console.log(info[graph].unit);
+                console.log(categories);
+
                 return (
                   <View>
                         {/* Title */}

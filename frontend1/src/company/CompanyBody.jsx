@@ -15,6 +15,7 @@ import Tabs from '@mui/joy/Tabs';
 import TabList from '@mui/joy/TabList';
 import Tab from '@mui/joy/Tab';
 import TabPanel from '@mui/joy/TabPanel';
+import ExternalLinks from './ExternalLinks.jsx';
 
 
 const CompanyBody = ({companyId,
@@ -63,6 +64,7 @@ const CompanyBody = ({companyId,
               <TabList>
                 <Tab >Graph</Tab>
                 <Tab>Summary</Tab>
+                <Tab> News </Tab>
               </TabList>
 
             
@@ -80,11 +82,14 @@ const CompanyBody = ({companyId,
                   <Button size="sm" variant={`${period === '1yr' ? 'soft' : 'plain'}`} color={`${period === '1yr' ? 'primary' : 'neutral'}`} onClick={() => setPeriod("1yr")}
                     className={`period-select-button ${period === '1yr' ? 'active-psb' : ''}`}> 1y </Button>
                 </div>}
-                <StockAreaChartVisualisation className='Stockareachartvis' companyName={companyName} period={period} ticker={"AMZN"}/>
+                <StockAreaChartVisualisation className='Stockareachartvis' companyName={companyName} period={period} ticker={ticker}/>
               </div>
               </TabPanel>
               <TabPanel value={1}>
-              <CompanySummary companyName={companyName} ticker={"AMZN"}/>
+              <CompanySummary companyName={companyName} ticker={ticker}/>
+              </TabPanel>
+              <TabPanel value={2}>
+                  <ExternalLinks ticker={"AMZN"}/>
               </TabPanel>
             </Tabs>          
           </div>

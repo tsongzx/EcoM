@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .reportContainer {
     display: flex;
     flex-direction: row;
-    background-color: aqua;
     margin-top: 70px;
     position: absolute;
     height: 90vh;
     right: 0;
+    display: absolute;
+    top: 0;
+    width: 100%;
 }
 
 .reportContent {
@@ -13,16 +17,46 @@
     height: 100vh;
     background-color: beige;
     margin-right: 320px;
+    width: 100%;
+    justify-content: center;
+    margin-left: 2vw;
+}
+
+.reportContent h2 {
+    font-size: 2em;
+    font-family: Inter;
+    font-weight: bold;
+}
+
+.reportContent p {
+    font-family: Inter;
 }
 
 .reportControl {
     display:flex;
     flex-direction: column;
     width:300px;
-    background-color: rgb(156, 93, 215);
+    background-color: #bed4e9;
     padding: 10px 5px;
     position: fixed;
     right:0;
+    top: 40px;
+    border-radius: 10px;
+}
+
+.reportControl p {
+    font-family: Inter;
+}
+
+.reportControl button {
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    height: 20px;
+}
+
+.reportControl button:hover {
+    background-color: #e7f1fb;
 }
 
 .draggable {
@@ -31,17 +65,19 @@
     padding: 0px 5px;
     border: solid 1px black;
     border-radius: 5px;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
     justify-content: space-between;
-    background-color: rgb(255, 241, 169);
+    align-items: center;
 }
 
 .draggable:hover {
-    border-color: blue;
+    border: solid 2px white;
+    padding: 0px 4px;
 }
 
 .draggable.shown {
-    background-color: rgb(173, 202, 173);
+    background-color: #3373b0;
+    color: white;
 }
 
 .draggable.hidden {
@@ -49,7 +85,7 @@
 }
 
 .toggleDisplayButton{
-
+    height: 30px;
     flex-shrink: 0; 
     margin-left: 0px;
 }
@@ -60,8 +96,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    height: 100%;
 }
 
-.draggable p {
-    background-color: rgb(255, 255, 255);
+.dragEnt p {
+    font-family: Inter;
+    background-color: none;
+    margin: 6px 3px;
 }

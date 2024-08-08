@@ -4,6 +4,7 @@ import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 
 const BarChartStyled = ({data, title, unit, categories}) => {
 
+  console.log('BAR CHART DATA FOR ', title);
   console.log(data);
   console.log(unit);
   const yesNoTickFormatter = (tick) => (tick === 0 ? "N" : "Y");
