@@ -25,7 +25,8 @@ const Navbar = () => {
       navigate('/compare', { state: { companiesList: [], selectedFramework: null } });
     }
 
-    const handleAbout = () => {
+    const handleAbout = (event) => {
+      event.preventDefault();
       navigate('/about');
     }
 

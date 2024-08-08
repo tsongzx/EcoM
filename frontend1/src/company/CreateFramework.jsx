@@ -12,7 +12,7 @@ import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
 import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
 
-const CreateFramework = () => {
+const CreateFramework = ({setOfficialFrameworks, setSelectedFramework}) => {
 
     const [Emetrics, setEMetrics] = useState([]);
     const [Smetrics, setSMetrics] = useState([]);

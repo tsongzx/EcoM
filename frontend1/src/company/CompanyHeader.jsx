@@ -33,15 +33,16 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
     const getScore = async () => {
       if (indicatorsCompany) {
         // Getting prev year..
-        // const years = Object.keys(indicatorsCompany);
-        // const sortedYears = [...new Set(years)].sort((a, b) => b - a);
-        // let year;
-        // if (years.length > 1) {
-        //   year = sortedYears[1];
-        // } else {
-        //   year = year[0];
-        // }
-        const year = Math.max(...Object.keys(indicatorsCompany));
+        const years = Object.keys(indicatorsCompany);
+        const sortedYears = [...new Set(years)].sort((a, b) => b - a);
+        let year;
+        if (years.length > 1) {
+          year = sortedYears[1];
+        } else {
+          year = year[0];
+        }
+        // const year = Math.max(...Object.keys(indicatorsCompany));
+        console.log(year);
         const avgScore = await getFrameworkAvgScore([companyName], year);
         console.log(avgScore);
         setESGScore(avgScore[companyName]);
@@ -88,11 +89,11 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
       {/* <Stack alignItems="center" justifyContent="center">
         <Typography align="center">58.78</Typography>
         <Typography align="center">Current Price</Typography>
-      </Stack>
+      </Stack> */}
       <Stack alignItems="center" justifyContent="center">
         {esgScore && <Typography align="center"><NumericLabel>{esgScore}</NumericLabel></Typography>}
         <Typography align="center">ESG Score</Typography>
-      </Stack> */}
+      </Stack>
       <Button onClick={handleClickReport}>Save Report</Button>
       {/* <Button onClick={openReportModal}>Save Report</Button> */}
       <Button onClick={openWatchlistModal}>Add to List</Button>

@@ -366,6 +366,7 @@ const Company = () => {
             setsScore={setsScore}
             setgScore={setgScore}
             findCategoricalMetrics={findCategoricalMetrics}
+            setOfficialFrameworks={setOfficialFrameworks}
         />
         <Box component="main" sx={{ 
           width: '70vw',
@@ -396,7 +397,7 @@ const Company = () => {
             ticker={ticker}
           />
           <CompanyBody 
-            companyId={companyId} companyName={companyName}
+            companyId={companyId} companyName={companyName} ticker={ticker}
           />
           <GraphTableToggle
             display={frameworkDisplay}

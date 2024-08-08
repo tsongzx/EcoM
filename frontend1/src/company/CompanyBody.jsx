@@ -15,7 +15,7 @@ import TabPanel from '@mui/joy/TabPanel';
 import FrameworkAverageVisualisation from './FrameworkAverageVisualisation.jsx';
 import ExternalLinks from './ExternalLinks.jsx';
 
-const CompanyBody = ({companyId, companyName}) => {
+const CompanyBody = ({companyId, companyName, ticker}) => {
   const [period, setPeriod] = useState('1mo');
   const [view, setView] = useState('joint');
   // const [showGraph, setShowGraph] = useState(true);

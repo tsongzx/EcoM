@@ -571,8 +571,7 @@ async def get_company_news_sentiment(
     session: Session = Depends(get_session),
 ):
     # CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
-    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={
-        ticker}&apikey=QO74GE9362PLVHDU'
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
 
     r = requests.get(url)
     data = r.json()

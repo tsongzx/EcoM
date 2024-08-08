@@ -27,7 +27,7 @@ const LeftPanel = ({
   setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
   eScore, sScore, gScore,
   frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
-  seteScore, setsScore, setgScore, findCategoricalMetrics
+  seteScore, setsScore, setgScore, findCategoricalMetrics, setOfficialFrameworks
 }) => {
   const navigate = useNavigate();
 
@@ -139,7 +139,7 @@ const LeftPanel = ({
             exitFramework={exitFramework}
             setExitFramework={setExitFramework}
           />
-          <CreateFramework/>
+          <CreateFramework setOfficialFrameworks={setOfficialFrameworks} setSelectedFramework={setSelectedFramework} />
         </div>
     </Box> 
   );
