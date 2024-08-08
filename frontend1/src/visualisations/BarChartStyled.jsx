@@ -1,6 +1,7 @@
 import { Typography } from '@mui/material';
 import React, { PureComponent } from 'react';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Label } from 'recharts';
+import NumericLabel from 'react-pretty-numbers';
 
 const BarChartStyled = ({data, title, unit, categories}) => {
 
@@ -28,8 +29,8 @@ const BarChartStyled = ({data, title, unit, categories}) => {
         margin={{
           top: 5,
           right: 30,
-          left: 20,
-          bottom: 5,
+          left: 60,
+          bottom: 20,
         }}
       >
         <CartesianGrid strokeDasharray="3 3" />
@@ -39,7 +40,7 @@ const BarChartStyled = ({data, title, unit, categories}) => {
           label={{
             value:"Year",
             position:"bottom",
-            fontFamily:'Roboto, sans-serif'
+            fontFamily:'Roboto, sans-serif',
           }}
           
         />
@@ -47,24 +48,34 @@ const BarChartStyled = ({data, title, unit, categories}) => {
           tickCount={unit === "Yes/No" ? 1 : undefined} 
           tickFormatter={unit === "Yes/No" ? yesNoTickFormatter : undefined}
           fontFamily={'Roboto, sans-serif'}
+          tick={{ 
+            fontSize: '12px'
+          }}
         >         
           <Label 
             value={unit} 
             angle={-90}
+            offset={20}
             position="left"
             style={{
               textAnchor: 'middle',
               fontFamily: 'Roboto, sans-serif',
+              marginLeft: '50px'
             }}
           />
         </YAxis>
         <Tooltip />
-        <Legend />
+        <Legend
+          layout="horizontal"
+          verticalAlign="top"
+          align="center"
+          wrapperStyle={{
+            paddingBottom: '20px',
+          }}
+        />        
         {categories.map((category, index) => (
           <Bar key={index} dataKey={category} fill={getColor(index)} activeBar={<Rectangle fill="pink" stroke="blue" />}/>
         ))}
-        {/* <Bar dataKey="value" fill="#8884d8" activeBar={<Rectangle fill="pink" stroke="blue" />}/> */}
-        {/* <Bar dataKey="uv" fill="#82ca9d" activeBar={<Rectangle fill="gold" stroke="purple" />} /> */}
       </BarChart>
     </ResponsiveContainer>
   );
