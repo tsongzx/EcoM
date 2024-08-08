@@ -2,6 +2,9 @@
 
 .nav-placeholder {
     height: 50px;
+    position: fixed;
+    top: 0;
+    width: 100%;
 }
 /* 
 .navbar-ul {
@@ -24,7 +27,7 @@
     color: #B4B2FC;
 }
 
-a {
+.navbar-button a {
     text-decoration: none;
     font-family: Inter;
     font-weight: bold;
@@ -34,17 +37,18 @@ a {
 
 .profileTab {
     background-color: rgb(255, 255, 255);
-    position: fixed;
+    position: absolute;
     height: 30vh;
     z-index: 998;
     padding-top: 10px;
     right: 1%;
     width: 200px;
-    margin-top: 45px;
+    margin-top: 0px;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 20px;
     border: solid 2px #0c3960;
+    top: 50px;
 }
 
 .pfpName-container {

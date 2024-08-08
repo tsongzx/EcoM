@@ -48,15 +48,12 @@ const Recommendations = ({companyId}) => {
         <Stack id="recommendations-container"
           maxWidth='300px'
           width='100%'
-          justifyContent="space-evenly"
         >
-            <Button variant="contained">
-                Others also viewed
-            </Button>   
+            <h2 className="recc-h2-other">Others also viewed </h2> 
             {reccs.map((r) => (
-                <Button className="recommendations-button" 
+                <button className="recommendations-button" 
                     variant="outlined"
-                    key={r.id} 
+                    key={r.id}
                     onClick={() => navigate(`/company/${encodeURIComponent(r.id)}`, {
                         state: { 
                             companyId: r.id, 
@@ -66,7 +63,7 @@ const Recommendations = ({companyId}) => {
                     })}
                 >
                     {r.company_name}
-                </Button>
+                </button>
             ))}
         </Stack>
     );

@@ -67,7 +67,7 @@ const Dashboard = () => {
   return (
     <>
       <Navbar />
-        <Box>
+        <Box sx={{marginTop: '-25px'}}>
           <Stack justifyContent="center" alignItems="center" spacing={3}
             sx={{
               backgroundColor: '#0D2149',

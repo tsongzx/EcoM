@@ -376,7 +376,7 @@ const Compare = () => {
 
   //render table cell if company is not null
   return (
-    <Box>
+    <Box sx={{position: 'absolute', top: '50px', left: '0'}}>
       <Navbar/>
       {loading && <CircularLoader/>}   
       <Box component="main" sx={{
@@ -389,13 +389,15 @@ const Compare = () => {
         }}></GraphTableToggle>
         {display === 'tabular' ? (
         <Box>  
-          <TableContainer className='compare-table-cont' style={{height: '75vh',}}>
+          <TableContainer className='compare-table-cont' style={{height: '95vh',}}>
             <Table className='compare-table' style={{ tableLayout: 'fixed' }}>
               {/* Header where Company controls are obtained */}
               <TableHead className='compare-tableheader'>
                 <TableRow>
                   <TableCell>
                     <Typography variant="h6">Metrics</Typography>
+                    <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
+                    <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
                   </TableCell>
                   {/* Where the companies are rendered */}
                   {companies.map((company, index) => (
@@ -530,8 +532,8 @@ const Compare = () => {
               ))}
             </Table>
           </TableContainer>
-          <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
-          <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
+          {/* <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
+          <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/> */}
         </Box>
       ) :
       (
