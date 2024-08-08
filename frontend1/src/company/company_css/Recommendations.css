@@ -1,11 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .recommendations-container {
     display: flex;
     flex-direction: column;
     width: 100%;
     max-width: 300px;
     padding: 2px 2px;
+    justify-content: flex-start;
+    gap: 10px;
 }
 
+.recc-h2-other {
+    margin-bottom: 2px;
+    font-family: Inter;
+    font-weight: 1.3em;
+}
 /* button {
     border: 1px solid black;
 }
@@ -14,15 +23,21 @@ button:hover {
     border: 1px solid blue;
 } */
 
-.recommendations-button {
+.recommendations-button{
     margin-bottom: 5px;
     border-radius: 10px;
     border: solid 1px black;
     cursor: pointer;
-    padding: 3px 5px;
+    padding: 5px 9px;
+    font-family: Inter;
+    color: black;
+    border: solid 2px #3373b0;
+    font-size: 1em;
 }
 
 .recommendations-button:hover {
-    border: solid 2px blue;
+    border: solid 2px #3373b0;
+    background-color: #3373b0;
+    color: white;
     padding: 2px 4px;
 }

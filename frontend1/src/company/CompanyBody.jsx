@@ -96,7 +96,7 @@ const CompanyBody = ({companyId,
           <Recommendations companyId={companyId}/>
         </Stack>
         <Stack direction="row">
-          <Button onClick={aiPredict}>AI Predict</Button>
+          {/* <Button onClick={aiPredict}>AI Predict</Button> */}
         </Stack>
       </Box>
     </Box>

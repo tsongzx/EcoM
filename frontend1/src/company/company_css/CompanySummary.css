@@ -6,7 +6,7 @@
 .company-summary-container{
     display: flex;
     flex-direction: row;
-    background-color: #e7f1fb;
+    background-color: #ffffff;
     max-width: 53vw;
     height: 400px;
 }

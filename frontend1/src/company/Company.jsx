@@ -327,6 +327,7 @@ const Company = () => {
         height: 'calc(100vh - 5vh)',
         display: 'flex',
         position: 'relative',
+        marginTop: '50px',
       }}>
         {/* Everything observed on the left hand side of the screen */}
         <LeftPanel

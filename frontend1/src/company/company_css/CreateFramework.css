@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 .cfw-button {
     border-radius: 10px;
     margin-bottom: 2px;
@@ -8,27 +10,31 @@
     box-sizing: border-box;
     padding: 3px 3px;
     cursor: pointer;
+    font-family: Inter;
 }
 
 .cfw-button:hover {
-    border: 2px solid rgb(167, 144, 63);
+    border: 2px solid #bed4e9;
     padding: 2px 2px;
-    background-color: rgb(242, 231, 190);
+    background-color: #bed4e9;
 }
 
 .cfw-button-includedE {
-    border-color: rgb(192, 185, 62);
-    background-color: rgb(187, 232, 203);
+    border-color: #33b091;
+    background-color: #33b091;
+    color: white;
 }
 
 .cfw-button-includedS {
-    border-color: rgb(192, 185, 62);
-    background-color: rgb(232, 187, 232);
+    border-color: #3373b0;
+    background-color: #3373b0;
+    color: white;
 }
 
 .cfw-button-includedG {
-    border-color: rgb(192, 185, 62);
-    background-color: rgb(224, 232, 187);
+    border-color: #5f49b6;
+    background-color: #5f49b6;
+    color: white;
 }
 
 .cfwbtn-container {
@@ -50,4 +56,31 @@
     margin-bottom: 0px;
     position: relative;
     font-weight: bold;
+}
+
+.cfw-button-www {
+    border-radius: 10px;
+    font-family: Inter;
+    cursor: pointer;
+    margin-top: 5px;
+    border: solid 1px #0c3960;
+    padding: 4px 7px;
+}
+
+
+.cfw-button-www:hover {
+    background-color: #bed4e9;
+    color: white;
+}
+
+.cfw-top-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    margin-bottom: 3px;
+}
+
+.cfw-top-controls button {
+    border: none;
+    cursor: pointer;
 }

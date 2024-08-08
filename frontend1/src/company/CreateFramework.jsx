@@ -11,6 +11,7 @@ import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
 import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
+import CloseIcon from '@mui/icons-material/Close';
 
 const CreateFramework = ({setSelectedFramework,
   officialFrameworks,
@@ -183,7 +184,7 @@ const CreateFramework = ({setSelectedFramework,
 
     return (
       <div style={{ marginTop: '100px'}}>
-        <button onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
+        <button className='cfw-button-www' onClick={() => setIsOpen(!isOpen)}>{isOpen ? 'Close' : 'Open Create Framework'}</button>
         {isOpen && <div className="cfw-container">
           <div className="cfw-esgdescriptor">
             <p className="cfw-esgdescriptor-content" style={{
@@ -248,12 +249,14 @@ const CreateFramework = ({setSelectedFramework,
             </AccordionDetails>
             </Accordion>
           </AccordionGroup>
-            {!showAddName && (<button onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
+            {!showAddName && (<button className="cfw-button-www" onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
             {showAddName && (<div>
-                <button onClick={handleClose}>X</button>
-                    <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
-                    <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
-                <button onClick={() => handleSubmitNewFramework()}>save</button>
+                <div className="cfw-top-controls">
+                  <button onClick={handleClose}><CloseIcon/></button>
+                  <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
+                </div>  
+                  <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
+                <button className="cfw-button-www" onClick={() => handleSubmitNewFramework()}>save</button>
             </div>)}
         </div>}
         {showMessage && <SelfExpiringMessage message={message} onExpiry={handleCloseMessage} />}

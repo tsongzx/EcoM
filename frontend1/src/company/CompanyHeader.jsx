@@ -5,7 +5,7 @@ import {
   Stack
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
+import './company_css/Company.css'
 import {
   addToFavourites,
   deleteFromFavourites
