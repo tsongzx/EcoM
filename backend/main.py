@@ -39,6 +39,9 @@ import requests
 from bs4 import BeautifulSoup
 import liveData
 import metrics
+import asyncio
+from collections import defaultdict
+
 load_dotenv()
 print(os.environ.get("OPENAI_API_KEY"))
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -568,8 +571,7 @@ async def get_company_news_sentiment(
     session: Session = Depends(get_session),
 ):
     # CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
-    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={
-        ticker}&apikey=QO74GE9362PLVHDU'
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
 
     r = requests.get(url)
     data = r.json()
@@ -685,6 +687,112 @@ async def get_companies_by_industry_by_country(
         company_models.Company.headquarter_country.in_(filter.countries)
     )
     return {'total': query.count(), 'companies': query.offset(offset).limit(20).all()}
+  
+@app.post("/company/framework/average/", tags=["company"]) 
+async def get_framework_companies_average(
+    request: score_schemas.ESGScore,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+) -> dict:
+    frameworks = session.query(framework_models.Frameworks).filter(
+        framework_models.Frameworks.is_official_framework == True
+    ).all()
+    
+    if not frameworks:
+        return {"error": "No frameworks found"}
+
+    # Fetch framework metrics once and cache them
+    framework_metrics_cache = {}
+    for framework in frameworks:
+        framework_metrics_cache[framework.id] = await get_framework_metrics(framework.id, user, session)
+
+    company_scores = {}
+
+    for company_name in request.companies:
+        scores = []
+        companyData = await get_company_indicators(company_name, user, session)
+        print(f"Company Data for {company_name}: {companyData}")
+
+        for framework in frameworks:
+            framework_metrics = framework_metrics_cache[framework.id]
+            
+            category_metrics = defaultdict(list)
+            for metric in framework_metrics:
+                category = metric.category
+                category_metrics[category].append(metric)
+                
+            framework_score = 0
+            for category, metrics in category_metrics.items():
+                metric_values = await asyncio.gather(
+                    *[calculate_metric_company_view(companyData.get(request.year, {}), {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
+                                                        user, session) for metric in metrics]
+                )
+                category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+                category_weighting = getattr(framework, category, 0)
+                framework_score += category_score * category_weighting
+
+            scores.append(framework_score)
+            print(f"Framework Score for {framework.framework_name} and {company_name}: {framework_score}")
+
+        company_scores[company_name] = sum(scores) / len(scores) if scores else 0
+        print(f"Company Score for {company_name}: {company_scores[company_name]}")
+
+    return company_scores
+  
+# @app.get("/company/framework/average/", tags=["company"])
+# async def get_framework_company_average(
+#     company_name: str,
+#     year: int,
+#     user: user_schemas.UserInDB = Depends(get_user),
+#     session: Session = Depends(get_session),
+# ) -> float:
+    
+#     frameworks = session.query(framework_models.Frameworks).filter(
+#         framework_models.Frameworks.is_official_framework == True
+#     ).all()
+    
+#     if not frameworks:
+#         return 0 
+
+#     scores = []
+#     categories = ["E", "S", "G"]
+    
+#     companyData = await get_company_indicators(company_name, user, session)
+
+#     for framework in frameworks:
+#         # Fetch all metrics for this framework and all categories - dont remove comments yet
+#         # category_metrics = await asyncio.gather(
+#         #     *[get_framework_metrics_by_category(framework.id, category, user, session) for category in categories]
+#         # )
+#         framework_metrics = await get_framework_metrics(framework.id, user, session)
+        
+#         category_metrics = defaultdict(list)
+#         for metric in framework_metrics:
+#             category = metric.category
+#             category_metrics[category].append(metric)
+            
+#         framework_score = 0
+#         for category, metrics in category_metrics.items():
+#         # for category, metrics in zip(categories, category_metrics):
+#             # Fetch all metric values concurrently
+#             print(f"categry {category}")
+#             print(metrics)
+#             metric_values = await asyncio.gather(
+#                 *[calculate_metric_company_view(companyData[year], {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
+#                                                 user, session) for metric in metrics]
+#             )
+#             print(metric_values)
+#             category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+#             print(category_score)
+#             category_weighting = getattr(framework, category, 0)
+#             framework_score += category_score * category_weighting
+#             print(framework_score)
+#         scores.append(framework_score)
+
+#     for framework in frameworks:
+#       print(framework.framework_name)
+#     print(scores)
+#     return sum(scores) / len(scores) if scores else 0
 # ***************************************************************
 #                        Framework Apis
 # ***************************************************************
@@ -1258,93 +1366,10 @@ async def get_recommended_companies(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    companies = session.query(company_models.Company).filter_by(
-        industry=industry).order_by(func.rand()).limit(10).all()
-
-    return companies
-
-# #test all of the average ones claire
-# @app.get("/industry/framework/average/", tags=["Industry"])
-# async def get_framework_industry_average(
-#     industry: str,
-#     framework_id: int,
-#     year: int,
-#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) :
-#     # fix - get average for an industry for a framework
-#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-#     TODO: BATCH PROCESSING
-#     """
-#     # @GEOFF: CONSIDER BATCH PROCESSING
-#     # score = 0
-#     # for company in companies:
-#     #     score += await get_framework_score(framework_id, company.company_name, year, user, session)
-
-#     # return score / len(companies) if companies else 0
-#     if not companies:
-#         return 0
-
-#     tasks = [
-#         get_framework_score(framework_id, company.company_name, year, user, session)
-#         for company in companies
-#     ]
-
-#     # Run concurrently
-#     scores = await asyncio.gather(*tasks)
-
-
-@app.get("/company/framework/average/", tags=["company"])
-async def get_framework_company_average(
-    company_name: str,
-    year: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> float:
-
-    frameworks = session.query(framework_models.Frameworks).filter(or_(
-        # framework_models.Frameworks.user_id == user.id,
-        framework_models.Frameworks.is_official_framework == True
-    )
-    ).all()
-
-    # REMOVE LATER
-    if not frameworks:
-        # Return 0 or handle the case when no frameworks are found
-        return 0
-
-    # Print all frameworks
-    for framework in frameworks:
-        print(framework)
-
-    score = 0
-
-    for framework in frameworks:
-        score += await get_framework_score(framework_id=framework.id, company_name=company_name, year=year, user=user, session=session)
-
-    return score / len(frameworks)
-
-# @app.get("/industry/metric/average/", tags=["Industry"])
-# async def get_metric_industry_average(
-#     metric_id: int,
-#     year: int,
-#     framework_id: int,
-#     companies: List[company_models.Company] = Depends(get_companies_in_industry),
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) :
-#     # fix - get average for an industry for a framework
-#     """_summary_: PROBABLY DON'T USE THIS IS FAR TOO SLOW
-#       TODO: BATCH PROCESSING
-#     """
-#     # @GEOFF: CONSIDER BATCH PROCESSING
-#     score = 0
-#     for company in companies:
-#         score += await calculate_metric(metric_id, company.company_name, framework_id, year, user, session)
-
-#     return score / len(companies) if companies else 0
-
+    companies = session.query(company_models.Company).filter_by(industry=industry).order_by(func.rand()).limit(10).all()
+    
+    return companies  
+  
 
 @app.get("/industry/averages/{industry}", tags=["Industry"])
 async def get_indicator_industry_averages(
@@ -1354,21 +1379,7 @@ async def get_indicator_industry_averages(
 ):
     """_summary_: Retrieves indicator average for an industry
     """
-
-    # results = session.query(
-    #     company_models.CompanyData.indicator_name,
-    #     func.avg(company_models.CompanyData.indicator_value).label('average_indicator_value')
-    # ).join(
-    #     company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
-    # ).join(
-    #     metrics_models.Indicators, metrics_models.Indicators.name == company_models.CompanyData.indicator_name
-    # ).filter(
-    #     company_models.Company.industry == industry,
-    #     metrics_models.Indicators.unit != 'Yes/No'
-    # ).group_by(
-    #     company_models.CompanyData.indicator_name
-    # ).all()
-
+    
     results = session.query(
         company_models.CompanyData.indicator_name,
         func.avg(company_models.CompanyData.indicator_value).label(
@@ -1383,25 +1394,8 @@ async def get_indicator_industry_averages(
 
     average_dict = {}
     for result in results:
-        average_dict[result.indicator_name] = result.average_indicator_value
-
-    # results = session.query(
-    #     company_models.CompanyData.indicator_name,
-    #     func.count(company_models.CompanyData.indicator_value).label('count')
-    # ).join(
-    #     company_models.Company, company_models.Company.company_name == company_models.CompanyData.company_name
-    # ).join(
-    #     metrics_models.Indicators, metrics_models.Indicators.name == company_models.CompanyData.indicator_name
-    # ).filter(
-    #     company_models.Company.industry == industry,
-    #     metrics_models.Indicators.unit == 'Yes/No'
-    # ).group_by(
-    #     company_models.CompanyData.indicator_name
-    # ).all()
-
-    # for result in results:
-    #   average_dict[result.indicator_name] = result.count
-
+      average_dict[result.indicator_name] = result.average_indicator_value
+        
     return average_dict
 
 # ***************************************************************
@@ -1471,8 +1465,8 @@ async def get_predictive(
     ).all()
 
     if not isinstance(metric_unit, str):
-        metric_uni = str(metric_unit)
-
+        metric_unit = str(metric_unit)
+        
     if not data:
         raise HTTPException(status_code=404, detail="Error")
 
@@ -1634,7 +1628,118 @@ async def get_metric_bar_graph(
             data_by_metric[metric.metric_id].append(data_point)
 
     return data_by_metric
+  
+@app.get("/graph/framework/average/", tags=["Graph"])
+async def get_framework_avg_line_graph(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    frameworks = session.query(framework_models.Frameworks).filter(
+        framework_models.Frameworks.is_official_framework == True
+    ).all()
 
+    if not frameworks:
+        return []
+
+    years = await get_years([company_name], user, session)
+    company_data = await get_company_indicators(company_name, user, session)
+
+    # Pre-fetch and group metrics by category for each framework
+    framework_metrics_map = defaultdict(lambda: defaultdict(list))
+    indicators_map = {}
+
+    for framework in frameworks:
+        metrics = await get_framework_metrics(framework.id, user, session)
+        for metric in metrics:
+            framework_metrics_map[framework.id][metric.category].append(metric)
+            if metric.metric_id not in indicators_map:
+                indicators_map[metric.metric_id] = {
+                    indicator.indicator_name: indicator.weighting
+                    for indicator in get_indicators(framework.id, metric.metric_id, user, session)
+                }
+
+    graph_values = []
+
+    for year in years:
+        scores = []
+        for framework in frameworks:
+            framework_score = 0
+
+            for category, metrics in framework_metrics_map[framework.id].items():
+                metric_values = await asyncio.gather(
+                    *[calculate_metric_company_view(company_data[year], indicators_map[metric.metric_id], user, session)
+                      for metric in metrics]
+                )
+
+                category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+                category_weighting = getattr(framework, category, 0)
+                framework_score += category_score * category_weighting
+
+            scores.append(framework_score)
+        
+        average = sum(scores) / len(scores) if scores else 0
+        graph_values.append({
+            'average': average,
+            'year': year,
+        })
+
+    return graph_values
+
+@app.get("/graph/framework", tags=["Graph"])
+async def get_framework_line_graph(
+    company_name: str,
+    user: user_schemas.UserInDB = Depends(get_user),
+    session: Session = Depends(get_session),
+):
+    frameworks = session.query(framework_models.Frameworks).filter(
+        framework_models.Frameworks.is_official_framework == True
+    ).all()
+
+    if not frameworks:
+        return []
+
+    years = await get_years([company_name], user, session)
+    company_data = await get_company_indicators(company_name, user, session)
+
+    # Pre-fetch and group metrics by category for each framework
+    framework_metrics_map = defaultdict(lambda: defaultdict(list))
+    indicators_map = {}
+
+    for framework in frameworks:
+        metrics = await get_framework_metrics(framework.id, user, session)
+        for metric in metrics:
+            framework_metrics_map[framework.id][metric.category].append(metric)
+            if metric.metric_id not in indicators_map:
+                indicators_map[metric.metric_id] = {
+                    indicator.indicator_name: indicator.weighting
+                    for indicator in get_indicators(framework.id, metric.metric_id, user, session)
+                }
+
+    graph_values = []
+
+    for year in years:
+        year_scores = {
+          'year': year
+        }
+        for framework in frameworks:
+            framework_score = 0
+
+            for category, metrics in framework_metrics_map[framework.id].items():
+                metric_values = await asyncio.gather(
+                    *[calculate_metric_company_view(company_data[year], indicators_map[metric.metric_id], user, session)
+                      for metric in metrics]
+                )
+
+                category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
+                category_weighting = getattr(framework, category, 0)
+                framework_score += category_score * category_weighting
+
+            year_scores[framework.framework_name] = framework_score
+            
+        graph_values.append(year_scores)
+
+    return graph_values
 # ***************************************************************
 #                        Year Apis
 # ***************************************************************

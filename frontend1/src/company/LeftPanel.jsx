@@ -9,6 +9,7 @@ import AdditionalMetrics from "./AdditionalMetrics";
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getIndicatorFromMetric } from "../helper";
+import CreateFramework from "./CreateFramework";
 import './company_css/LeftPanel.css'
 
 // This component includes the majority of the left bar of the company page.
@@ -26,7 +27,7 @@ const LeftPanel = ({
   setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
   eScore, sScore, gScore,
   frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
-  seteScore, setsScore, setgScore, findCategoricalMetrics
+  seteScore, setsScore, setgScore, findCategoricalMetrics, setOfficialFrameworks
 }) => {
   const navigate = useNavigate();
 
@@ -138,6 +139,7 @@ const LeftPanel = ({
             exitFramework={exitFramework}
             setExitFramework={setExitFramework}
           />
+          <CreateFramework setOfficialFrameworks={setOfficialFrameworks} setSelectedFramework={setSelectedFramework} />
         </div>
     </Box> 
   );

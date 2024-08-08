@@ -153,10 +153,10 @@ const Home = () => {
       </Card>
       <div id='homeTitleContainer'>
         <div id='header'>
-          ESG NOW
+          EcoM
         </div>
         <div id='titleContainer'>
-          <h1 id='homeTitle'>ESG NOW</h1>
+          <h1 id='homeTitle'>EcoM</h1>
           <p id='homeDesc'>ESG Analysis Platform</p>
           <div style={{ display: 'flex', maxWidth: '400px', minWidth: '250px', justifyContent: 'space-between' }}>
             <Button className="titleButton loginButton" type="submit" variant="contained" onClick={openLoginModal}>Login</Button>

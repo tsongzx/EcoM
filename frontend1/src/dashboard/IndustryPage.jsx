@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, Paper, Typography, Box, FormGroup, FormControlLabel, Checkbox, Pagination, Button, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { getHeadquarterCountries, getCompanyByCountryByIndustry } from '../helper.js';
+import { getHeadquarterCountries, getCompanyByCountryByIndustry, getFrameworkAvgScore } from '../helper.js';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import NumericLabel from 'react-pretty-numbers';
 
 const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   const [companies, setCompanies] = useState([]);
   const [numPages, setNumPages] = useState(0);
   const [curPage, setCurPage] = useState(1);
+  const [esgScore, setESGScore] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +29,19 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const getScore = async () => {
+      const companyNames = companies.map(company => {
+        return company.company_name;
+      })
+      console.log(companyNames);
+      const avgScore = await getFrameworkAvgScore(companyNames, 2024);
+      console.log(avgScore);
+      setESGScore(avgScore);
+    }
+    getScore();
+  }, [companies])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,7 +78,9 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', height: 'calc(67vh - 50px)' }}>
+    <Box sx={{ display: 'flex', 
+      height: 'calc(67vh - 50px)'
+    }}>
       <Box
         sx={{
           width: '20%',
@@ -73,9 +90,19 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
           overflowY: 'scroll',
         }}
       >
-        <Typography variant="h6">Headquarter country</Typography>
-        <Button variant="contained" onClick={handleSelectAll} sx={{ marginBottom: 1, marginRight: 1 }}>Select All</Button>
-        <Button variant="contained" onClick={handleDeselectAll} sx={{ marginBottom: 1 }}>Deselect All</Button>
+        <Typography variant="h6" fontWeight='bold'
+          fontFamily='Merriweather'
+        >Filter by headquarter country</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={6} key={'select'}>
+            <Button variant="text" onClick={handleSelectAll}>Select All</Button>
+          </Grid>
+          <Grid item xs={6} key={'deselect'}>
+            <Button variant="text" onClick={handleDeselectAll}>Deselect All</Button>  
+          </Grid>
+        </Grid>
+        <Stack direction="row" spacing={3}>
+        </Stack>
         {headquarterCountries && (
           <FormGroup>
             <Grid container spacing={2}>
@@ -98,11 +125,16 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
       <Stack alignItems="center"
         sx={{
           width: '80%',
-          overflowY: 'scroll',
+          overflowY: 'scroll'
         }}
       >
         <Pagination page={curPage} count={numPages} onChange={(event, value) => setCurPage(value)} color="secondary"/>
-        <TableContainer component={Paper}>
+        <TableContainer component={Paper}
+          sx={{
+            boxSizing: 'border-box',
+            padding: '0 2% 5% 0'
+          }}
+        >
           <Table>
             <TableHead
               sx={{
@@ -132,7 +164,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
                   <TableCell align="right">{company.headquarter_country}</TableCell>
                   <TableCell align="right">{company.ticker}</TableCell>
                   <TableCell align="right">Current Price</TableCell>
-                  <TableCell align="right">ESG Score</TableCell>                
+                  <TableCell align="right">{esgScore && <Typography align="center"><NumericLabel>{esgScore[company.company_name]}</NumericLabel></Typography>}</TableCell>                
                 </TableRow>
               ))}
             </TableBody>
