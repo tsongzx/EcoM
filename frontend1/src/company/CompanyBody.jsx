@@ -54,19 +54,24 @@ const CompanyBody = ({companyId, companyName, ticker}) => {
               </div>
               </TabPanel>
               <TabPanel value={1}>
-                <Button size="sm" variant={`${view === 'joint' ? 'soft' : 'plain'}`} color={`${view === 'joint' ? 'primary' : 'neutral'}`} onClick={() => setView("joint")}> Joint view </Button>
-                <Button size="sm" variant={`${view === 'disjoint' ? 'soft' : 'plain'}`} color={`${view === 'disjoint' ? 'primary' : 'neutral'}`} onClick={() => setView("disjoint")}> Disjoint view </Button>
-                <FrameworkAverageVisualisation companyName={companyName} view={view}/>
+                <div style={{height: '400px'}}>
+                  <Button size="sm" variant={`${view === 'joint' ? 'soft' : 'plain'}`} color={`${view === 'joint' ? 'primary' : 'neutral'}`} onClick={() => setView("joint")}> Joint view </Button>
+                  <Button size="sm" variant={`${view === 'disjoint' ? 'soft' : 'plain'}`} color={`${view === 'disjoint' ? 'primary' : 'neutral'}`} onClick={() => setView("disjoint")}> Disjoint view </Button>
+                  <FrameworkAverageVisualisation companyName={companyName} view={view}/>
+                </div>
               </TabPanel>
               <TabPanel value={2}>
                 <CompanySummary companyName={companyName} ticker={ticker}/>
               </TabPanel>
               <TabPanel value={3}>
-                  <ExternalLinks ticker={"AMZN"}/>
+                  <ExternalLinks ticker={ticker}/>
               </TabPanel>
             </Tabs>          
           </div>
           <Recommendations companyId={companyId}/>
+        </Stack>
+        <Stack direction="row">
+          {/* <Button onClick={aiPredict}>AI Predict</Button> */}
         </Stack>
       </Box>
     </Box>

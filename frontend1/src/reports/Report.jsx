@@ -290,6 +290,7 @@ const getCompanyMetaInformation = async () => {
                         {showAddText ? <CustomTextarea handleClose={handleClose}/> : (<div style={{height: '152px'}}></div>)}
                     </div>
                     <PDFDownloadLink 
+                        className="download-pdf-link"
                         key={key}
                         document={<ReportDoc 
                         contentList={components} 

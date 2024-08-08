@@ -11,6 +11,7 @@ import AccordionDetails from '@mui/joy/AccordionDetails';
 import AccordionSummary from '@mui/joy/AccordionSummary';
 import Slider from '@mui/material/Slider';
 import SelfExpiringMessage from "../assets/SelfExpiringMessage.jsx";
+import CloseIcon from '@mui/icons-material/Close';
 
 const CreateFramework = ({setOfficialFrameworks, setSelectedFramework}) => {
 
@@ -239,12 +240,14 @@ const CreateFramework = ({setOfficialFrameworks, setSelectedFramework}) => {
             </AccordionDetails>
             </Accordion>
           </AccordionGroup>
-            {!showAddName && (<Button onClick={() => setShowAddName(!showAddName)}>Create Framework</Button>)}
+            {!showAddName && (<button className="cfw-button-www" onClick={() => setShowAddName(!showAddName)}>Create Framework</button>)}
             {showAddName && (<div>
-                <Button onClick={handleClose}>X</Button>
-                    <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
-                    <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
-                <Button onClick={() => handleSubmitNewFramework()}>save</Button>
+                <div className="cfw-top-controls">
+                  <button onClick={handleClose}><CloseIcon/></button>
+                  <TextField onChange={(event) => setNewFrameworkName(event.target.value)} label="Framework Name" variant="standard"/>
+                </div>  
+                  <Textarea minRows={3} size="sm" placeholder="Describe your Framework!" onChange={(event) => setDescription(event.target.value)}/>
+                <button className="cfw-button-www" onClick={() => handleSubmitNewFramework()}>save</button>
             </div>)}
         </div>}
         {showMessage && <SelfExpiringMessage message={message} onExpiry={handleCloseMessage} />}

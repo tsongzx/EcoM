@@ -5,14 +5,25 @@
     height: 400px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    overflow-y: scroll;
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: 10px;
 }
 
 .externalLink-button {
-    width: 80%;
+    width: 100%;
     border-radius: 10px;
     font-family: Inter;
+    margin-bottom: 4px;
+    cursor: pointer;
+    padding: 5px 5px;
+    margin-top: 3px;
+    border: solid 1px black;
+}
+
+.externalLink-button:hover {
+    background-color: #0c3960;
+    color: white;
 }
 
 .externalLinks-container p {

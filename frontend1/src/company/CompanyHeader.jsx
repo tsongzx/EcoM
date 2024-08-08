@@ -5,6 +5,7 @@ import {
   Stack
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import './company_css/Company.css'
 import NumericLabel from 'react-pretty-numbers';
 import {
   addToFavourites,

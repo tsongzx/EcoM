@@ -11,15 +11,16 @@ const ExternalLinks = ({ticker}) => {
             }
             setLinks(sentiment);
         }
+        console.log('inside external links');
         initExternalLinks();
     },[ticker]);
 
     return (
       <div className="externalLinks-container">
         {links.map(link => {
-            <a href={link.URL} target="_blank">
+            return (<a href={link.URL} target="_blank">
                 <button className="externalLink-button">{link["Article Title"]}</button>
-            </a>
+            </a>);
         })}
         {(links.length === 0) && <p>No Available Articles</p>}
       </div>

@@ -15,7 +15,7 @@
 .reportContent {
     flex: 1;
     height: 100vh;
-    background-color: beige;
+    background-color: none;
     margin-right: 320px;
     width: 100%;
     justify-content: center;
@@ -103,4 +103,14 @@
     font-family: Inter;
     background-color: none;
     margin: 6px 3px;
+}
+
+.download-pdf-link {
+    text-decoration: none;
+    font-family: Inter;
+    color: white;
+    background-color: #3373b0;
+    padding: 3px 5px;
+    border-radius: 10px;
+    margin-top: 10px;
 }
