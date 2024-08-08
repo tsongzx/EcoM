@@ -107,9 +107,8 @@ driver = webdriver.Chrome()
 session = SessionLocal()
 driver.get('https://sasb.ifrs.org/find-your-industry/')
 # companies = session.query(Company).all()
-companies = session.query(Company).all()
+companies = session.query(Company).filter(Company.industry == None).all()
 company_names = [company.company_name for company in companies]
-# company_names = ['Tsingtao Brewery Group Co Ltd', 'PB Financial Corp', 'PJX Resources Inc', 'Kaizen Discovery Inc', 'Study King Co Ltd']
 print(driver.title)
 form = driver.find_element(By.CLASS_NAME, 'sasb-sics-form')  # Find the search box
 searchbar = form.find_element(By.CLASS_NAME, 'form-control')
