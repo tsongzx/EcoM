@@ -1,5 +1,4 @@
 import unittest
-import models.metrics_models as metrics_models
 import metrics
 import models.company_models as company_models
 class TestMetricCalculations(unittest.TestCase):

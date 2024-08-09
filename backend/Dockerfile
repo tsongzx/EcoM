@@ -18,12 +18,12 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY . .
+COPY src/ ./src
 
 # Expose the backend server's port (e.g., 5000 for Flask)
 EXPOSE 8000
 
-ENV MODULE_NAME=main:app
+ENV MODULE_NAME=src.main:app
 ENV HOST=0.0.0.0
 ENV PORT=8000
 

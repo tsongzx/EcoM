@@ -39,7 +39,7 @@ import liveData
 import metrics
 import asyncio
 from collections import defaultdict
-import articles
+import articles as articles_module
 
 load_dotenv()
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -530,10 +530,6 @@ async def get_all_company(
         company_models.Company).all()
     return companyData
 
-# ***************************************************************
-#                        Report Apis
-# ***************************************************************
-
 
 @app.get("/company/news/sentiment", tags=["company"])
 async def get_company_news_sentiment(
@@ -922,8 +918,6 @@ async def modify_framework_metrics(
     session.commit()
 
     return {"message": f"Successfully modified framework metrics {framework_id}"}
-
-# route to delete framework - can only delete custom frameworks
 
 
 @app.delete("/framework", tags=["Framework"])
@@ -1364,7 +1358,7 @@ async def articles(
     URL: str,
 ) -> List[Dict[str, str]]:
 
-    return articles.access_articles(URL)
+    return articles_module.access_articles(URL)
 
 # URL = "https://www.pwc.com.au/environment-social-governance.html"
 
