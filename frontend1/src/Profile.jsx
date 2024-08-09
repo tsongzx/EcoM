@@ -160,19 +160,6 @@ const Profile = () => {
         }
     }
 
-    // 4) When the user presses enter or esc, it exits a text box or submits
-    const handleKeyPressEnter = (event) => {
-        if (event.key === 'Enter' || event.keyCode === 13) {
-            //submit 
-        }
-    }
-
-    const handleKeyPressEsc = (event) => {
-        if (event.key === 'Escape' || event.keyCode === 27) {
-            
-        } 
-    }
-
     const handleShowPassword = () => {
         setShowUpdatePassword(!showUpdatePassword);
         setShowUpdateName(false);

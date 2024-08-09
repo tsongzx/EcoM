@@ -9,16 +9,15 @@ const ContextMenu = ({
     buttons,
     contextMenuRef
 }) => {
-    //console.log('RENDERING A CONTEXT MENU AT ',positionX, ', ', positionY);
     return (
         <menu style={{
             top: positionY + 2 + 'px',
             left: positionX + 2 + 'px'
-        }} 
-        className={`context-menu ${isToggled ? 'active' : ''}`}
-        ref = {contextMenuRef}> 
-            
-            {buttons.map((button, index)=>{
+        }}
+            className={`context-menu ${isToggled ? 'active' : ''}`}
+            ref={contextMenuRef}>
+
+            {buttons.map((button, index) => {
                 function handleClick(e) {
                     e.stopPropagation()
                     button.onClick(e, rightClickItem);

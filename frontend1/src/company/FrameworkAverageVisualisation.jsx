@@ -39,13 +39,13 @@ const FrameworkAverageVisualisation = ({ companyName, view }) => {
   }
 
   const gradientColors = [
-    ['#FF5733', '#FFBD33'],  
-    ['#33FF57', '#33FFBD'],  
-    ['#3357FF', '#5733FF'],  
-    ['#FF33A6', '#FF33FF'],  
-    ['#FFD700', '#FF5733'],  
-    ['#00CED1', '#4682B4'],  
-    ['#8B4513', '#D2691E']   
+    ['#FF5733', '#FFBD33'],
+    ['#33FF57', '#33FFBD'],
+    ['#3357FF', '#5733FF'],
+    ['#FF33A6', '#FF33FF'],
+    ['#FFD700', '#FF5733'],
+    ['#00CED1', '#4682B4'],
+    ['#8B4513', '#D2691E']
   ];
 
   return (
@@ -64,8 +64,8 @@ const FrameworkAverageVisualisation = ({ companyName, view }) => {
                 );
               })}
               <linearGradient id='gradient' x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#BFC5FC" stopOpacity={0.4}></stop>
-                  <stop offset="75%" stopColor="#BFC5FC" stopOpacity={0.05}></stop>
+                <stop offset="0%" stopColor="#BFC5FC" stopOpacity={0.4}></stop>
+                <stop offset="75%" stopColor="#BFC5FC" stopOpacity={0.05}></stop>
               </linearGradient>
             </defs>
 
@@ -81,10 +81,8 @@ const FrameworkAverageVisualisation = ({ companyName, view }) => {
                   type="monotone"
                   dataKey={category}
                   name={category}
-                  stroke={gradientColors[index % gradientColors.length][0]} 
-                  // fill={`url(#gradient-${category})`}
+                  stroke={gradientColors[index % gradientColors.length][0]}
                   fill="url(#gradient)"
-                  // stackId="1"
                 />
               );
             })}

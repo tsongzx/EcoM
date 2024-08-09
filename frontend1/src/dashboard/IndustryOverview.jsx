@@ -30,13 +30,13 @@ const IndustryOverview = ({ selectedIndustry }) => {
         if (info[indicator].unit === 'Yes/No') {
           averages[indicator] = Math.round(curValue) === 0 ? 'No' : 'Yes';
         } else {
-          averages[indicator] = curValue; // You can format it if needed
+          averages[indicator] = curValue;
         }
       }
       setIndicatorAverages(averages);
     };
     fetchData();
-  }, [selectedIndustry]);
+  }, [selectedIndustry, indicatorInfo]);
 
   useEffect(() => {
     const getIndicatorInfo = async () => {
@@ -49,7 +49,7 @@ const IndustryOverview = ({ selectedIndustry }) => {
 
   // Prepare data for DataGrid
   const rows = Object.keys(indicatorAverages).map((indicator) => ({
-    id: indicator, // Unique identifier
+    id: indicator,
     indicator,
     source: indicatorInfo[indicator]?.source,
     pillar: indicatorInfo[indicator]?.pillar,
@@ -58,11 +58,12 @@ const IndustryOverview = ({ selectedIndustry }) => {
   }));
 
   const columns = [
-    { field: 'indicator', headerClassName: 'header', headerName: 'Indicator', flex: 3},
+    { field: 'indicator', headerClassName: 'header', headerName: 'Indicator', flex: 3 },
     { field: 'source', headerClassName: 'header', headerName: 'Source', flex: 1, align: 'right' },
     { field: 'pillar', headerClassName: 'header', headerName: 'Pillar', flex: 1, align: 'right' },
     { field: 'unit', headerClassName: 'header', headerName: 'Unit', flex: 2, align: 'right' },
-    { field: 'average', headerClassName: 'header', headerName: 'Average', flex: 2, align: 'right',
+    {
+      field: 'average', headerClassName: 'header', headerName: 'Average', flex: 2, align: 'right',
       renderCell: (params) => {
         const unit = indicatorInfo[params.row.indicator]?.unit;
         return unit === 'Yes/No' ? params.value : <NumericLabel>{params.value}</NumericLabel>;
@@ -82,25 +83,21 @@ const IndustryOverview = ({ selectedIndustry }) => {
       <Typography variant="h5">Industry Overview</Typography>
       <Typography>{description}</Typography>
 
-      <Paper 
+      <Paper
         style={{ height: '100%', width: '100%' }}
       >
         <DataGrid
           rows={rows}
           columns={columns}
-          // pageSize={10}
-          // rowsPerPageOptions={[5, 10, 25]}
-          // hideFooter={true}
           hideFooterPagination={true}
           disableSelectionOnClick
           sx={{
             '& .header': {
-              backgroundColor: '#7653bd', 
-              color: 'white', 
-              fontWeight: 'bold', 
+              backgroundColor: '#7653bd',
+              color: 'white',
+              fontWeight: 'bold',
             },
             '& .MuiDataGrid-cell': {
-              // padding: '0 16px', 
             },
             paddingBottom: 8
           }}

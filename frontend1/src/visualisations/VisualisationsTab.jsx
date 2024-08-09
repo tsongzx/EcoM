@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import VisualisationsPanel from './VisualisationsPanel';
 import { Tabs, Tab, Box } from '@mui/material';
 
@@ -32,15 +32,15 @@ const VisualisationsTab = ({ graphValues, info, categories, filterColumn, metric
         <Tab label="All" value="All" />
       </Tabs>
       {/* Rendering content based on the selected tab */}
-        <VisualisationsPanel
-          graphValues={graphValues}
-          info={info}
-          filter={filter}
-          categories={categories}
-          filterColumn={filterColumn}
-          metricInfoCard={metricInfoCard}
-        />
-      </Box>
+      <VisualisationsPanel
+        graphValues={graphValues}
+        info={info}
+        filter={filter}
+        categories={categories}
+        filterColumn={filterColumn}
+        metricInfoCard={metricInfoCard}
+      />
+    </Box>
   );
 }
 

@@ -57,8 +57,8 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
         framework: selectedFramework ?? null,
         year: null,
         selected: false
-    }));
-    console.log(compareCompanies);
+      }));
+      console.log(compareCompanies);
       navigate('/compare', { state: { companiesList: compareCompanies, selectedFramework } });
     }
   };
@@ -114,22 +114,15 @@ const CompareModal = ({ companyId, companyName, isOpen, compareModalOpen, setCom
                 placeholder="Select a company..."
                 maxMenuHeight={100}
                 loadOptions={(search, loadedOptions, additional) => {
-                  return selectedIndustry 
+                  return selectedIndustry
                     ? getCompaniesOfIndustryByBatch(search, loadedOptions, additional, selectedIndustry.label)
                     : fetchCompanies(search, loadedOptions, additional);
                 }}
                 cacheOptions
-                // getOptionValue={getOptionValue}
-                // getOptionLabel={getOptionLabel}
                 onChange={handleSelectChange}
-                // styles={{
-                //   container: base => ({ ...base, width: '73%' }),
-                //   menu: base => ({ ...base, maxHeight: '100px' }), // Set max height for the menu
-                //   menuList: base => ({ ...base, maxHeight: '100px', overflowY: 'auto' }) // Ensure only menuList has scroll
-                // }}
                 additional={{
                   page: 1,
-              }}></AsyncPaginate>
+                }}></AsyncPaginate>
               {error && (
                 <Typography variant="body2" color="error" style={{ marginTop: '10px' }}>
                   {error}

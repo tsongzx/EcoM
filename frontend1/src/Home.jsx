@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, Button } from '@mui/material';
 import LoginModal from './LoginModal';
 import RegisterModal from './RegisterModal';
-import imageCat from './assets/IMG_2678.jpg';
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
 import axios from 'axios';

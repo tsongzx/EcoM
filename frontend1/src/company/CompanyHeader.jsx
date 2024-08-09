@@ -12,10 +12,9 @@ import {
   deleteFromFavourites,
   getFrameworkAvgScore
 } from '../helper.js';
-import { gridAdditionalRowGroupsSelector } from '@mui/x-data-grid/internals';
-const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, isInFavs, 
+const CompanyHeader = ({ setWatchlistModalOpen, companyId, isInFavs,
   setIsInFavs, companyName, selectedFramework, selectedYear, indicatorsCompany,
-  sliderValuesIndicator, selectedMetrics, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, graphStateChange, ticker
+  selectedMetrics, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, graphStateChange, ticker
 }) => {
 
   const [esgScore, setESGScore] = useState(null);
@@ -25,10 +24,6 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
   const openWatchlistModal = () => {
     setWatchlistModalOpen(true);
   };
-
-  const openReportModal = () => {
-    setOpenReportModal(true);
-  }
 
   useEffect(() => {
     const getScore = async () => {
@@ -50,7 +45,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
       }
     }
     getScore();
-    
+
   }, [companyName, indicatorsCompany])
 
   const handleToggleFavourite = () => {
@@ -65,10 +60,11 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
   };
 
   const handleClickReport = () => {
-    console.log('navigating to /report/',companyId, ' ', companyName, ' fw:', selectedFramework, ' (', selectedYear,')');
-    navigate(`/report/${companyId}`, 
-      { state: { 
-          id: companyId, 
+    console.log('navigating to /report/', companyId, ' ', companyName, ' fw:', selectedFramework, ' (', selectedYear, ')');
+    navigate(`/report/${companyId}`,
+      {
+        state: {
+          id: companyId,
           companyName,
           framework: selectedFramework,
           year: selectedYear,
@@ -81,22 +77,17 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
           graphStateChange,
           selectedMetrics,
           ticker
-        } 
+        }
       });
   }
   return (
-    <Stack id="heading" direction="row" spacing={3}>
-      <Typography variant="h3">{companyName}</Typography>
-      {/* <Stack alignItems="center" justifyContent="center">
-        <Typography align="center">58.78</Typography>
-        <Typography align="center">Current Price</Typography>
-      </Stack> */}
+    <Stack id="heading" direction="row" spacing={3} sx={{ marginBottom: '10px', }}>
+      <Typography variant="h3" sx={{ fontWeight: 'bold' }}>{companyName}</Typography>
       <Stack alignItems="center" justifyContent="center">
         {esgScore && <Typography align="center"><NumericLabel>{esgScore}</NumericLabel> / 100</Typography>}
         <Typography align="center">ESG Score</Typography>
       </Stack>
       <Button onClick={handleClickReport}>Save Report</Button>
-      {/* <Button onClick={openReportModal}>Save Report</Button> */}
       <Button onClick={openWatchlistModal}>Add to List</Button>
       <Button onClick={handleToggleFavourite}>{isInFavs ? 'unlike' : 'like'}</Button>
     </Stack>
