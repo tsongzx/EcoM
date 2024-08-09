@@ -1,6 +1,6 @@
-import { Typography } from '@mui/joy';
-import { Box, Paper, Stack } from '@mui/material';
-import {React, useEffect, useState, useRef} from 'react';
+
+import { Stack } from '@mui/material';
+import { React } from 'react';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CompanySearch from '../CompanySearch';
 

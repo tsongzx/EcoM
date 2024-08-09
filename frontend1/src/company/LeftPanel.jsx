@@ -24,9 +24,9 @@ const LeftPanel = ({
   allIndicators, allIndicatorsInfo, setMetricNames, setAllIndicators,
   sliderValues, sliderValuesFixed, sliderValuesIndicatorFixed, metricNamesFixed,
   selectedMetricsFixed, allIndicatorsFixed, selectedIndicatorsFixed, sliderValuesIndicator,
-  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics, 
+  setSliderValuesIndicator, setSliderValues, selectedFramework, setCompareModalOpen, allMetrics,
   eScore, sScore, gScore,
-  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores, 
+  frameworkScore, setFrameworkScore, indicatorsCompany, selectedYear, setMetricScores,
   seteScore, setsScore, setgScore, findCategoricalMetrics, setOfficialFrameworks
 }) => {
   const navigate = useNavigate();
@@ -57,7 +57,7 @@ const LeftPanel = ({
       ...prevIndicators,
       [unselectedMetricId]: indicatorIds
     }));
-   
+
   };
 
   return (
@@ -68,80 +68,105 @@ const LeftPanel = ({
         overflow: "hidden",
         overflowY: "scroll",
       }}>
-        <Button className="left-panel-button" sx={{width: '100%'}}
-          variant="contained" color="primary" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
-          Return to Dashboard
-        </Button>
-        <Button className="left-panel-button" variant="contained" 
-          sx={{width: '100%', margin: '1vh 0'}} 
-          onClick={openCompareModal}>Compare</Button>
-        <Button className="left-panel-button" variant="contained" 
-          sx={{width: '100%', margin: '1vh 0'}} 
-          onClick={() => setExitFramework(!exitFramework)}>Exit Framework View</Button>
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column',
-          paddingTop: '1vh'
-        }}>
-          <SelectFramework
-            setSelectedFramework={setSelectedFramework}
-            setMetricNames={setMetricNames}
-            setSelectedMetrics={setSelectedMetrics}
-            setAllIndicators={setAllIndicators}
-            setSelectedIndicators={setSelectedIndicators}
-            selectedFramework={selectedFramework}
-            officialFrameworks={officialFrameworks}
-            />
-          <MetricIndicatorsCard
-            selectedIndicators={selectedIndicators}
-            selectedMetrics={selectedMetrics}
-            metricNames={metricNames}
-            setSelectedIndicators={setSelectedIndicators}
-            setSelectedMetrics={setSelectedMetrics}
-            allIndicators={allIndicators}
-            allIndicatorsInfo={allIndicatorsInfo}
-            setMetricNames={setMetricNames}
-            setAllIndicators={setAllIndicators}
-            sliderValues={sliderValues}
-            sliderValuesFixed={sliderValuesFixed}
-            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
-            metricNamesFixed={metricNamesFixed}
-            selectedMetricsFixed={selectedMetricsFixed}
-            allIndicatorsFixed={allIndicatorsFixed}
-            selectedIndicatorsFixed={selectedIndicatorsFixed}
-            sliderValuesIndicator={sliderValuesIndicator}
-            setSliderValuesIndicator={setSliderValuesIndicator}
-            setSliderValues={setSliderValues}
-            eScore={eScore}
-            sScore={sScore}
-            gScore={gScore}
-            frameworkScore={frameworkScore}
-            setFrameworkScore={setFrameworkScore}
-            indicatorsCompany={indicatorsCompany}
-            selectedYear={selectedYear}
-            setMetricScores={setMetricScores}
-            seteScore={seteScore}
-            setsScore={setsScore}
-            setgScore={setgScore}
-            findCategoricalMetrics={findCategoricalMetrics}
-            officialFrameworks={officialFrameworks}
-            selectedFramework={selectedFramework}
-          />
-          <AdditionalMetrics
-            selectedMetrics={selectedMetrics}
-            metricNames={metricNames}
-            setSelectedIndicators={setSelectedIndicators}
-            setSelectedMetrics={setSelectedMetrics}
-            setMetricNames={setMetricNames}
-            allMetrics={allMetrics}
-            setSelectedFramework={setSelectedFramework}
-            updateMetricName={updateMetricName}
-            exitFramework={exitFramework}
-            setExitFramework={setExitFramework}
-          />
-          <CreateFramework setOfficialFrameworks={setOfficialFrameworks} setSelectedFramework={setSelectedFramework} />
-        </div>
-    </Box> 
+      <Button className="left-panel-button" sx={{
+        width: '100%', backgroundColor: '#0c3960',
+        fontWeight: 'bold', padding: '6px 16px',
+        '&:hover': {
+          backgroundColor: '#e7f1fb',
+          color: '#0c3960',
+          border: 'solid 2px #0c3960',
+          padding: '5px 15px',
+        },
+      }}
+        variant="contained" startIcon={<ArrowBackIcon />} onClick={handleReturn}>
+        Return to Dashboard
+      </Button>
+      <Button className="left-panel-button" variant="contained"
+        sx={{
+          width: '100%', margin: '1vh 0', backgroundColor: '#0c3960', fontWeight: 'bold', padding: '6px 16px',
+          '&:hover': {
+            backgroundColor: '#e7f1fb',
+            color: '#0c3960',
+            border: 'solid 2px #0c3960',
+            padding: '5px 15px',
+          },
+        }}
+        onClick={openCompareModal}>Compare</Button>
+      <Button className="left-panel-button" variant="contained"
+        sx={{
+          width: '100%', margin: '1vh 0', backgroundColor: '#0c3960', fontWeight: 'bold', padding: '6px 16px',
+          '&:hover': {
+            backgroundColor: '#e7f1fb',
+            color: '#0c3960',
+            border: 'solid 2px #0c3960',
+            padding: '5px 15px',
+          },
+        }}
+        onClick={() => setExitFramework(!exitFramework)}>Exit Framework View</Button>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        paddingTop: '1vh'
+      }}>
+        <SelectFramework
+          setSelectedFramework={setSelectedFramework}
+          setMetricNames={setMetricNames}
+          setSelectedMetrics={setSelectedMetrics}
+          setAllIndicators={setAllIndicators}
+          setSelectedIndicators={setSelectedIndicators}
+          selectedFramework={selectedFramework}
+          officialFrameworks={officialFrameworks}
+        />
+        <MetricIndicatorsCard
+          selectedIndicators={selectedIndicators}
+          selectedMetrics={selectedMetrics}
+          metricNames={metricNames}
+          setSelectedIndicators={setSelectedIndicators}
+          setSelectedMetrics={setSelectedMetrics}
+          allIndicators={allIndicators}
+          allIndicatorsInfo={allIndicatorsInfo}
+          setMetricNames={setMetricNames}
+          setAllIndicators={setAllIndicators}
+          sliderValues={sliderValues}
+          sliderValuesFixed={sliderValuesFixed}
+          sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+          metricNamesFixed={metricNamesFixed}
+          selectedMetricsFixed={selectedMetricsFixed}
+          allIndicatorsFixed={allIndicatorsFixed}
+          selectedIndicatorsFixed={selectedIndicatorsFixed}
+          sliderValuesIndicator={sliderValuesIndicator}
+          setSliderValuesIndicator={setSliderValuesIndicator}
+          setSliderValues={setSliderValues}
+          eScore={eScore}
+          sScore={sScore}
+          gScore={gScore}
+          frameworkScore={frameworkScore}
+          setFrameworkScore={setFrameworkScore}
+          indicatorsCompany={indicatorsCompany}
+          selectedYear={selectedYear}
+          setMetricScores={setMetricScores}
+          seteScore={seteScore}
+          setsScore={setsScore}
+          setgScore={setgScore}
+          findCategoricalMetrics={findCategoricalMetrics}
+          officialFrameworks={officialFrameworks}
+          selectedFramework={selectedFramework}
+        />
+        <AdditionalMetrics
+          selectedMetrics={selectedMetrics}
+          metricNames={metricNames}
+          setSelectedIndicators={setSelectedIndicators}
+          setSelectedMetrics={setSelectedMetrics}
+          setMetricNames={setMetricNames}
+          allMetrics={allMetrics}
+          setSelectedFramework={setSelectedFramework}
+          updateMetricName={updateMetricName}
+          exitFramework={exitFramework}
+          setExitFramework={setExitFramework}
+        />
+        <CreateFramework setOfficialFrameworks={setOfficialFrameworks} setSelectedFramework={setSelectedFramework} />
+      </div>
+    </Box>
   );
 }
 

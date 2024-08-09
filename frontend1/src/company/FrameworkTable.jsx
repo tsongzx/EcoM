@@ -17,13 +17,12 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getPrediction } from '../helper';
 
-const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear, 
+const FrameworkTable = ({ indicatorsCompany, selectedYear, setSelectedYear,
   companyName, availableYears, selectedFramework, selectedIndicators, metricNames, allIndicators,
   metricScores, allIndicatorsInfo
 }) => {
   const [tableCollapsed, setTableCollapsed] = useState(false);
   const [predictedScore, setPredictedScore] = useState({});
-  const [indicatorsInSelectedFramework, setIndicatorsInSelectedFramework] = useState({});
 
   console.log(`All of Framework Table's stuff (indicatorsCompany)`);
   console.log(indicatorsCompany);
@@ -40,8 +39,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
         .filter(([_, value]) => selectedIds.includes(value.id))
     );
     console.log(filteredPredictedScore);
-    setIndicatorsInSelectedFramework(filteredPredictedScore);
-  }, [selectedIndicators]);
+  }, [selectedIndicators, predictedScore]);
 
   const findIndicatorValue = (indicatorName) => {
     if (indicatorName in indicatorsCompany[Number(selectedYear)]) {
@@ -66,7 +64,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
       let score = await getPrediction(indicator.name, indicator.unit, companyName);
       if (score) {
         let newObj = {};
-        newObj['id'] = indicator.id; 
+        newObj['id'] = indicator.id;
         newObj['indicator_name'] = score.indicator_name;
         newObj['prediction'] = score.prediction;
         allPredictedScores[score.indicator_id] = newObj;
@@ -85,37 +83,37 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
   }
 
   return (
-    <Card style={{ width: '100%', display: 'flex', flexDirection: 'column'}}>
+    <Card style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       <IconButton onClick={() => setTableCollapsed(!tableCollapsed)} size="large">
         See table
         {tableCollapsed ? <ExpandMoreIcon /> : <ExpandLessIcon />}
       </IconButton>
       <Collapse in={!tableCollapsed}>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h2>{companyName}</h2>
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '30px'}}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: '30px' }}>
             {availableYears.map((year) => (
               <Button
                 key={year}
                 onClick={() => handleYearChange(year)}
                 sx={{
                   borderRadius: 1,
-                  boxShadow: (theme) => 
-                    selectedYear === year 
-                      ? `0px 8px 16px ${theme.palette.grey[700]}` // 3D effect for selected button
-                      : `0px 4px 8px ${theme.palette.grey[500]}`, // 2D effect for unselected buttons
+                  boxShadow: (theme) =>
+                    selectedYear === year
+                      ? `0px 8px 16px ${theme.palette.grey[700]}`
+                      : `0px 4px 8px ${theme.palette.grey[500]}`,
                   transition: 'transform 0.2s, box-shadow 0.2s',
-                  backgroundColor: (theme) => selectedYear === year ? '#6D28D9' : '#B4B2FC', // Dark purple for selected, light purple for others
+                  backgroundColor: (theme) => selectedYear === year ? '#6D28D9' : '#B4B2FC',
                   color: (theme) => selectedYear === year ? theme.palette.primary.contrastText : 'black',
-                  margin: '0 8px', // Space between buttons
-                  transform: selectedYear === year ? 'translateY(-4px)' : 'translateY(0)', // Elevate selected button
+                  margin: '0 5px',
+                  transform: selectedYear === year ? 'translateY(-4px)' : 'translateY(0)',
                   '&:hover': {
-                    boxShadow: (theme) => 
-                      selectedYear === year 
-                        ? `0px 10px 20px ${theme.palette.grey[700]}` // Darker shadow for selected on hover
-                        : `0px 6px 12px ${theme.palette.grey[600]}`, // Slightly darker shadow for unselected on hover
+                    boxShadow: (theme) =>
+                      selectedYear === year
+                        ? `0px 10px 20px ${theme.palette.grey[700]}`
+                        : `0px 6px 12px ${theme.palette.grey[600]}`,
                     transform: 'translateY(-2px)',
-                    backgroundColor: (theme) => selectedYear === year ? '#6D28D9' : '#A6A6FF', // Slightly different color on hover
+                    backgroundColor: (theme) => selectedYear === year ? '#6D28D9' : '#A6A6FF',
                   },
                 }}
               >
@@ -215,7 +213,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
           </Grid>
         )}
         {!selectedFramework && (
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             {selectedYear && indicatorsCompany[selectedYear] && selectedYear !== 'Predicted' && (
               <TableContainer component={Paper} style={{ marginTop: '40px' }}>
                 <Table>
@@ -228,7 +226,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                   </TableHead>
                   <TableBody>
                     {(selectedYear !== 'Predicted') && Object.values(indicatorsCompany[selectedYear]).map((indicator, index) => (
-                      
+
                       <TableRow key={index}>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>{indicator.indicator_name}</TableCell>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>{getName(Object.values(allIndicatorsInfo).find(item => item.name === indicator.indicator_name).unit)}</TableCell>

@@ -18,7 +18,7 @@ const ExternalLinks = ({ticker}) => {
     return (
       <div className="externalLinks-container">
         {links.map(link => {
-            return (<a href={link.URL} target="_blank">
+            return (<a href={link.URL} target="_blank" rel="noreferrer">
                 <button className="externalLink-button">{link["Article Title"]}</button>
             </a>);
         })}

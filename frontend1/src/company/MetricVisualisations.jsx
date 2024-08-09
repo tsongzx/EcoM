@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { getIndicatorsForMetric, getMetricBarGraph, getAllMetricsAvailable, getMetricScoreByYear } from '../helper';
+import { getMetricBarGraph, getAllMetricsAvailable } from '../helper';
 import VisualisationsTab from '../visualisations/VisualisationsTab';
 import { Box, Stack } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import CircularLoader from '../utils/CircularLoader.jsx';
 
-const MetricVisualisations = ({selectedFramework, selectedMetrics, graphStateChange, companyName, companyIndicators}) => {
+const MetricVisualisations = ({ selectedFramework, selectedMetrics, graphStateChange, companyName, companyIndicators }) => {
 
   console.log(selectedFramework);
   const [graphValues, setGraphValues] = useState({});
   const [metricInfo, setMetricInfo] = useState({});
   const [loading, setLoading] = useState(false);
   useEffect(() => {
-    const getMetricData = async() => {
+    const getMetricData = async () => {
       const metricsByCategory = await getAllMetricsAvailable();
       const allMetrics = [...metricsByCategory['E'], ...metricsByCategory['S'], ...metricsByCategory['G']]
 
@@ -60,7 +60,7 @@ const MetricVisualisations = ({selectedFramework, selectedMetrics, graphStateCha
   //           [companyName]: score
   //         })
   //       }
-        
+
   //       metricScores[idMetric] = metricList;
   //     }
   //     console.log(metricScores);
@@ -98,7 +98,7 @@ const MetricVisualisations = ({selectedFramework, selectedMetrics, graphStateCha
           <Skeleton variant="rectangular" height="25vh" />
         </Stack>
       )}
-      {loading ? <CircularLoader/> : null}
+      {loading ? <CircularLoader /> : null}
     </Box>
   );
 }

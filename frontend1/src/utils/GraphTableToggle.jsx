@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { Box } from '@mui/material';
 
-const GraphTableToggle = ({display, setDisplay, props}) => {
+const GraphTableToggle = ({ display, setDisplay, props }) => {
   const handleChange = (event, newDisplay) => {
     // console.log(event.target.innerText);
     console.log(newDisplay);
@@ -21,15 +21,15 @@ const GraphTableToggle = ({display, setDisplay, props}) => {
       }}
     >
       <ToggleButtonGroup
-      color="primary"
-      value={display}
-      exclusive
-      onChange={handleChange}
-      aria-label="Display"
-    >
-      <ToggleButton value="tabular">TABULAR</ToggleButton>
-      <ToggleButton value="graphical">GRAPHICAL</ToggleButton>
-    </ToggleButtonGroup>
+        color="primary"
+        value={display}
+        exclusive
+        onChange={handleChange}
+        aria-label="Display"
+      >
+        <ToggleButton value="tabular">TABULAR</ToggleButton>
+        <ToggleButton value="graphical">GRAPHICAL</ToggleButton>
+      </ToggleButtonGroup>
     </Box>
   );
 }

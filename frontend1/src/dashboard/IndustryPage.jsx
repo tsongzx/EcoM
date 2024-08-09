@@ -8,7 +8,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import NumericLabel from 'react-pretty-numbers';
 
 const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   const navigate = useNavigate();
@@ -18,7 +17,6 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   const [companies, setCompanies] = useState([]);
   const [numPages, setNumPages] = useState(0);
   const [curPage, setCurPage] = useState(1);
-  const [esgScore, setESGScore] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,7 +36,6 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
       console.log(companyNames);
       const avgScore = await getFrameworkAvgScore(companyNames, 2024);
       console.log(avgScore);
-      setESGScore(avgScore);
     }
     getScore();
   }, [companies])
@@ -60,12 +57,13 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   };
 
   const handleRowClick = (companyId, companyName) => {
-    navigate(`/company/${encodeURIComponent(companyId)}`, 
-      { state: { 
-          companyId, 
+    navigate(`/company/${encodeURIComponent(companyId)}`,
+      {
+        state: {
+          companyId,
           companyName,
           initialFramework: null
-        } 
+        }
       });
   };
 
@@ -78,7 +76,8 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', 
+    <Box sx={{
+      display: 'flex',
       height: 'calc(67vh - 50px)'
     }}>
       <Box
@@ -98,7 +97,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
             <Button variant="text" onClick={handleSelectAll}>Select All</Button>
           </Grid>
           <Grid item xs={6} key={'deselect'}>
-            <Button variant="text" onClick={handleDeselectAll}>Deselect All</Button>  
+            <Button variant="text" onClick={handleDeselectAll}>Deselect All</Button>
           </Grid>
         </Grid>
         <Stack direction="row" spacing={3}>
@@ -108,7 +107,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
             <Grid container spacing={2}>
               {headquarterCountries.map((country, index) => (
                 <Grid item xs={6} key={index}>
-                  <FormControlLabel 
+                  <FormControlLabel
                     control={
                       <Checkbox
                         name={country}
@@ -128,7 +127,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
           overflowY: 'scroll'
         }}
       >
-        <Pagination page={curPage} count={numPages} onChange={(event, value) => setCurPage(value)} color="secondary"/>
+        <Pagination page={curPage} count={numPages} onChange={(event, value) => setCurPage(value)} color="secondary" />
         <TableContainer component={Paper}
           sx={{
             boxSizing: 'border-box',
@@ -156,7 +155,7 @@ const IndustryPage = ({ selectedIndustry, setSelectedCompany }) => {
             <TableBody>
               {companies?.map((company, index) => (
                 <TableRow key={index}
-                  onClick={() => handleRowClick(company.id, company.company_name)} 
+                  onClick={() => handleRowClick(company.id, company.company_name)}
                   hover
                   style={{ cursor: 'pointer' }}
                 >

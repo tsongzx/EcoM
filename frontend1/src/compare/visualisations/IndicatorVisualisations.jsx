@@ -1,4 +1,4 @@
-import {React, useEffect, useState} from 'react';
+import { React, useEffect, useState } from 'react';
 import {
   Stack,
   Box
@@ -8,21 +8,17 @@ import VisualisationsTab from '../../visualisations/VisualisationsTab.jsx';
 import Skeleton from '@mui/material/Skeleton';
 import CircularLoader from '../../utils/CircularLoader.jsx';
 
-const IndicatorVisualisation = ({companies}) => {
-  // const [companyMap, setCompanyMap] = useState(companies.reduce((map, company) => {
-  //   map[company.id] = company.companyName;
-  //   return map;
-  // }, {}));
+const IndicatorVisualisation = ({ companies }) => {
   const [indicatorDict, setIndicatorDict] = useState({});
   const [graphValues, setGraphValues] = useState({});
 
-  const [selectedYears, setSelectedYears] = useState([]);  
+  const [selectedYears, setSelectedYears] = useState([]);
   const [indicatorInfo, setIndicatorInfo] = useState({});
-    
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getIndicatorInfo = async() => {
+    const getIndicatorInfo = async () => {
       const info = await getIndicatorsInfoByName();
       console.log(info);
       setIndicatorInfo(info);
@@ -33,12 +29,12 @@ const IndicatorVisualisation = ({companies}) => {
   useEffect(() => {
     const fetchData = async () => {
       const indicatorDict = await getIndicatorBarGraph(companies);
-      setIndicatorDict(indicatorDict);  
+      setIndicatorDict(indicatorDict);
       console.log(indicatorDict);
     }
     fetchData();
   }, [companies, selectedYears]);
-  
+
   useEffect(() => {
     setLoading(true);
     let graph = {};
@@ -48,7 +44,6 @@ const IndicatorVisualisation = ({companies}) => {
         graph[indicator] = [...graph[indicator], indicatorDict[indicator][year]];
       });
     })
-    // console.log(graph);
     setGraphValues(graph);
     setLoading(false);
   }, [indicatorDict])
@@ -65,7 +60,7 @@ const IndicatorVisualisation = ({companies}) => {
 
   return (
     <Box>
-      { isDataReady() ?
+      {isDataReady() ?
         (<VisualisationsTab info={indicatorInfo} graphValues={graphValues}
           categories={companies} filterColumn={'pillar'} metricInfoCard={false}
         ></VisualisationsTab>) : (
@@ -73,10 +68,10 @@ const IndicatorVisualisation = ({companies}) => {
             <Skeleton variant="rectangular" height="5vh" />
             <Skeleton variant="rectangular" height="25vh" />
             <Skeleton variant="rectangular" height="25vh" />
-            <Skeleton variant="rectangular" height="25vh" />         
+            <Skeleton variant="rectangular" height="25vh" />
           </Stack>
-      )}
-      {loading ? <CircularLoader/> : null}
+        )}
+      {loading ? <CircularLoader /> : null}
     </Box>
   );
 }

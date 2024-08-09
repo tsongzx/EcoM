@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import Navbar from '../navbar/Navbar.jsx';
@@ -16,14 +16,12 @@ import {
   getAllMetricsAvailable,
   getMetricScoreByYear,
   getIndicatorFromMetric,
-  companyScoreGeneral,
   fetchCompanyInfo
 
 } from '../helper.js';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-import CreateFramework from './CreateFramework.jsx';
 import LeftPanel from './LeftPanel.jsx';
 import FrameworkTable from './FrameworkTable';
 import CompanyHeader from './CompanyHeader.jsx';
@@ -34,11 +32,10 @@ import Visualisations from './Visualisations.jsx';
 // This component renders the general company page once the user has chosen a company to view.
 const Company = () => {
   const location = useLocation();
-  const { companyId: initialCompanyId, companyName: initialCompanyName, initialFramework, selectedIndustry } = location.state || {};
+  const { companyId: initialCompanyId, companyName: initialCompanyName, initialFramework } = location.state || {};
   const [companyName, setCompanyName] = useState(initialCompanyName);
   const [watchlistModalOpen, setWatchlistModalOpen] = useState(false);
   const [compareModalOpen, setCompareModalOpen] = useState(false);
-  const [reportModal, setOpenReportModal] = useState(false);
   const [isInFavs, setIsInFavs] = useState(false);
   const [officialFrameworks, setOfficialFrameworks] = useState([]);
   const [selectedFramework, setSelectedFramework] = useState(initialFramework);
@@ -89,7 +86,7 @@ const Company = () => {
   }, [window.location.href]);
 
   useEffect(() => {
-    const fetchCompanyIndicators = async(companyName) => {
+    const fetchCompanyIndicators = async (companyName) => {
       const allMetricsAvailable = await getAllMetricsAvailable();
       setAllMetrics(allMetricsAvailable);
       const allIndicators1 = await getAllIndicators();
@@ -100,7 +97,7 @@ const Company = () => {
       years.push('Predicted');
       setAvailableYears(years);
       if (years.length > 0) {
-        setSelectedYear(years[years.length - 2]); 
+        setSelectedYear(years[years.length - 2]);
       }
     };
 
@@ -124,7 +121,7 @@ const Company = () => {
       years.push('Predicted');
       setAvailableYears(years);
       if (years.length > 0) {
-        setSelectedYear(years[years.length - 2]); 
+        setSelectedYear(years[years.length - 2]);
       }
     }
 
@@ -133,7 +130,7 @@ const Company = () => {
     } else {
       alternativeFetch();
     }
-    
+
   }, []);
 
   useEffect(() => {
@@ -180,7 +177,7 @@ const Company = () => {
           setMetricNamesFixed(nameOfMetrics);
           setSelectedMetrics(metricIds);
           setSelectedMetricsFixed(metricIds);
-          
+
           const newAllIndicators = {};
           for (let id of metricIds) {
             const indicators = await getIndicatorsForMetric(parseInt(selectedFramework), parseInt(id));
@@ -189,7 +186,7 @@ const Company = () => {
 
           setAllIndicators(newAllIndicators);
           setAllIndicatorsFixed(newAllIndicators);
-          
+
           const newSelectedIndicators = {};
           for (const id of metricIds) {
             newSelectedIndicators[id] = newAllIndicators[id].map(indicator => indicator.indicator_id);
@@ -226,7 +223,7 @@ const Company = () => {
 
   useEffect(() => {
     setGraphStateChange(!graphStateChange);
-    const runScore = async() => {
+    const runScore = async () => {
       let metricScoreMock = {};
       for (let idMetric of selectedMetrics) {
         const indicatorsInfo = await getIndicatorFromMetric(idMetric);
@@ -245,8 +242,8 @@ const Company = () => {
           }
         } else {
           correspondingScore = 0;
-        }        
-        
+        }
+
         let obj1 = {};
         obj1["score"] = correspondingScore;
         metricScoreMock[idMetric] = obj1;
@@ -285,7 +282,7 @@ const Company = () => {
       return acc;
     }, {});
 
-    metricScoreMockReduced =  Object.values(metricScoreMockReduced);
+    metricScoreMockReduced = Object.values(metricScoreMockReduced);
     metricScoreMockReduced = metricScoreMockReduced.map(item => ({
       score: parseFloat(item.score),
       weighting: parseFloat(item.weighting)
@@ -300,7 +297,7 @@ const Company = () => {
       console.error('No authToken cookie found');
     }
     try {
-      const response = await axios.post(
+      await axios.post(
         `http://127.0.0.1:8000/recently_viewed?company_id=${cId}`,
         {},
         {
@@ -331,45 +328,45 @@ const Company = () => {
       }}>
         {/* Everything observed on the left hand side of the screen */}
         <LeftPanel
-            setSelectedFramework={setSelectedFramework}
-            officialFrameworks={officialFrameworks}
-            selectedIndicators={selectedIndicators}
-            selectedMetrics={selectedMetrics}
-            metricNames={metricNames}
-            setSelectedIndicators={setSelectedIndicators}
-            setSelectedMetrics={setSelectedMetrics}
-            allIndicators={allIndicators}
-            allIndicatorsInfo={allIndicatorsInfo}
-            setMetricNames={setMetricNames}
-            setAllIndicators={setAllIndicators}
-            sliderValues={sliderValues}
-            sliderValuesFixed={sliderValuesFixed}
-            sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
-            metricNamesFixed={metricNamesFixed}
-            selectedMetricsFixed={selectedMetricsFixed}
-            allIndicatorsFixed={allIndicatorsFixed}
-            selectedIndicatorsFixed={selectedIndicatorsFixed}
-            sliderValuesIndicator={sliderValuesIndicator}
-            setSliderValuesIndicator={setSliderValuesIndicator}
-            setSliderValues={setSliderValues}
-            selectedFramework={selectedFramework}
-            setCompareModalOpen={setCompareModalOpen}
-            allMetrics={allMetrics}
-            eScore={eScore}
-            sScore={sScore}
-            gScore={gScore}
-            frameworkScore={frameworkScore}
-            setFrameworkScore={setFrameworkScore}
-            indicatorsCompany={indicatorsCompany}
-            selectedYear={selectedYear}
-            setMetricScores={setMetricScores}
-            seteScore={seteScore}
-            setsScore={setsScore}
-            setgScore={setgScore}
-            findCategoricalMetrics={findCategoricalMetrics}
-            setOfficialFrameworks={setOfficialFrameworks}
+          setSelectedFramework={setSelectedFramework}
+          officialFrameworks={officialFrameworks}
+          selectedIndicators={selectedIndicators}
+          selectedMetrics={selectedMetrics}
+          metricNames={metricNames}
+          setSelectedIndicators={setSelectedIndicators}
+          setSelectedMetrics={setSelectedMetrics}
+          allIndicators={allIndicators}
+          allIndicatorsInfo={allIndicatorsInfo}
+          setMetricNames={setMetricNames}
+          setAllIndicators={setAllIndicators}
+          sliderValues={sliderValues}
+          sliderValuesFixed={sliderValuesFixed}
+          sliderValuesIndicatorFixed={sliderValuesIndicatorFixed}
+          metricNamesFixed={metricNamesFixed}
+          selectedMetricsFixed={selectedMetricsFixed}
+          allIndicatorsFixed={allIndicatorsFixed}
+          selectedIndicatorsFixed={selectedIndicatorsFixed}
+          sliderValuesIndicator={sliderValuesIndicator}
+          setSliderValuesIndicator={setSliderValuesIndicator}
+          setSliderValues={setSliderValues}
+          selectedFramework={selectedFramework}
+          setCompareModalOpen={setCompareModalOpen}
+          allMetrics={allMetrics}
+          eScore={eScore}
+          sScore={sScore}
+          gScore={gScore}
+          frameworkScore={frameworkScore}
+          setFrameworkScore={setFrameworkScore}
+          indicatorsCompany={indicatorsCompany}
+          selectedYear={selectedYear}
+          setMetricScores={setMetricScores}
+          seteScore={seteScore}
+          setsScore={setsScore}
+          setgScore={setgScore}
+          findCategoricalMetrics={findCategoricalMetrics}
+          setOfficialFrameworks={setOfficialFrameworks}
         />
-        <Box component="main" sx={{ 
+        <Box component="main" sx={{
           width: '70vw',
           padding: '2vh 1vw 0 1vw',
           overflow: "hidden",
@@ -380,9 +377,8 @@ const Company = () => {
           {/* Top center half of the screen */}
           <CompanyHeader
             setWatchlistModalOpen={setWatchlistModalOpen}
-            setOpenReportModal={setOpenReportModal}
             companyId={companyId}
-            isInFavs={isInFavs} 
+            isInFavs={isInFavs}
             setIsInFavs={setIsInFavs}
             companyName={companyName}
             selectedFramework={selectedFramework}
@@ -398,7 +394,7 @@ const Company = () => {
             graphStateChange={graphStateChange}
             ticker={ticker}
           />
-          <CompanyBody 
+          <CompanyBody
             companyId={companyId} companyName={companyName} ticker={ticker}
           />
           <GraphTableToggle
@@ -409,7 +405,7 @@ const Company = () => {
           {frameworkDisplay === 'tabular' && <FrameworkTable
             indicatorsCompany={indicatorsCompany}
             selectedYear={selectedYear}
-            setSelectedYear={setSelectedYear} 
+            setSelectedYear={setSelectedYear}
             companyName={companyName}
             availableYears={availableYears}
             selectedFramework={selectedFramework}
@@ -419,8 +415,8 @@ const Company = () => {
             metricScores={metricScores}
             allIndicatorsInfo={allIndicatorsInfo}
           />}
-          {frameworkDisplay === 'graphical' && <Visualisations selectedMetrics={selectedMetrics} graphStateChange={graphStateChange} selectedFramework={selectedFramework} companyIndicators={indicatorsCompany} companyName={companyName}/>}
-          <CompareModal companyId={companyId} companyName={companyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework}/>
+          {frameworkDisplay === 'graphical' && <Visualisations selectedMetrics={selectedMetrics} graphStateChange={graphStateChange} selectedFramework={selectedFramework} companyIndicators={indicatorsCompany} companyName={companyName} />}
+          <CompareModal companyId={companyId} companyName={companyName} isOpen={compareModalOpen} compareModalOpen={compareModalOpen} setCompareModalOpen={setCompareModalOpen} selectedFramework={selectedFramework} />
         </Box>
       </Box>
     </Box>

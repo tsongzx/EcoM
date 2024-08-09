@@ -16,7 +16,6 @@ const styles = StyleSheet.create({
 
 const ReportTableRow = ({ items }) => {
   const rows = items.map((item) => (
-    //<View style={styles.row} key={item.sr.toString()}> should have a key
     <View style={styles.row}>
       <Text style={styles.description}>itemDesc</Text>
       <Text style={styles.description}>itemDesc</Text>

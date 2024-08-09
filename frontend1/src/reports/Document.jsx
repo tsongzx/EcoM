@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react';
-import { Page, Text, Image, Document, StyleSheet, View, Font } from '@react-pdf/renderer';
+import { Page, Text, Document, StyleSheet } from '@react-pdf/renderer';
 import ReportFrameworkTable from './ReportFrameworkTable';
 import ReportGraphContainer from './ReportGraphContainer';
-import ReactPDFChart from "react-pdf-charts";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 //Register Fonts
 // Font.register({
 //   family: "Open Sans",
@@ -17,99 +15,54 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 
 // Create styles
 const styles = StyleSheet.create({
-    body: {
-      paddingTop: 35,
-      paddingBottom: 65,
-      paddingHorizontal: 35,
-    },
-    title: {
-      fontSize: 24,
-      textAlign: 'center',
-      fontFamily: 'Times-Roman'
-    },
-    author: {
-      fontSize: 12,
-      textAlign: 'center',
-      marginBottom: 40,
-    },
-    subtitle: {
-      fontSize: 18,
-      margin: 12,
-      fontFamily: 'Times-Roman'
-    },
-    text: {
-      margin: 12,
-      fontSize: 14,
-      textAlign: 'justify',
-      fontFamily: 'Times-Roman'
-    },
-    image: {
-      marginVertical: 15,
-      marginHorizontal: 100,
-    },
-    header: {
-      fontSize: 12,
-      marginBottom: 20,
-      textAlign: 'center',
-      color: 'grey',
-    },
-    pageNumber: {
-      position: 'absolute',
-      fontSize: 12,
-      bottom: 30,
-      left: 0,
-      right: 0,
-      textAlign: 'center',
-      color: 'grey',
-    },
-  });
+  body: {
+    paddingTop: 35,
+    paddingBottom: 65,
+    paddingHorizontal: 35,
+  },
+  title: {
+    fontSize: 24,
+    textAlign: 'center',
+    fontFamily: 'Times-Roman'
+  },
+  author: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  subtitle: {
+    fontSize: 18,
+    margin: 12,
+    fontFamily: 'Times-Roman'
+  },
+  text: {
+    margin: 12,
+    fontSize: 14,
+    textAlign: 'justify',
+    fontFamily: 'Times-Roman'
+  },
+  image: {
+    marginVertical: 15,
+    marginHorizontal: 100,
+  },
+  header: {
+    fontSize: 12,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: 'grey',
+  },
+  pageNumber: {
+    position: 'absolute',
+    fontSize: 12,
+    bottom: 30,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: 'grey',
+  },
+});
 
-  const data = [
-    {
-      name: 'Page A',
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: 'Page B',
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: 'Page C',
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: 'Page D',
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: 'Page E',
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: 'Page F',
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: 'Page G',
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
-
-export const ReportDoc = ({contentList, companyId, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, predictedScore, graphStateChange, selectedMetrics, indicatorInfo, graphValues}) => {
+export const ReportDoc = ({ contentList, companyId, companyName, framework, year, indicatorsCompany, selectedIndicators, metricNames, allIndicators, metricScores, allIndicatorsInfo, predictedScore, graphStateChange, selectedMetrics, indicatorInfo, graphValues }) => {
   //content list is what is from Report.jsx
   const headerTypes = ['country', 'year', 'industry', 'longSummary'];
 
@@ -117,11 +70,11 @@ export const ReportDoc = ({contentList, companyId, companyName, framework, year,
     console.log('Inside ReportDocument');
     console.log(contentList);
 
-  },[contentList]);
+  }, [contentList]);
 
   return (
-    <Document> 
-        <Page size="A4" style={styles.body}>
+    <Document>
+      <Page size="A4" style={styles.body}>
 
         {/* Title Page mapping */}
         {contentList.map(c => {
@@ -133,44 +86,44 @@ export const ReportDoc = ({contentList, companyId, companyName, framework, year,
           }
           // probably disallow textboxes to show on title page
         })}
-        </Page>
-        <Page style={styles.body}>
-          {contentList.map(c => {
-            if (c.type === 'text' && c.isDisplayed) {
-              return <Text style={{ ...styles.text, ...{fontWeight: c.fw, fontStyle: c.italic} }}>
-                {c.name}
-              </Text>
-            }
-            else if (c.type === 'table' && c.isDisplayed) {
-              return <ReportFrameworkTable 
-                indicatorsCompany={indicatorsCompany}
-                selectedYear={year}
-                selectedFramework={framework}
-                selectedIndicators={selectedIndicators}
-                metricNames={metricNames}
-                allIndicators={allIndicators}
-                metricScores={metricScores}
-                allIndicatorsInfo={allIndicatorsInfo}
-                predictedScore={predictedScore}
-              />
-            }
+      </Page>
+      <Page style={styles.body}>
+        {contentList.map(c => {
+          if (c.type === 'text' && c.isDisplayed) {
+            return <Text style={{ ...styles.text, ...{ fontWeight: c.fw, fontStyle: c.italic } }}>
+              {c.name}
+            </Text>
+          }
+          else if (c.type === 'table' && c.isDisplayed) {
+            return <ReportFrameworkTable
+              indicatorsCompany={indicatorsCompany}
+              selectedYear={year}
+              selectedFramework={framework}
+              selectedIndicators={selectedIndicators}
+              metricNames={metricNames}
+              allIndicators={allIndicators}
+              metricScores={metricScores}
+              allIndicatorsInfo={allIndicatorsInfo}
+              predictedScore={predictedScore}
+            />
+          }
 
-            else if (c.type === 'iGraph' && c.isDisplayed) {
-              return <ReportGraphContainer graphValues={graphValues} info={indicatorInfo} categories={[companyName]}/>
-              // return (
-              //   <ReactPDFChart>
-              //     <LineChart data={data} height={300} width={500}>
-              //       <XAxis dataKey="name" />
-              //       <YAxis />
-              //       <CartesianGrid stroke="#eee" strokeDasharray="5" />
-              //       <Line type="monotone" dataKey="uv" stroke="#8884d8" />
-              //       <Line type="monotone" dataKey="pv" stroke="#82ca9d" />
-              //     </LineChart>
-              //   </ReactPDFChart>
-              // )
-            }
-          })}
-        </Page>
-  </Document>
+          else if (c.type === 'iGraph' && c.isDisplayed) {
+            return <ReportGraphContainer graphValues={graphValues} info={indicatorInfo} categories={[companyName]} />
+            // return (
+            //   <ReactPDFChart>
+            //     <LineChart data={data} height={300} width={500}>
+            //       <XAxis dataKey="name" />
+            //       <YAxis />
+            //       <CartesianGrid stroke="#eee" strokeDasharray="5" />
+            //       <Line type="monotone" dataKey="uv" stroke="#8884d8" />
+            //       <Line type="monotone" dataKey="pv" stroke="#82ca9d" />
+            //     </LineChart>
+            //   </ReactPDFChart>
+            // )
+          }
+        })}
+      </Page>
+    </Document>
   );
 }

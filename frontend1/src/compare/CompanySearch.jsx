@@ -1,19 +1,17 @@
-import React, {useState, useEffect} from "react";
+import React, { useState } from "react";
 import { fetchCompanies } from "../helper";
-import {MenuItem } from "@mui/material";
-import Select from 'react-select';
 import { AsyncPaginate } from "react-select-async-paginate";
 
 //takes in a function that retuns which company id was send
-const CompanySearch = ({handleSelectedCompanyId, props}) => {
-    const [selected, setSelected] = useState(null);
+const CompanySearch = ({ handleSelectedCompanyId, props }) => {
+  const [selected, setSelected] = useState(null);
 
-    const handleOnSubmit = (selectedOption) => {
-        setSelected(null);
-        handleSelectedCompanyId(selectedOption.value, selectedOption.label);
-    }
-    return (
-      <AsyncPaginate
+  const handleOnSubmit = (selectedOption) => {
+    setSelected(null);
+    handleSelectedCompanyId(selectedOption.value, selectedOption.label);
+  }
+  return (
+    <AsyncPaginate
       id='companyfilter'
       placeholder="Select Company"
       maxMenuHeight={100}
@@ -22,19 +20,19 @@ const CompanySearch = ({handleSelectedCompanyId, props}) => {
       value={selected}
       styles={{
         control: (provided) => ({
-            ...provided,
-            ...props,
+          ...provided,
+          ...props,
         }),
         menu: (provided) => ({
-            ...provided,
-            ...props
+          ...provided,
+          ...props
         }),
       }}
       onChange={(selectedOption) => handleOnSubmit(selectedOption)}
       additional={{
-          page: 1,
+        page: 1,
       }}></AsyncPaginate>
-    );
+  );
 }
 
 export default CompanySearch;

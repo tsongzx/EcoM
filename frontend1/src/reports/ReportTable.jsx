@@ -12,9 +12,7 @@ const styles = StyleSheet.create({
 //NOTE Documents have to be the parent element and its children can only be of type <Page/>
 const ReportTable = ({ data }) => (
   <View style={styles.tableContainer}>
-    {/*<TableHeader />*/}
     <ReportTableRow items={data.items} />
-    {/*<TableFooter items={data.items} />*/}
   </View>
 );
 
