@@ -1,6 +1,5 @@
 from typing import Literal
 import asyncio
-from urllib.parse import urljoin
 from sklearn.linear_model import LinearRegression
 from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -36,14 +35,13 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import requests
-from bs4 import BeautifulSoup
 import liveData
 import metrics
 import asyncio
 from collections import defaultdict
+import articles
 
 load_dotenv()
-print(os.environ.get("OPENAI_API_KEY"))
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 alpha_client = os.getenv("ALPHA_VANTAGE_API_KEY")
 
@@ -140,9 +138,6 @@ async def get_user(
 ) -> user_schemas.UserInDB:
     token_data = await is_authenticated(session, token)
     user = get_user_using_id(session, id=token_data.userId)
-    # this shouldn't happen i think so probs can remove
-    # if user is None:
-    #     raise credentials_exception
     return user
 
 
@@ -153,9 +148,7 @@ async def change_user_password(
     session: Session = Depends(get_session),
 ):
     user = get_user_object_using_id(session, id=user.id)
-    # Alternatively, we can handle the below in the frontend
     if request.old_password == request.new_password:
-        # may be more secure to keep track of more old passwords
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot reuse old password")
 
@@ -167,7 +160,6 @@ async def change_user_password(
     user.password = encrypted_password
     session.commit()
 
-    # alternatively just return empty {}
     return {"message": "Password changed successfully"}
 
 
@@ -182,7 +174,6 @@ async def change_user_full_name(
     user.full_name = new_name.new_name
     session.commit()
 
-    # alternatively just return empty {} or message
     userInDB = get_user_using_id(session, id=user.id)
     return userInDB
 
@@ -194,7 +185,6 @@ async def change_user_full_name(
 @app.get("/lists", tags=["Lists"])
 async def get_lists(
     user: user_schemas.UserInDB = Depends(get_user),
-    # authorization: str = Depends(security),
     session: Session = Depends(get_session),
 ):
     lists = session.query(list_models.UserList).filter(
@@ -347,15 +337,6 @@ async def delete_company_from_list(
     return {"message": f"Successfully deleted company {company_id} from list {list_id}"}
 
 
-# to do: add error codes
-# from pydantic import BaseModel
-# # Define your models here like
-# class model200(BaseModel):
-#     message: str = ""
-
-# @api.get("/my-route/", responses={200: {"response": model200}, 404: {"response": model404}, 500: {"response": model500}})
-#     async def api_route():
-#         return "I'm a wonderful route"
 # ***************************************************************
 #                        Watclist Apis
 # ***************************************************************
@@ -540,16 +521,6 @@ async def get_company_by_batch(
     return companyData
 
 
-# @app.get("/company/all", tags=["company"])
-# async def get_all_company(
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ):
-#     companyData = session.query(
-#         company_models.Company).all()
-#     return companyData
-
-
 @app.get("/company/all", tags=["company"])
 async def get_all_company(
     user: user_schemas.UserInDB = Depends(get_user),
@@ -570,8 +541,7 @@ async def get_company_news_sentiment(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    # CLAIRE: THE API KEY DOES NOT WORK FULLY SO CURRENTLY HARDCODED
-    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey=QO74GE9362PLVHDU'
+    url = f'https://www.alphavantage.co/query?function=NEWS_SENTIMENT&tickers={ticker}&apikey={alpha_client}'
 
     r = requests.get(url)
     data = r.json()
@@ -602,13 +572,11 @@ async def get_company(
 @app.get("/company/indicators/{company_name}", tags=["company"])
 async def get_company_indicators(
     company_name: str,
-    # year: int,
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
     company_data = session.query(company_models.CompanyData).filter(
         company_models.CompanyData.company_name == company_name,
-        # company_models.CompanyData.indicator_year_int == company_name,
     ).all()
 
     by_year = {}
@@ -634,8 +602,6 @@ async def get_company_info(
 # Company's Live Stock History
 # Get the Company's Stock Price history, period is how far the history
 # will date back into for example: 1 month is "1mo", 5 days would be "5d"
-
-
 @app.get("/company/history/{company_code},{period}", tags=["company"])
 async def get_company_history(
     company_code: str,
@@ -649,9 +615,6 @@ async def get_company_history(
 # Company's Live ESG Ratings
 # This data will return a dataframe, please check the
 # exampleReturnSustainbility.txt file to see an example
-# If you would like me to return any value please let me (Geoffrey) know
-
-
 @app.get("/company/sustainability/{company_code}", tags=["company"])
 async def get_company_sustainability(
     company_code: str,
@@ -670,8 +633,6 @@ async def get_companies_by_industry_by_country(
     session: Session = Depends(get_session),
 ):
     offset = (filter.page - 1) * 20
-
-    print(f'page: {filter.page}')
 
     if industry == 'Unknown':
         query = session.query(company_models.Company).filter(
@@ -739,60 +700,6 @@ async def get_framework_companies_average(
 
     return company_scores
   
-# @app.get("/company/framework/average/", tags=["company"])
-# async def get_framework_company_average(
-#     company_name: str,
-#     year: int,
-#     user: user_schemas.UserInDB = Depends(get_user),
-#     session: Session = Depends(get_session),
-# ) -> float:
-    
-#     frameworks = session.query(framework_models.Frameworks).filter(
-#         framework_models.Frameworks.is_official_framework == True
-#     ).all()
-    
-#     if not frameworks:
-#         return 0 
-
-#     scores = []
-#     categories = ["E", "S", "G"]
-    
-#     companyData = await get_company_indicators(company_name, user, session)
-
-#     for framework in frameworks:
-#         # Fetch all metrics for this framework and all categories - dont remove comments yet
-#         # category_metrics = await asyncio.gather(
-#         #     *[get_framework_metrics_by_category(framework.id, category, user, session) for category in categories]
-#         # )
-#         framework_metrics = await get_framework_metrics(framework.id, user, session)
-        
-#         category_metrics = defaultdict(list)
-#         for metric in framework_metrics:
-#             category = metric.category
-#             category_metrics[category].append(metric)
-            
-#         framework_score = 0
-#         for category, metrics in category_metrics.items():
-#         # for category, metrics in zip(categories, category_metrics):
-#             # Fetch all metric values concurrently
-#             print(f"categry {category}")
-#             print(metrics)
-#             metric_values = await asyncio.gather(
-#                 *[calculate_metric_company_view(companyData[year], {indicator.indicator_name: indicator.weighting for indicator in get_indicators(framework.id, metric.metric_id, user, session)},
-#                                                 user, session) for metric in metrics]
-#             )
-#             print(metric_values)
-#             category_score = sum(value * metric.weighting for value, metric in zip(metric_values, metrics))
-#             print(category_score)
-#             category_weighting = getattr(framework, category, 0)
-#             framework_score += category_score * category_weighting
-#             print(framework_score)
-#         scores.append(framework_score)
-
-#     for framework in frameworks:
-#       print(framework.framework_name)
-#     print(scores)
-#     return sum(scores) / len(scores) if scores else 0
 # ***************************************************************
 #                        Framework Apis
 # ***************************************************************
@@ -1055,40 +962,7 @@ async def delete_framework(
     session.commit()
     return {"message": f"Successfully deleted framework {framework_id}"}
 
-# calculate framework score
-# CHANGE THIS CLAIRE
 
-
-@app.get("/framework/score/", tags=["Framework"])
-async def get_framework_score(
-    framework_id: int,
-    company_name: str,
-    year: int,
-    user: user_schemas.UserInDB = Depends(get_user),
-    session: Session = Depends(get_session),
-) -> float:
-    """_summary_: TO DO: USE BATCH PROCESSSING. ACCEPT MULTIPLE
-    FRAMEWORKS / COMPANY_NAMES / YEARS AT ONCE
-    """
-    framework = session.query(framework_models.Frameworks).get(framework_id)
-    total_score = 0
-    categories = ["E", "S", "G"]
-
-    for category in categories:
-        metrics = await get_framework_metrics_by_category(framework_id, category, user, session)
-        print("calculating category score for framework")
-
-        score = 0
-        for metric in metrics:
-            print("calculating metric score for framework")
-            print(metric.metric_id)
-            metric_value = await calculate_metric(framework_id, metric.metric_id, company_name, year, user, session)
-            score += metric_value * metric.weighting
-
-        category_weighting = getattr(framework, category, 0)
-
-        total_score += score * category_weighting
-    return total_score
 # ***************************************************************
 #                        Indicator Apis
 # ***************************************************************
@@ -1201,7 +1075,6 @@ async def get_all_metrics(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    # fix this later
     metrics = session.query(metrics_models.Metrics).all()
 
     metrics_dict = {}
@@ -1259,8 +1132,6 @@ def get_company_indicators_by_metric(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    """_summary_: MAY NEED TO REMOVE YEAR FILTER
-    """
     indicator_names = [indicator.indicator_name for indicator in indicators]
     values = session.query(company_models.CompanyData).filter(
         company_models.CompanyData.company_name == company_name,
@@ -1480,7 +1351,6 @@ async def get_predictive(
         elif predicted_value == 0:
             prediction = 'No'
     else:
-        # metric_unit in ["USD (000)", "Tons CO2e", "Tons", "Tons CO2", "Number of fatalities",  "Number of breaches",  "Number of days", "Hours/employee", "USD", "GJ", "Ratio", "Tons of NOx", "Tons of SOx", "Tons of VOC"]:
         prediction = linear_regression(data)
 
     return PredictiveIndicators(indicator_id=data[0].id, indicator_name=indicator, prediction=prediction)
@@ -1489,41 +1359,12 @@ async def get_predictive(
 #                   Articles Apis
 # **************************************************************
 
-
-def access_articles(URL: str) -> List[Dict[str, str]]:
-    page = requests.get(URL)
-    if page.status_code == 200:
-        soup = BeautifulSoup(page.content, "html.parser")
-        articles = []
-        results = soup.find_all('div', class_='text-component')
-
-        for article in results:
-            title_exists = article.find('h3')
-            link_exists = article.find('a')
-
-            if title_exists and link_exists:
-                title = title_exists.text.strip()
-                link = urljoin(URL, link_exists['href'].strip())
-                if link.startswith("https://"):
-                    link_page = requests.get(link)
-                    if link_page.status_code == 404:
-                        continue
-                    articles.append({'title': title, 'link': link})
-
-    return articles
-
-
 @app.get("/articles", tags=["Articles"])
 async def articles(
     URL: str,
-    # token: str = Depends(oauth2_scheme),
-    # session: Session = Depends(get_session)
 ) -> List[Dict[str, str]]:
 
-    # token_data = await is_authenticated(session, token)
-    # user = get_user_using_id(session, id=token_data.userId)
-
-    return access_articles(URL)
+    return articles.access_articles(URL)
 
 # URL = "https://www.pwc.com.au/environment-social-governance.html"
 

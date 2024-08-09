@@ -12,11 +12,7 @@ def calculate_metric(year_indicators, weights):
     
     overall_score = 0
     for indicator_name, weight in weights.items():
-        # print(indicator_name)
-        # print(f'printing weight {weight}')
         if indicator_name not in year_indicators:
-            # indicator does not exist for that company for that year
-            # print("skipping")
             continue
         indicator_scaling = indicator_data[indicator_name]
         indicator_value = year_indicators[indicator_name].indicator_value
@@ -45,8 +41,6 @@ def calculate_metric(year_indicators, weights):
             # If negative reverses score
             if indicator_scaling["pos"] == "Negative":
                 scaled_score = 100 - scaled_score            
-        # print(f'printing indicator value {indicator_value}')
         overall_score += scaled_score * weight
         
-    print(f'overall score: {overall_score}')
     return round(overall_score)

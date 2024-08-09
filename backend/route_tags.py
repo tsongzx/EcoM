@@ -7,10 +7,6 @@ tags_metadata = [
     {
         "name": "User",
         "description": "Managing user profiles.",
-        # "externalDocs": {
-        #     "description": "Items external docs",
-        #     "url": "https://fastapi.tiangolo.com/",
-        # },
     },
     {
         "name": "Lists",
