@@ -1,13 +1,13 @@
-import schemas.user_schemas as user_schemas
+from .schemas import user_schemas
 from fastapi import HTTPException, status
-import models.user_models as models
+from .models import user_models
 
 async def valid_userId(db, userId: str) -> bool:
-    user = db.query(models.User).filter_by(id=userId).first()
+    user = db.query(user_models.User).filter_by(id=userId).first()
     return True if user else False
   
 def get_user_using_id(db, id: str):
-    user = db.query(models.User).filter(models.User.id == id).first()
+    user = db.query(user_models.User).filter(user_models.User.id == id).first()
     if user is not None:
         # return info of user in db
         return user_schemas.UserInDB(id=user.id,
@@ -18,7 +18,7 @@ def get_user_using_id(db, id: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
 
 def get_user_object_using_id(db, id: str):
-    user = db.query(models.User).filter(models.User.id == id).first()
+    user = db.query(user_models.User).filter(user_models.User.id == id).first()
     if user is not None:
         # return info of user in db
         return user
@@ -26,7 +26,7 @@ def get_user_object_using_id(db, id: str):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found - invalid id")
       
 def get_user_using_email(db, email: str):
-    user = db.query(models.User).filter(models.User.email == email).first()
+    user = db.query(user_models.User).filter(user_models.User.email == email).first()
     if user is not None:
         # return info of user in db
         return user_schemas.UserInDB(id=user.id,

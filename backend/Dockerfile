@@ -18,7 +18,8 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY src/ ./src
+# COPY src/ ./src
+COPY . .
 
 # Expose the backend server's port (e.g., 5000 for Flask)
 EXPOSE 8000

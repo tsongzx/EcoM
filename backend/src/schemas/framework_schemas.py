@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from config import Config
+from ..config import Config
 
 class CustomFramework(BaseModel):
     framework_name: str

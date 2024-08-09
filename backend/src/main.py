@@ -5,41 +5,50 @@ from fastapi import Depends, FastAPI, HTTPException, status, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
 import numpy as np
-from auth import generate_token, is_authenticated, authenticate_user, hash_password
-from schemas.predictive_schemas import PredictiveIndicators
-from db import Base, engine, SessionLocal
-from user import get_user_using_id, get_user_object_using_id
+from .auth import generate_token, is_authenticated, authenticate_user, hash_password
+from .schemas.predictive_schemas import PredictiveIndicators
+from .db import Base, engine, SessionLocal
+from .user import get_user_using_id, get_user_object_using_id
 from sqlalchemy.orm import Session
-from route_tags import tags_metadata
-import schemas.user_schemas as user_schemas
-import schemas.industry_schemas as industry_schemas
-import schemas.list_schemas as list_schemas
-import schemas.graph_schemas as graph_schemas
-import schemas.framework_schemas as framework_schemas
-import schemas.metric_schemas as metric_schemas
-import schemas.chat_schemas as chat_schemas
-import schemas.score_schemas as score_schemas
-import models.company_models as company_models
-import models.framework_models as framework_models
-import models.list_models as list_models
-import models.metrics_models as metrics_models
-import models.user_models as user_models
-import models.industry_models as industry_models
+from .route_tags import tags_metadata
+from .schemas import (
+  user_schemas,
+  industry_schemas,
+  list_schemas,
+  graph_schemas,
+  framework_schemas,
+  metric_schemas,
+  chat_schemas,
+  score_schemas
+)
+from .models import (
+  company_models,
+  framework_models,
+  list_models,
+  metrics_models,
+  user_models,
+  industry_models
+)
+
 import json
 from sqlalchemy import delete, and_, or_, distinct
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import func
-from config import Config
+from .config import Config
 from typing import List, Any, Dict, Optional, Union
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
 import requests
-import liveData
-import metrics
+from .liveData import (
+  getCompanyESG,
+  getCompanyHist,
+  getCompanyESG
+)
+from .metrics import calculate_metric
 import asyncio
 from collections import defaultdict
-import articles as articles_module
+from .articles import access_articles
 
 load_dotenv()
 client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -592,7 +601,7 @@ async def get_company_info(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    info = liveData.getCompanyInfo(company_code)
+    info = getCompanyInfo(company_code)
     return info
 
 # Company's Live Stock History
@@ -605,7 +614,7 @@ async def get_company_history(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    hist = liveData.getCompanyHist(company_code, period)
+    hist = getCompanyHist(company_code, period)
     return hist
 
 # Company's Live ESG Ratings
@@ -617,7 +626,7 @@ async def get_company_sustainability(
     user: user_schemas.UserInDB = Depends(get_user),
     session: Session = Depends(get_session),
 ):
-    sustainability = liveData.getCompanyESG(company_code)
+    sustainability = getCompanyESG(company_code)
     return sustainability
 
 
@@ -1159,7 +1168,7 @@ async def calculate_metric(
 
     weights = {
         indicator.indicator_name: indicator.weighting for indicator in indicators}
-    return metrics.calculate_metric(year_indicators, weights)
+    return calculate_metric(year_indicators, weights)
 
 
 # ***************************************************************
@@ -1358,7 +1367,7 @@ async def articles(
     URL: str,
 ) -> List[Dict[str, str]]:
 
-    return articles_module.access_articles(URL)
+    return access_articles(URL)
 
 # URL = "https://www.pwc.com.au/environment-social-governance.html"
 
@@ -1613,7 +1622,7 @@ async def calculate_metric_company_view(
     Returns:
         _type_: _description_
     """
-    return metrics.calculate_metric(company_indicators, indicators)
+    return calculate_metric(company_indicators, indicators)
 
 # ***************************************************************
 #                        Headquarter country Apis

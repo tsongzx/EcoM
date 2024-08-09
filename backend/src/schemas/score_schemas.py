@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from config import Config
+from ..config import Config
 
 class CompanyIndicator(BaseModel):
     id: int

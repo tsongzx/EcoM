@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime
-from db import Base
+from ..db import Base
 
 class Averages(Base):
     __tablename__ = 'IndustryAverages'

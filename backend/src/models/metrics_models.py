@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, Enum
-from db import Base
+from ..db import Base
 from typing import Literal, get_args
 Data_Type = Literal["float", "int"]
 Pillar = Literal["E", "S", "G"]

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String, DateTime, Enum
-from db import Base
+from ..db import Base
 from typing import get_args
-from config import Config
+from ..config import Config
 
 class Company(Base):
     __tablename__ = 'Companies'

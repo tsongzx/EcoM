@@ -1,11 +1,11 @@
 from passlib.context import CryptContext
 import jwt
-import schemas.user_schemas as user_schemas
+from .schemas import user_schemas
 from fastapi import HTTPException, status
 from datetime import datetime, timedelta, timezone
 from typing import Union
-from config import Config
-from user import valid_userId, get_user_using_email
+from .config import Config
+from .user import valid_userId, get_user_using_email
 import os
 from dotenv import load_dotenv
 
