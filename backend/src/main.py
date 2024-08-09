@@ -1332,7 +1332,7 @@ async def get_predictive(
     company_name=str,
     session: Session = Depends(get_session),
     user: user_schemas.UserInDB = Depends(get_user)
-) -> PredictiveIndicators:
+):
     data = session.query(company_models.CompanyData).filter(
         company_models.CompanyData.indicator_name == indicator,
         company_models.CompanyData.company_name == company_name,
@@ -1342,7 +1342,7 @@ async def get_predictive(
         metric_unit = str(metric_unit)
         
     if not data:
-        raise HTTPException(status_code=404, detail="Error")
+        return 0
 
     if "%" in metric_unit:
         prediction = linear_regression(data)
