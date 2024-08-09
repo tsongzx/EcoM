@@ -1,8 +1,4 @@
 from pydantic import BaseModel
-from typing import Union, List, Tuple
-# from sqlalchemy import DateTime
-import datetime
-from sqlalchemy.orm import Mapped, mapped_column
 
 class IndicatorGraph(BaseModel):
     indicator: str

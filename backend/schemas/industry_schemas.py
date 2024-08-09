@@ -1,7 +1,5 @@
 from pydantic import BaseModel
-from typing import Union, List, Tuple
-# from sqlalchemy import DateTime
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List
 
 class CompanyFilter(BaseModel):
   countries: List[str]

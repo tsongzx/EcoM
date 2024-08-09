@@ -1,15 +1,12 @@
 from pydantic import BaseModel
-from typing import Literal, Union, List, Tuple
-# from sqlalchemy import DateTime
-from datetime import date
-from sqlalchemy.orm import Mapped, mapped_column
-Disclosure = Literal["CALCULATED", "ADJUSTED", "ESTIMATED", "REPORTED", "IMPUTED"]
+from typing import List
+from config import Config
 
 class CompanyIndicator(BaseModel):
     id: int
     company_name: str
     perm_id: str 
-    disclosure: Disclosure
+    disclosure: Config.Disclosure
     indicator_name: str
     indicator_value: float
     indicator_year: str
@@ -18,10 +15,6 @@ class CompanyIndicator(BaseModel):
     provider_name:  str 
     reported_date:  str 
     indicator_year_int: int
-    
-# class CompanyIndicator(BaseModel):
-#     indicator_name: str
-#     indicator_value: float
      
 class Value(BaseModel):
     score: float
