@@ -2,12 +2,13 @@
 
 .ESGInfo-container {
     width: 100%;
-    padding: 50px 0px;
+    padding: 50px 5px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: #3373b0;
+    background: linear-gradient(#081124, #bed4e9);
+    box-sizing: border-box;
 }
 
 .ESGInfo-container h1 {
@@ -21,7 +22,7 @@
     font-family: Inter;
 }
 
-.ESGInfo-title, .ESGReporting-container, .ESGScore-containers {
+.ESGInfo-title {
     background-color: #bed4e9;
     display: flex;
     justify-content: center;
@@ -30,32 +31,82 @@
     min-width: 400px;
     padding: 10px 30px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    width: 400px;
+    background-color: #e7f1fb;
+    border-radius: 15px;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+.ESGReporting-container, .ESGScore-containers {
+  background-color: #bed4e9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-width: 400px;
+    padding: 10px 30px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    margin-bottom: 10px;
+    width: 60%;
+    background-color: #e7f1fb;
+    border-radius: 15px;
+    box-sizing: border-box;
 }
 
 .ESGCategory-container {
     display: flex;
     flex-direction: row;
-    width: 100%;
-    background-color: #bed4e9;
+    width: 95%;
+    background-color: transparent;
     margin-bottom: 10px;
     align-items: center;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    padding-right: 20px;
 }
 
 .ESGCategoryImg{
     width: 400px;
     height: 400px;
     margin-left: 0px;
+    border-radius: 10px;
+    box-sizing: border-box;
 }
 
 .ESGCategory-Text {
     flex: 1;
-    margin-left: 10px;
+    margin-left: 20px;
     margin-right: 10px;
+    padding: 10px 10px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-sizing: border-box;
 }
+
+.ESGCategory-Text-E {
+  background-color: rgb(20, 122, 100);
+  color: white;
+  box-sizing: border-box;
+}
+
+.ESGCategory-Text-S {
+  background-color: rgb(51, 58, 159);
+  color: white;
+  box-sizing: border-box;
+}
+
+.ESGCategory-Text-G {
+  background-color: rgb(98, 56, 153);
+  color: white;
+  box-sizing: border-box;
+}
+
 
 .ESGInfo-li {
   font-family: Inter;
+  box-sizing: border-box;
 }
 
 .ESGScore-ext-raise-button:hover,
@@ -65,8 +116,8 @@
 }
 
 .ESGScore-ext-raise-button {
-  --color: #8d60ff;
-  --hover: #d279ff; 
+  --color: #bed4e9;
+  --hover: #9b79ff; 
   background: none;
   border: 2px solid;
   font: inherit;
@@ -76,6 +127,7 @@
   color: var(--color);
   transition: 0.25s;
   cursor: pointer;
+  font-family: Inter;
 }
 
 .ESGScore-ext-raise-button:hover,
@@ -86,13 +138,16 @@
 
 .ESGScore-externalLinks-container {
   color: #fff;
-  background: hsl(227, 10%, 10%);
+  background: #0c3960;
   font: 300 1em 'Fira Sans', sans-serif;
   justify-content: center;
   align-content: center;
   align-items: center;
   text-align: center;
   display: flex;
+  width: 95%;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .ESGCategory-Text h1 {
   font-weight: bold;

@@ -3,7 +3,7 @@
     transition: display 0.5s ease-in-out; /* Smooth transition for fading */
     position: fixed;
     z-index: 900;
-    background-color: rgb(202, 177, 240);
+    background-color: #bed4e9;
     border-radius: 10px;
     padding: 5px 10px;
     opacity: 80%;
@@ -27,7 +27,7 @@
   .progress-bar-container {
     position: relative;
     height: 5px;
-    background-color: #692b78;
+    background-color: #3373b0;
     margin-top: 10px;
   }
   
@@ -37,7 +37,7 @@
     left: 0;
     height: 100%;
     width: 100%;
-    background-color: #e073ca;
+    background-color: #0c3960;
     transition: width linear;
   }
 

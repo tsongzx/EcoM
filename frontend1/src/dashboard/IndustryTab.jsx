@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Tabs, Tab, Box } from '@mui/material';
 import IndustryOverview from './IndustryOverview';
 import IndustryPage from './IndustryPage';
 
-const IndustryTab = ({selectedIndustry, setSelectedCompany}) => {
+const IndustryTab = ({ selectedIndustry, setSelectedCompany }) => {
   const [tab, setTab] = useState("companies");
 
   const handleChange = (event, newTab) => {
@@ -11,8 +11,9 @@ const IndustryTab = ({selectedIndustry, setSelectedCompany}) => {
   };
 
   return (
-    <Box sx={{ width: '100%', 
-      typography: 'body1', 
+    <Box sx={{
+      width: '100%',
+      typography: 'body1',
       height: 'calc(70vh - 50px)',
       overflow: "hidden",
       overflowY: "scroll",
@@ -23,16 +24,18 @@ const IndustryTab = ({selectedIndustry, setSelectedCompany}) => {
         aria-label="Industry Tabs"
         variant="scrollable"
         scrollButtons="auto"
-        sx={{ borderBottom: 1, 
-          borderColor: 'divider', height: '3vh'}}
+        sx={{
+          borderBottom: 1,
+          borderColor: 'divider', height: '3vh'
+        }}
       >
         <Tab label="See companies" value="companies" />
         <Tab label="Overview" value="overview" />
       </Tabs>
       {/* Rendering content based on the selected tab */}
-        {tab === 'companies' && <IndustryPage selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany}/>}
-        {tab === 'overview' && <IndustryOverview selectedIndustry={selectedIndustry}></IndustryOverview>}
-      </Box>
+      {tab === 'companies' && <IndustryPage selectedIndustry={selectedIndustry} setSelectedCompany={setSelectedCompany} />}
+      {tab === 'overview' && <IndustryOverview selectedIndustry={selectedIndustry}></IndustryOverview>}
+    </Box>
   );
 }
 

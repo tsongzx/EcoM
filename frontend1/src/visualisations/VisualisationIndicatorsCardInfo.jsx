@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Stack, Typography, Box, Paper } from '@mui/material';
+import React from 'react';
+import { Stack, Typography, Paper } from '@mui/material';
 
-const VisualisationIndicatorsCardInfo = ({info}) => {
+const VisualisationIndicatorsCardInfo = ({ info }) => {
   console.log("displaying info card");
   return (
     info ? (

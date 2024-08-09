@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import { getRecommendedCompanies, getIndustry, getFavouritesList } from "../helper";
 import { useNavigate } from "react-router-dom";
 import './company_css/Recommendations.css';
-import { Button, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 //given a Company Id return a mapped list of buttons of companies in that industry
 
-const Recommendations = ({companyId}) => {
+const Recommendations = ({ companyId }) => {
     const [reccs, setReccs] = useState([]);
     //get the industry of the company
     useEffect(() => {
-        const initialiseRecommendations = async(cId) => {
+        const initialiseRecommendations = async (cId) => {
             const indName = await getIndustry(cId);
             console.log(`Industry is ${indName}`);
             if (indName) {
@@ -30,8 +30,8 @@ const Recommendations = ({companyId}) => {
         if (companyId) {
             initialiseRecommendations(companyId);
         }
-        
-    },[companyId]);
+
+    }, [companyId]);
 
     const navigate = useNavigate();
 
@@ -43,23 +43,23 @@ const Recommendations = ({companyId}) => {
         const shuffled = array.sort(() => 0.5 - Math.random());
         return shuffled.slice(0, 5);
     }
-    
+
     return (
         <Stack id="recommendations-container"
-          maxWidth='300px'
-          width='100%'
+            maxWidth='300px'
+            width='100%'
         >
-            <h2 className="recc-h2-other">Others also viewed </h2> 
+            <h2 className="recc-h2-other">Others also viewed </h2>
             {reccs.map((r) => (
-                <button className="recommendations-button" 
+                <button className="recommendations-button"
                     variant="outlined"
                     key={r.id}
                     onClick={() => navigate(`/company/${encodeURIComponent(r.id)}`, {
-                        state: { 
-                            companyId: r.id, 
+                        state: {
+                            companyId: r.id,
                             companyName: r.company_name,
                             initialFramework: null
-                        } 
+                        }
                     })}
                 >
                     {r.company_name}

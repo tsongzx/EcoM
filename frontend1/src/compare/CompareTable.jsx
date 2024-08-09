@@ -1,4 +1,4 @@
-import {React, useEffect, useState, useRef} from 'react';
+import { React, useEffect, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CompanySearch from './CompanySearch';
 import {
@@ -21,9 +21,9 @@ import SelfExpiringMessage from '../assets/SelfExpiringMessage.jsx';
 import Button from '@mui/joy/Button';
 import GraphTableToggle from '../utils/GraphTableToggle.jsx';
 
-const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, defaultFramework}) => {
+const CompareTable = ({ frameworks, companies, setCompanies, selectedFramework, defaultFramework }) => {
   const navigate = useNavigate();
-  
+
   const years = [2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
   const [year, setYear] = useState(years[0]);
   const contextMenuRef = useRef(null);
@@ -53,27 +53,27 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
     console.log('metricsList changed so Imma change metrics!!!!');
     changeMetrics();
     setMetricsUpdated(true);
-  },[metricsList]);
+  }, [metricsList]);
 
   useEffect(() => {
     console.log('updating metrics:');
     updateMetrics();
-  },[year, frameworks, companies]);
+  }, [year, frameworks, companies]);
 
   useEffect(() => {
     console.log('METRICS CHANGED:');
     console.log(metrics);
-  },[metrics]);
+  }, [metrics]);
 
   //detect clicking off context menu
   useEffect(() => {
     function handler(e) {
       if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
-          console.log('just before reset', contextMenu);
-          if (contextMenu.toggled){
-            //only do reset if context menu is toggled
-            resetContextMenu();
-          } 
+        console.log('just before reset', contextMenu);
+        if (contextMenu.toggled) {
+          //only do reset if context menu is toggled
+          resetContextMenu();
+        }
       }
     }
     if (!open) {
@@ -81,13 +81,11 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
       document.addEventListener('click', handler);
     }
 
-    // console.log('Removing Click Event Handler');
-    // document.removeEventListener('click', handler);
     return () => {
       console.log('Removing Click Event Handler');
       document.removeEventListener('click', handler);
     }
-  },[contextMenu, open]);
+  }, [contextMenu, open]);
 
   //because there has been problems with resetContextMenu using old company data
   useEffect(() => {
@@ -97,51 +95,29 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
     }
   }, [companies, isDeleting]);
 
-    //THE ONLY TIME WE UPDATE METRICS IS ON COMPANY CHANGE, FRAMEWORK CHANGE and MODAL CLOSE, and METRIC DELTE
-
-  // useEffect(() => {
-  //   if (!initialMount.current && metricsUpdated) {
-  //     console.log('companies changed:', companies);
-  //     //update Everytime Companies change, then update metrics
-  //     updateMetrics();
-  //   }
-  //   ////IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSSAGE OR IF COMPANIES = 5 or more
-  // }, [companies]);
-  // useEffect(() => {
-  //   if (!initialMount.current && metricsUpdated) {
-  //     console.log('frameworks changed:', frameworks);
-  //     updateMetrics();
-  //   }
-  //   //IF YEAR IS NONE CREATE DISAPPEARING MESSAGE
-  // }, [frameworks]);
-  
-  //given the index that it was selected switch out the company ID at that index to become the new company ID
-    
-
-   //This function updates the metrics that are being used depending on the frameworks that are being selected
+  //This function updates the metrics that are being used depending on the frameworks that are being selected
   //This returns a list of JSON objects [{metric_id: , metricName}]
   //This is called everytime a framework or company changes and only adds onto the exisitng list without repalcing the old one
 
   const updateMetrics = async () => {
     const processedFrameworks = new Set();
     const updatedMetrics = [];
-  
+
     await Promise.all(companies.map(async (c) => {
       if (c.framework && !processedFrameworks.has(c.framework)) {
         console.log('processing framework: ', c.framework);
         processedFrameworks.add(c.framework);
-        
+
         //get the metrics for each framework
         const frameworkMetrics = await getMetricForFramework(c.framework);
         console.log(frameworkMetrics);
         updatedMetrics.push(...frameworkMetrics);
       }
     }));
-    
+
     //gets a list of {metric_id, metric_name, category}
     const newMetrics = await Promise.all(
       updatedMetrics
-        //.filter(m => !metricsList.some(i => i.metric_id === m.metric_id))
         .map(async m => ({
           metric_id: m.metric_id,
           metric_name: await getMetricName(m.metric_id),
@@ -154,12 +130,12 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
     console.log(metricsList);
     setMetricsList(newMetrics);
   };
-  
+
   // This is from the Adding tool (the modal)
   const changeMetrics = async () => {
     setLoading(true);
     const metricsPromises = metricsList.map((m) => {
-      console.log('mapping metric: ',m.metric_id, '/', metricsList.length);
+      console.log('mapping metric: ', m.metric_id, '/', metricsList.length);
       return calculateMetricScore(m.metric_id, m.metric_name, m.category, m.framework_id, companies, year);
     });
 
@@ -173,16 +149,13 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
 
   //add metric
   const deleteMetric = (metricId) => {
-    //const newMetrics = metrics.filter((m) => m.metric_id !== metricId);
     const newMetricList = metricsList.filter((m) => m.metric_id !== metricId);
-    //THis line may become redundnat due to the useEffect
-    //setMetrics(newMetrics);
     console.log('DELETING A METRIC');
     console.log(newMetricList);
     setMetricsList(newMetricList);
     resetContextMenu();
   }
-  
+
   const handleDeleteFromTable = (companyId) => {
     console.log('deleting from table ', companyId);
     const newListOfCompanies = companies.filter(company => company.id !== companyId);
@@ -194,52 +167,32 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
 
   const handleClickCompanyName = (companyId, companyName, framework) => {
     console.log('Clicked company Name at ', companyId);
-    navigate(`/company/${encodeURIComponent(companyId)}`, 
-      { state: { 
-          companyId, 
+    navigate(`/company/${encodeURIComponent(companyId)}`,
+      {
+        state: {
+          companyId,
           companyName,
           initialFramework: framework
-        } 
+        }
       });
   }
 
-  const handleSelectedFramework = async (companyId, selectedOption) =>  {
+  const handleSelectedFramework = async (companyId, selectedOption) => {
     const foundC = companies.find(company => company.id === companyId);
     if (foundC.framework === selectedOption) {
       console.log(`Already has company ${companyId} with that framework: `, selectedOption);
-      //CREATE DISAPPEARING MESSAGE FOR THIS
-      //IF YEAR IS NONE CREATE ANOTHER DISAPPEARING MESSAGE
       return;
     }
 
     const selectedFrameworkId = selectedOption ? selectedOption.value : null;
     console.log('Handing selected Framework: ', selectedFrameworkId, ' for company, ', companyId);
-    const newListOfCompanies = companies.map(company => 
+    const newListOfCompanies = companies.map(company =>
       company.id === companyId
-          ? { ...company, framework: selectedFrameworkId } // Update the object with new value
-          : company // Keep the object unchanged
+        ? { ...company, framework: selectedFrameworkId } // Update the object with new value
+        : company // Keep the object unchanged
     );
     setCompanies(newListOfCompanies);
-    
-    //MOST LIKELY TO GET DELETED FOR NEW IMPLEMENTATION
-    //Change the metrics to match the selected Framework
-    // if (!selectedFramework) {
-    //   const newListOfMetrics = metrics.map(metric => 
-    //     metric.companyId === companyId ?
-    //       {companyId, metrics: null}
-    //       : metric
-    //   );
-    //   setMetrics(newListOfMetrics);
-    //   return;
-    // }
-    // //get the metrics
-    // const metricsForFramework = await getMetricForFramework(selectedFrameworkId);
-    // const newListOfMetrics = metrics.map(metric => 
-    //   metric.companyId === companyId ?
-    //     {companyId, metrics: metricsForFramework}
-    //     : metric
-    // );
-    // setMetrics(newListOfMetrics);
+
   }
 
   const handleContextMenu = (e, companyId, isCompany) => {
@@ -281,7 +234,7 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
     //reset everything back to false
     console.log(companies);
     if (isSelectedCompany) {
-      const newListOfCompanies = companies.map(company => 
+      const newListOfCompanies = companies.map(company =>
         ({ ...company, selected: false })
       );
       console.log(newListOfCompanies);
@@ -306,7 +259,7 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
     }
 
     console.log(`Adding company ${companyId} ${companyName}`);
-    const newListOfCompanies = [...companies, {id: companyId, companyName, framework: 1, year: 2023, selected: false}];
+    const newListOfCompanies = [...companies, { id: companyId, companyName, framework: 1, year: 2023, selected: false }];
     setCompanies(newListOfCompanies);
 
     if (newListOfCompanies.length === 5) {
@@ -345,15 +298,15 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
             onClick: () => handleDeleteFromTable(selectedCompany),
           },
         ] :
-        [
-          {
-            text: "delete metric",
-            onClick: () => deleteMetric(selectedCompany), // This is abit dodgy because its actually getting passed in a metricId
-          },
-        ]
-      }
+          [
+            {
+              text: "delete metric",
+              onClick: () => deleteMetric(selectedCompany), // This is abit dodgy because its actually getting passed in a metricId
+            },
+          ]
+        }
       />
-      <TableContainer className='compare-table-cont' style={{height: '75vh',}}>
+      <TableContainer className='compare-table-cont' style={{ height: '75vh', }}>
         <Table className='compare-table' style={{ tableLayout: 'fixed' }}>
           {/* Header where Company controls are obtained */}
           <TableHead className='compare-tableheader'>
@@ -365,64 +318,64 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
               {companies.map((company, index) => (
                 <TableCell onContextMenu={(e) => handleContextMenu(e, company.id, true)} key={index}>
                   <div>
-                      <div className='comparecompanyheadertitle'> 
-                        <Stack direction="row" justifyContent="space-between">
-                          <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
-                            className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
-                            <Typography variant="h6">{company.companyName}</Typography>
-                          </a> 
-                          <Button variant="text" sx={{padding: '0 4%'}} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
-                        </Stack>
-                      </div>
+                    <div className='comparecompanyheadertitle'>
+                      <Stack direction="row" justifyContent="space-between">
+                        <a onClick={() => handleClickCompanyName(company.id, company.companyName, company.framework)}
+                          className={company.selected ? 'selected compare-anchor' : 'compare-anchor'}>
+                          <Typography variant="h6">{company.companyName}</Typography>
+                        </a>
+                        <Button variant="text" sx={{ padding: '0 4%' }} onClick={() => handleDeleteFromTable(company.id)}>X</Button>
+                      </Stack>
+                    </div>
                   </div>
                 </TableCell>
               ))}
               {/* Optional If there are less than 5 companies */}
               {companies.length < 5 && (
-                <TableCell> 
+                <TableCell>
                   <Typography variant="h6">Add Company</Typography>
                 </TableCell>
               )}
             </TableRow>
           </TableHead>
-          
+
           <TableRow>
-              <TableCell>
+            <TableCell>
+              <Select
+                styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                options={years.map((year) => ({ value: year, label: year }))}
+                label="Year"
+                placeholder="Select Year"
+                // value={year}
+                value={{ label: year, value: year }}
+                maxMenuHeight={100}
+                onChange={(e) => setYear(e.value)}
+              />
+            </TableCell>
+            {/* Where the companies are rendered */}
+            {companies.map((company, index) => (
+              <TableCell key={index}>
+                <div className='companyParamContainer'>
                   <Select
-                      styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                      options={years.map((year) => ({ value: year, label: year }))}
-                      label="Year"
-                      placeholder="Select Year"
-                      // value={year}
-                      value= {{label: year, value: year}}
-                      maxMenuHeight={100}
-                      onChange={(e) => setYear(e.value)}
+                    styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
+                    options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
+                    label="Framework"
+                    placeholder="Framework"
+                    maxMenuHeight={100}
+                    defaultValue={selectedFramework ? { value: selectedFramework, label: defaultFramework } : null}
+                    onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
                   />
+                </div>
               </TableCell>
-              {/* Where the companies are rendered */}
-              {companies.map((company, index) => (
-                <TableCell key={index}>
-                  <div className='companyParamContainer'>
-                    <Select
-                      styles={{ container: (provided) => ({ ...provided, width: '100%' }) }}
-                      options={frameworks.map((f) => ({ value: f.id, label: f.name }))}
-                      label="Framework"
-                      placeholder="Framework"
-                      maxMenuHeight={100}
-                      defaultValue={selectedFramework ? {value: selectedFramework, label: defaultFramework} : null}
-                      onChange={(selectedOption) => handleSelectedFramework(company.id, selectedOption)}
-                    />
-                  </div>
-                </TableCell>
-              ))}
-              {/* Optional If there are less than 5 companies */}
-              {companies.length < 5 && (
-                <TableCell> 
-                  <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId}/>
-                </TableCell>
-              )}
+            ))}
+            {/* Optional If there are less than 5 companies */}
+            {companies.length < 5 && (
+              <TableCell>
+                <CompanySearch handleSelectedCompanyId={handleSelectedCompanyId} />
+              </TableCell>
+            )}
           </TableRow>
-          
+
           <TableRow>
             <TableCell><Typography variant="h6">Environmental</Typography></TableCell>
           </TableRow>
@@ -430,11 +383,11 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
           {metrics.filter(m => m.category === 'E').map((metric, index) => (
             <TableRow>
               <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-                <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                <Typography sx={{ paddingLeft: "10%" }}>{metric.metricName}</Typography>
               </TableCell>
               {metric.companies.map((company, index) => (
                 <TableCell sx={{
-                  textAlign: 'right' 
+                  textAlign: 'right'
                 }}>
                   {company.score}
                 </TableCell>
@@ -449,11 +402,11 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
           {metrics.filter(m => m.category === 'S').map((metric, index) => (
             <TableRow>
               <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-                <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                <Typography sx={{ paddingLeft: "10%" }}>{metric.metricName}</Typography>
               </TableCell>
               {metric.companies.map((company, index) => (
                 <TableCell sx={{
-                  textAlign: 'right' 
+                  textAlign: 'right'
                 }}>
                   {company.score}
                 </TableCell>
@@ -468,11 +421,11 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
           {metrics.filter(m => m.category === 'G').map((metric, index) => (
             <TableRow>
               <TableCell onContextMenu={(e) => handleContextMenu(e, metric.metricId, false)}>
-                <Typography sx={{paddingLeft:"10%"}}>{metric.metricName}</Typography>
+                <Typography sx={{ paddingLeft: "10%" }}>{metric.metricName}</Typography>
               </TableCell>
               {metric.companies.map((company, index) => (
                 <TableCell sx={{
-                  textAlign: 'right' 
+                  textAlign: 'right'
                 }}>
                   {company.score}
                 </TableCell>
@@ -481,10 +434,10 @@ const CompareTable = ({frameworks, companies, setCompanies, selectedFramework, d
           ))}
         </Table>
       </TableContainer>
-      <Button sx={{marginLeft: "5%"}} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
-      <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList}/>
-      {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry}/>}
-    </Box>  
+      <Button sx={{ marginLeft: "5%" }} className='customise-metrics-button' onClick={handleToggleOpenModal}>Customise Metrics List</Button>
+      <SearchMetricsModal isOpen={open} closeModal={handleCloseModal} metricsList={metricsList} />
+      {showMessage && <SelfExpiringMessage message={message} onExpiry={handleMessageExpiry} />}
+    </Box>
   );
 }
 

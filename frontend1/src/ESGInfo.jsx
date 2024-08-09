@@ -6,19 +6,16 @@ import './ESGInfo.css';
 import { webscrapeLinks } from "./helper";
 
 const ESGInfo = () => {
-  const [E, setE] = useState(false);
-  const [S, setS] = useState(false);
-  const [G, setG] = useState(false);
   const [links, setLinks] = useState([]);
 
-  useEffect(()=> {
-    const doWebscrape = async() => {
+  useEffect(() => {
+    const doWebscrape = async () => {
       const response = await webscrapeLinks('https://www.pwc.com.au/environment-social-governance.html');
       setLinks(response);
       return;
     }
     doWebscrape();
-  },[]);
+  }, []);
 
   return (
     <div className="ESGInfo-container">
@@ -27,53 +24,53 @@ const ESGInfo = () => {
         <p>ESG refers to the environmental, social, and governance factors that investors measure when analyzing a company's sustainability efforts from a holistic view. Many companies publish ESG reports in alignment with ESG reporting frameworks, standards, regulations, or investor expectations to demonstrate transparency and disclose the environmental, social, and governance factors that contribute to the overall risks and opportunities involved with a company’s operations. The types of data included can vary from greenhouse gas emissions to labor practices, workforce diversity, executive compensation, and more. Confused yet? Don’t worry, we’re going to break all of this down for you.</p>
       </div>
       <div className="ESGCategory-container">
-        <img className='ESGCategoryImg' src={environmentImage} alt='Some trees'/>
-        <div className="ESGCategory-Text">
-            <h1>Environmental</h1>
-            <p>The “E” in ESG means the environmental responsibility companies have, including energy use and how they manage their environmental impacts as stewards of the planet. Some examples of environmental issues are:
-                </p>
-            <ul>
-              <li className="ESGInfo-li"> Carbon emissions</li>
-              <li className="ESGInfo-li"> Energy consumption</li>
-              <li className="ESGInfo-li"> Climate change effects</li>
-              <li className="ESGInfo-li"> Pollution</li>
-              <li className="ESGInfo-li"> Waste disposal</li>
-              <li className="ESGInfo-li"> Renewable energy</li>
-              <li className="ESGInfo-li"> Resource depletion</li>
-            </ul>
-            </div>
-      </div>
-    
-      <div className="ESGCategory-container">
-        <div className="ESGCategory-Text">
-        <h1>Social</h1>
-        <p>The data disclosed in the social responsibility portion of ESG covers a wide range of topics from how companies are fostering people and culture to diversity statistics and community impact. Some examples of social topics are:</p>
-        <ul>
-          <li className="ESGInfo-li"> Discrimination </li>
-          <li className="ESGInfo-li"> Diversity </li>
-          <li className="ESGInfo-li"> Human rights </li>
-          <li className="ESGInfo-li"> Community relations </li>
-        </ul>
+        <img className='ESGCategoryImg' src={environmentImage} alt='Some trees' />
+        <div className="ESGCategory-Text ESGCategory-Text-E">
+          <h1>Environmental</h1>
+          <p>The “E” in ESG means the environmental responsibility companies have, including energy use and how they manage their environmental impacts as stewards of the planet. Some examples of environmental issues are:
+          </p>
+          <ul>
+            <li className="ESGInfo-li"> Carbon emissions</li>
+            <li className="ESGInfo-li"> Energy consumption</li>
+            <li className="ESGInfo-li"> Climate change effects</li>
+            <li className="ESGInfo-li"> Pollution</li>
+            <li className="ESGInfo-li"> Waste disposal</li>
+            <li className="ESGInfo-li"> Renewable energy</li>
+            <li className="ESGInfo-li"> Resource depletion</li>
+          </ul>
         </div>
-        <img className='ESGCategoryImg' src={socialImage} alt='Some people'/>
       </div>
 
       <div className="ESGCategory-container">
-        <img className='ESGCategoryImg' src={governanceImage} alt='Some people'/>
-        <div className="ESGCategory-Text">
-            <h1>Governance</h1>
-            <p>Governance
-                Governance in ESG covers how companies are directed and controlled—and how leaders are held accountable. Increased transparency into corporate governance is quickly becoming an expectation. Some example topics related to governance include:</p>
-              <ul>
-               <li className="ESGInfo-li"> Open configuration options</li>
-               <li className="ESGInfo-li">Executive compensation</li>
-               <li className="ESGInfo-li">Shareholder rights</li>
-               <li className="ESGInfo-li">Takeover defense</li>
-               <li className="ESGInfo-li">Staggered boards</li>
-               <li className="ESGInfo-li">Independent directors</li>
-               <li className="ESGInfo-li">Board elections</li>
-               <li className="ESGInfo-li"> Political contributions</li>
-              </ul>
+        <div className="ESGCategory-Text ESGCategory-Text-S">
+          <h1>Social</h1>
+          <p>The data disclosed in the social responsibility portion of ESG covers a wide range of topics from how companies are fostering people and culture to diversity statistics and community impact. Some examples of social topics are:</p>
+          <ul>
+            <li className="ESGInfo-li"> Discrimination </li>
+            <li className="ESGInfo-li"> Diversity </li>
+            <li className="ESGInfo-li"> Human rights </li>
+            <li className="ESGInfo-li"> Community relations </li>
+          </ul>
+        </div>
+        <img className='ESGCategoryImg' src={socialImage} alt='Some people' />
+      </div>
+
+      <div className="ESGCategory-container">
+        <img className='ESGCategoryImg' src={governanceImage} alt='Some people' />
+        <div className="ESGCategory-Text ESGCategory-Text-G">
+          <h1>Governance</h1>
+          <p>Governance
+            Governance in ESG covers how companies are directed and controlled—and how leaders are held accountable. Increased transparency into corporate governance is quickly becoming an expectation. Some example topics related to governance include:</p>
+          <ul>
+            <li className="ESGInfo-li"> Open configuration options</li>
+            <li className="ESGInfo-li">Executive compensation</li>
+            <li className="ESGInfo-li">Shareholder rights</li>
+            <li className="ESGInfo-li">Takeover defense</li>
+            <li className="ESGInfo-li">Staggered boards</li>
+            <li className="ESGInfo-li">Independent directors</li>
+            <li className="ESGInfo-li">Board elections</li>
+            <li className="ESGInfo-li"> Political contributions</li>
+          </ul>
         </div>
       </div>
 
@@ -89,10 +86,10 @@ const ESGInfo = () => {
 
       <h1>Want to check out more?</h1>
       <div className="ESGScore-externalLinks-container">
-        
+
         {/* each consits of {title, link} */}
         {links.map(l => (
-          <a href={l.link} target="_blank">
+          <a href={l.link} target="_blank" rel="noreferrer">
             <button className="ESGScore-ext-raise-button">
               {l.title}
             </button>

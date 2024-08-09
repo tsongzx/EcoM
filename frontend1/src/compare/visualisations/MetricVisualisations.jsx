@@ -1,4 +1,4 @@
-import {React, useEffect, useState} from 'react';
+import { React, useEffect, useState } from 'react';
 import {
   Stack,
   Box
@@ -8,14 +8,14 @@ import Skeleton from '@mui/material/Skeleton';
 import CircularLoader from '../../utils/CircularLoader.jsx';
 import VisualisationsTab from '../../visualisations/VisualisationsTab.jsx';
 
-const MetricVisualisations = ({companies, framework}) => {
-  
+const MetricVisualisations = ({ companies, framework }) => {
+
   const [graphValues, setGraphValues] = useState([]);
   const [metricInfo, setMetricInfo] = useState([]);
 
   const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const getMetricData = async() => {
+    const getMetricData = async () => {
       const metricsByCategory = await getAllMetricsAvailable();
       const allMetrics = [...metricsByCategory['E'], ...metricsByCategory['S'], ...metricsByCategory['G']]
       console.log(allMetrics);
@@ -39,7 +39,7 @@ const MetricVisualisations = ({companies, framework}) => {
     }
     getGraphValues();
     setLoading(false);
-  }, [companies]);
+  }, [companies, framework.id]);
 
   const isDataReady = () => {
     // Ensure both graphValues and indicatorInfo are objects and have data
@@ -69,7 +69,7 @@ const MetricVisualisations = ({companies, framework}) => {
           <Skeleton variant="rectangular" height="25vh" />
         </Stack>
       )}
-      {loading ? <CircularLoader/> : null}
+      {loading ? <CircularLoader /> : null}
     </Box>
   );
 

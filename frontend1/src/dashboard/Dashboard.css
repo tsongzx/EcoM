@@ -36,3 +36,8 @@ html, body {
     margin-top: 20px;
     font-family: 'Merriweather';
 } */
+
+.list-buttons {
+    border: 'solid 1px black';
+    border-radius: '10px';
+}

@@ -1,17 +1,16 @@
-import {React, useEffect, useState} from 'react';
-import { Grid, Paper, Typography, Card, CardContent, IconButton, Menu, MenuItem, Button, Container, Box, Stack } from '@mui/material';
+import { React, useEffect, useState } from 'react';
+import { Grid, Typography, Card, CardContent, IconButton, Menu, MenuItem, Box, Stack } from '@mui/material';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { fetchLists, getRecentlyViewed, fetchCompanyInfo, getFavouritesList, deleteList } from '../helper.js';
 import { useNavigate } from 'react-router-dom';
 import ListModal from './list/ListModal.jsx';
 
-const DashboardBody = ({page, setSelectedCompany}) => {
+const DashboardBody = ({ page, setSelectedCompany }) => {
   const navigate = useNavigate();
 
   const [lists, setLists] = useState([]);
   const [recents, setRecents] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedList, setSelectedList] = useState(null); 
+  const [selectedList, setSelectedList] = useState(null);
   const [isListModalOpen, setIsListModalOpen] = useState(false);
   const [favsList, setFavsList] = useState([]);
   const [recentCompanyNames, setRecentCompanyNames] = useState([]);
@@ -21,7 +20,6 @@ const DashboardBody = ({page, setSelectedCompany}) => {
   useEffect(() => {
     console.log(page);
     const fetchData = async () => {
-      setLoading(true);
       try {
         const userLists = await fetchLists();
         console.log(userLists);
@@ -41,13 +39,12 @@ const DashboardBody = ({page, setSelectedCompany}) => {
             return acc;
           }
         }, []);
-        
+
         setRecents(uniqueRecents);
 
       } catch (error) {
         console.error('Error fetching companies:', error);
       }
-      setLoading(false);
     };
 
     fetchData();
@@ -55,7 +52,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
 
   useEffect(() => {
     console.log(recents);
-    const setNames = async() => {
+    const setNames = async () => {
       const names = await getCompanyNames(recents);
       setRecentCompanyNames(names);
     }
@@ -64,7 +61,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
 
   useEffect(() => {
     console.log(favsList);
-    const setNames = async() => {
+    const setNames = async () => {
       const names = await getCompanyNames(favsList);
       setFavCompanyNames(names);
     }
@@ -72,8 +69,8 @@ const DashboardBody = ({page, setSelectedCompany}) => {
   }, [favsList]);
 
   const handleListClick = (list) => {
-    setSelectedList(list); 
-    setIsListModalOpen(true); 
+    setSelectedList(list);
+    setIsListModalOpen(true);
     console.log(list);
   };
 
@@ -99,7 +96,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
     setIsListModalOpen(false);
   };
 
-  const getCompanyNames = async(companies) => {
+  const getCompanyNames = async (companies) => {
     console.log(companies);
     let nameList = [];
     for (let company of Object.keys(companies)) {
@@ -116,13 +113,14 @@ const DashboardBody = ({page, setSelectedCompany}) => {
       console.log(companyId);
       const companyInfo = await fetchCompanyInfo(companyId);
       setSelectedCompany(companyInfo);
-      navigate(`/company/${encodeURIComponent(companyId)}`, 
-      { state: { 
-          companyId: companyId, 
-          companyName: companyInfo.company_name,
-          initialFramework: null
-        } 
-      });
+      navigate(`/company/${encodeURIComponent(companyId)}`,
+        {
+          state: {
+            companyId: companyId,
+            companyName: companyInfo.company_name,
+            initialFramework: null
+          }
+        });
     } catch (error) {
       console.error('Failed to open company', error);
     }
@@ -133,17 +131,17 @@ const DashboardBody = ({page, setSelectedCompany}) => {
       paddingBottom: '5%'
     }}>
       <Stack sx={{
-          width: '100vw',
-        }}
-          alignItems={'center'} 
-          spacing={2}>
+        width: '100vw',
+      }}
+        alignItems={'center'}
+        spacing={2}>
         <Typography sx={{
-           color: '#0D2149',
-           fontSize: '30px',
-           fontWeight: 'bold',
-           fontFamily: 'Merriweather',
-           textAlign: 'left',
-           width: '95vw'
+          color: '#0D2149',
+          fontSize: '30px',
+          fontWeight: 'bold',
+          fontFamily: 'Merriweather',
+          textAlign: 'left',
+          width: '95vw'
         }}>Recently Viewed</Typography>
         <Grid container spacing={2}
           sx={{
@@ -153,17 +151,27 @@ const DashboardBody = ({page, setSelectedCompany}) => {
           }}
         >
           {recents.map((recent, index) => (
-            <Grid 
+            <Grid
               style={{
                 cursor: 'pointer',
                 // width: '15%'
-              }} 
-              item xs={2} 
+              }}
+              item xs={2}
               key={recent.id}
               onClick={() => dashboardToCompany(recent.company_id)}
             >
-              <Card style={{ cursor: 'pointer', height: '120px'}}>
-                <CardContent>
+              <Card sx={{
+                cursor: 'pointer', height: '120px', border: 'solid 1px #cfcfcf', borderRadius: '10px',
+                '&:hover': {
+                  border: 'solid 2px #3373b0',
+                },
+              }}>
+                <CardContent sx={{
+                  padding: '16px',
+                  '&:hover': {
+                    padding: '15px',
+                  },
+                }}>
                   <Typography variant="h6">{recentCompanyNames[index]}</Typography>
                 </CardContent>
               </Card>
@@ -173,17 +181,17 @@ const DashboardBody = ({page, setSelectedCompany}) => {
       </Stack>
 
       <Stack sx={{
-          width: '100vw'
-        }}
-          alignItems={'center'} 
-          spacing={2}>
+        width: '100vw'
+      }}
+        alignItems={'center'}
+        spacing={2}>
         <Typography sx={{
-           color: '#0D2149',
-           fontSize: '30px',
-           fontWeight: 'bold',
-           fontFamily: 'Merriweather',
-           textAlign: 'left',
-           width: '95vw'
+          color: '#0D2149',
+          fontSize: '30px',
+          fontWeight: 'bold',
+          fontFamily: 'Merriweather',
+          textAlign: 'left',
+          width: '95vw'
         }}>Favourites: {favsList.length}</Typography>
         <Grid container spacing={2}
           sx={{
@@ -193,14 +201,24 @@ const DashboardBody = ({page, setSelectedCompany}) => {
           }}
         >
           {favsList.map((f, index) => (
-            <Grid 
-              style={{ cursor: 'pointer' }} 
-              item xs={2} 
+            <Grid
+              style={{ cursor: 'pointer' }}
+              item xs={2}
               key={f.company_id}
               onClick={() => dashboardToCompany(f.company_id)}
             >
-              <Card sx={{height: '120px'}}>
-                <CardContent>
+              <Card sx={{
+                cursor: 'pointer', height: '120px', border: 'solid 1px #cfcfcf', borderRadius: '10px',
+                '&:hover': {
+                  border: 'solid 2px #3373b0',
+                },
+              }}>
+                <CardContent sx={{
+                  padding: '16px',
+                  '&:hover': {
+                    padding: '15px',
+                  },
+                }}>
                   <Typography variant="h6">{favCompanyNames[index]}</Typography>
                 </CardContent>
               </Card>
@@ -216,7 +234,7 @@ const DashboardBody = ({page, setSelectedCompany}) => {
             width: '100vw',
             // marginLeft: 0,
           }}
-        >        
+        >
           <Typography sx={{
             color: '#0D2149',
             fontSize: '30px',
@@ -226,9 +244,20 @@ const DashboardBody = ({page, setSelectedCompany}) => {
             width: '95vw'
           }}>My Lists</Typography>
           {Array.isArray(lists) && lists.map((list) => (
-            <Box key={list.id} sx={{ cursor: 'pointer', overflowX:'auto', overflowY: 'hidden', width: '95%' }}>
+            <Box key={list.id} sx={{
+              cursor: 'pointer', overflowX: 'auto', overflowY: 'hidden', width: '95%', border: 'solid 1px #cfcfcf', borderRadius: '10px',
+              '&:hover': {
+                border: 'solid 2px #3373b0',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', // Add a shadow effect on hover
+              },
+            }}>
               <Card>
-                <CardContent style={{ position: 'relative' }}>
+                <CardContent style={{
+                  position: 'relative', padding: '16px',
+                  '&:hover': {
+                    padding: '15px',
+                  },
+                }}>
                   <div onClick={() => handleListClick(list)}>
                     <Typography variant="h6">{list.list_name}</Typography>
                   </div>
@@ -252,9 +281,9 @@ const DashboardBody = ({page, setSelectedCompany}) => {
           ))}
         </Stack>
       </Stack>
-      {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany}/>}
+      {isListModalOpen && <ListModal isOpen={isListModalOpen} onClose={handleCloseListModal} list={selectedList} setSelectedCompany={setSelectedCompany} />}
     </Stack>
-    
+
   );
 }
 

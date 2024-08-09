@@ -3,5 +3,8 @@
     "@mui/icons-material": "^5.15.20",
     "lodash": "^4.17.21",
     "openai": "^4.53.2"
+  },
+  "devDependencies": {
+    "cypress": "^13.13.2"
   }
 }
