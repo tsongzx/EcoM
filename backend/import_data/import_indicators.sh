@@ -25,16 +25,3 @@ mysql --local-infile=1 -t -h $host -u $username --password=$password -t $db << E
 EOF
   echo $f 'ran'
 done
-
-# Extract and display the summary from the output
-# grep -E 'Query OK|Records|Deleted|Skipped|Warnings' $MYSQL_OUTPUT
-
-# LOAD DATA LOCAL INFILE 'C:/Users/byunt/OneDrive - UNSW/Documents/UNSW/2024/T2/COMP3900/ESG Data/esg_raw_data_on_corporations_myu_5122_perm_id_20240326_1966_chunk_7.csv'
-#   INTO TABLE Indicators 
-#   FIELDS TERMINATED BY '|' 
-#     ENCLOSED BY '"'
-#   LINES TERMINATED BY '\n'
-#   IGNORE 1 ROWS 
-#   (@dummy, @dummy, data_type, @dummy, description, name, unit, @dummy, @dummy, @dummy, @dummy, @dummy, @dummy, pillar, @dummy);
-# SHOW WARNINGS;
-# UPDATE Indicators set source = "ClarityAI";
