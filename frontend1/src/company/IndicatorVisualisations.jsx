@@ -70,7 +70,7 @@ const IndicatorVisualisations = ({companyIndicators, companyName}) => {
   return (
     <>
       { isDataReady() ?
-      (<VisualisationsTab info={indicatorInfo} graphValues={graphValues} categories={[companyName]} filterColumn={'pillar'} displayInfoCard={true}></VisualisationsTab>) : (<Box>...loading</Box>)}
+      (<VisualisationsTab info={indicatorInfo} graphValues={graphValues} categories={[companyName]} filterColumn={'pillar'} metricInfoCard={false}></VisualisationsTab>) : (<Box>...loading</Box>)}
     </>
   );
 }

@@ -39,19 +39,19 @@ const FrameworkAverageVisualisation = ({ companyName, view }) => {
   }
 
   const gradientColors = [
-    ['#6a0dad', '#e9d1f2'],  
-    ['#8a2be2', '#d1b3e2'],  
-    ['#9370db', '#d9c6e2'],  
-    ['#d8bfd8', '#f5d6f5'],  
-    ['#dda0dd', '#f4c6f4'],  
-    ['#ab47bc', '#e1bee7'],  
-    ['#9c27b0', '#f48fb1']   
+    ['#FF5733', '#FFBD33'],  
+    ['#33FF57', '#33FFBD'],  
+    ['#3357FF', '#5733FF'],  
+    ['#FF33A6', '#FF33FF'],  
+    ['#FFD700', '#FF5733'],  
+    ['#00CED1', '#4682B4'],  
+    ['#8B4513', '#D2691E']   
   ];
 
   return (
     <>
       {graphValues.length > 0 && categories.length > 0 ? (
-        <ResponsiveContainer width="100%" height={400}>
+        <ResponsiveContainer width="100%" height={380}>
           <AreaChart data={graphValues}>
             <defs>
               {categories.map((category, index) => {
@@ -84,7 +84,7 @@ const FrameworkAverageVisualisation = ({ companyName, view }) => {
                   stroke={gradientColors[index % gradientColors.length][0]} 
                   // fill={`url(#gradient-${category})`}
                   fill="url(#gradient)"
-                  stackId="1"
+                  // stackId="1"
                 />
               );
             })}

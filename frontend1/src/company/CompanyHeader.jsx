@@ -92,7 +92,7 @@ const CompanyHeader = ({setWatchlistModalOpen, setOpenReportModal, companyId, is
         <Typography align="center">Current Price</Typography>
       </Stack> */}
       <Stack alignItems="center" justifyContent="center">
-        {esgScore && <Typography align="center"><NumericLabel>{esgScore}</NumericLabel></Typography>}
+        {esgScore && <Typography align="center"><NumericLabel>{esgScore}</NumericLabel> / 100</Typography>}
         <Typography align="center">ESG Score</Typography>
       </Stack>
       <Button onClick={handleClickReport}>Save Report</Button>

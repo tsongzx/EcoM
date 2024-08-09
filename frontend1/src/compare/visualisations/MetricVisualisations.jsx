@@ -59,7 +59,7 @@ const MetricVisualisations = ({companies, framework}) => {
           info={metricInfo}
           categories={companies}
           filterColumn={'category'}
-          displayInfoCard={false}
+          metricInfoCard={true}
         />
       ) : (
         <Stack spacing={1}>

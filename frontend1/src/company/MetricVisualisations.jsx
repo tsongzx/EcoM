@@ -88,7 +88,7 @@ const MetricVisualisations = ({selectedFramework, selectedMetrics, graphStateCha
           info={metricInfo}
           categories={[companyName]}
           filterColumn={'category'}
-          displayInfoCard={false}
+          metricInfoCard={true}
         />
       ) : (
         <Stack spacing={1}>

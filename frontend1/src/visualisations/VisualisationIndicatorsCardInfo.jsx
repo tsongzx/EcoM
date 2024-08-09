@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Stack, Typography, Box, Paper } from '@mui/material';
 
-const VisualisationCardInfo = ({info}) => {
+const VisualisationIndicatorsCardInfo = ({info}) => {
   console.log("displaying info card");
   return (
     info ? (
@@ -36,4 +36,4 @@ const VisualisationCardInfo = ({info}) => {
   );
 }
 
-export default VisualisationCardInfo;
+export default VisualisationIndicatorsCardInfo;
