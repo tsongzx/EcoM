@@ -6,8 +6,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Union
 from config import Config
 from user import valid_userId, get_user_using_email
+import os
+from dotenv import load_dotenv
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+load_dotenv()
+secret_key = os.getenv("SECRET_KEY")
 
 async def is_authenticated(db, token: str) -> user_schemas.TokenData:
     credentials_exception = HTTPException(
@@ -15,8 +19,18 @@ async def is_authenticated(db, token: str) -> user_schemas.TokenData:
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    """_summary_: authenticates the user, if authenticated, returns token data
+
+    Raises:
+        credentials_exception: _description_
+        HTTPException: _description_
+        credentials_exception: _description_
+
+    Returns:
+        _type_: user_schemas.TokenData
+    """    
     try:
-        payload = jwt.decode(token, Config.SECRET_KEY, algorithms=[Config.ALGORITHM])
+        payload = jwt.decode(token, secret_key, algorithms=[Config.ALGORITHM])
         userId: str = payload.get("userId")
         if userId is None or not await valid_userId(db, userId):
             raise credentials_exception
@@ -49,7 +63,7 @@ def generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=15)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, Config.SECRET_KEY, algorithm=Config.ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=Config.ALGORITHM)
     return encoded_jwt
   
 def verify_password(plain_password, hashed_password):
