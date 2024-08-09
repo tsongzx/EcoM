@@ -43,7 +43,7 @@ import requests
 from .liveData import (
   getCompanyESG,
   getCompanyHist,
-  getCompanyESG
+  getCompanyInfo
 )
 from .metrics import calculate_metric
 import asyncio
