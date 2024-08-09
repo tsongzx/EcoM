@@ -16,3 +16,6 @@ Run ```docker-compose up --build``` to build and run this project
 
 ### Step 4
 Go to ```http://localhost:3000``` to see our project
+
+## Backend Tests
+To run backend tests enter the backend folder within the terminal and run ```python -m pytest tests/```
