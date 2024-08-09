@@ -375,7 +375,7 @@ const Company = () => {
         }}>
           <ListModal isOpen={watchlistModalOpen} handleClose={handleCloseWatchList} companyId={companyId} />
           {/* Top center half of the screen */}
-          <CompanyHeader
+          {companyName && <CompanyHeader
             setWatchlistModalOpen={setWatchlistModalOpen}
             companyId={companyId}
             isInFavs={isInFavs}
@@ -393,7 +393,7 @@ const Company = () => {
             allIndicatorsInfo={allIndicatorsInfo}
             graphStateChange={graphStateChange}
             ticker={ticker}
-          />
+          />}
           <CompanyBody
             companyId={companyId} companyName={companyName} ticker={ticker}
           />
