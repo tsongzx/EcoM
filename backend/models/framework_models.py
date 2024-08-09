@@ -3,9 +3,8 @@ from sqlalchemy import String, DateTime, Enum
 from db import Base
 import datetime
 from datetime import timezone
-from typing import Literal, get_args
-
-Category = Literal["E", "S", "G"]
+from typing import get_args
+from config import Config
 
 class Frameworks(Base):
     __tablename__ = 'Frameworks'
@@ -25,8 +24,8 @@ class OfficialFrameworkMetrics(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-    category: Mapped[Category] = mapped_column(Enum(
-      *get_args(Category),
+    category: Mapped[Config.Category] = mapped_column(Enum(
+      *get_args(Config.Category),
       name="category",
       create_constraint=True,
       validate_strings=True,
@@ -39,8 +38,8 @@ class CustomMetrics(Base):
     
     id: Mapped[int]= mapped_column(primary_key=True, unique=True, nullable=False)
     framework_id: Mapped[int] = mapped_column(primary_key=False, unique=False, nullable=False)
-    category: Mapped[Category] = mapped_column(Enum(
-      *get_args(Category),
+    category: Mapped[Config.Category] = mapped_column(Enum(
+      *get_args(Config.Category),
       name="category",
       create_constraint=True,
       validate_strings=True,

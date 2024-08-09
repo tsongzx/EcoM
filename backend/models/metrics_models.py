@@ -1,13 +1,11 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, DateTime, Enum
+from sqlalchemy import String, Enum
 from db import Base
-import datetime
-from datetime import timezone
 from typing import Literal, get_args
 Data_Type = Literal["float", "int"]
 Pillar = Literal["E", "S", "G"]
 Category = Literal["E", "S", "G"]
-      #to do - change primary key from id to name - maybe dont need
+
 class Indicators(Base):
     __tablename__ = 'Indicators'
  
@@ -34,7 +32,6 @@ class Metrics(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)
-    # description: Mapped[str] = mapped_column(String(1000))
     category: Mapped[Category] = mapped_column(Enum(
       *get_args(Category),
       name="category",

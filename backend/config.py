@@ -9,6 +9,7 @@ class Config(object):
 
     Disclosure = Literal["CALCULATED", "ADJUSTED", "ESTIMATED", "REPORTED", "IMPUTED"]
     Category = Literal["E", "S", "G"]
+    Data_Type = Literal["float", "int"]
 
     chat_prompts = [
       {"role": "system", 
