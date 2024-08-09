@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import VisualisationsPanel from './VisualisationsPanel';
 import { Tabs, Tab, Box } from '@mui/material';
 
-const VisualisationsTab = ({ graphValues, info, categories, filterColumn, displayInfoCard }) => {
+const VisualisationsTab = ({ graphValues, info, categories, filterColumn, metricInfoCard }) => {
   const [filter, setFilter] = useState("E");
 
   console.log('INSIDE REPORT VISUALISATION TAB ________---_-_-_--_---');
@@ -38,7 +38,7 @@ const VisualisationsTab = ({ graphValues, info, categories, filterColumn, displa
           filter={filter}
           categories={categories}
           filterColumn={filterColumn}
-          displayInfoCard={displayInfoCard}
+          metricInfoCard={metricInfoCard}
         />
       </Box>
   );

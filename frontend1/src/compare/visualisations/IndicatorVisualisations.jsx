@@ -67,7 +67,7 @@ const IndicatorVisualisation = ({companies}) => {
     <Box>
       { isDataReady() ?
         (<VisualisationsTab info={indicatorInfo} graphValues={graphValues}
-          categories={companies} filterColumn={'pillar'} displayInfoCard={true}
+          categories={companies} filterColumn={'pillar'} metricInfoCard={false}
         ></VisualisationsTab>) : (
           <Stack spacing={1}>
             <Skeleton variant="rectangular" height="5vh" />

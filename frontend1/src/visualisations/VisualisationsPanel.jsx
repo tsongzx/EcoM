@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import BarChartStyled from './BarChartStyled';
 import { Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import VisualisationCardInfo from './VisualisationCardInfo';
+import VisualisationIndicatorsCardInfo from './VisualisationIndicatorsCardInfo';
+import VisualisationMetricsCardInfo from './VisualisationMetricsCardInfo';
 
-const VisualisationsPanel = ({filter, graphValues, info, categories, filterColumn, displayInfoCard}) => {
+const VisualisationsPanel = ({filter, graphValues, info, categories, filterColumn, metricInfoCard}) => {
   return (
     <>
       {/* {graphValues ? <BarChartStyled data={graphValues['HUMAN_RIGHTS_VIOLATION_PAI']}/> : <p>Loading...</p>} */}
@@ -20,7 +21,8 @@ const VisualisationsPanel = ({filter, graphValues, info, categories, filterColum
               </AccordionSummary>
               <AccordionDetails>
                 <Stack direction="row">
-                  {displayInfoCard && <VisualisationCardInfo info={info[graph]}></VisualisationCardInfo>}
+                  {!metricInfoCard && <VisualisationIndicatorsCardInfo info={info[graph]}></VisualisationIndicatorsCardInfo>}
+                  {metricInfoCard && <VisualisationMetricsCardInfo info={info[graph]}></VisualisationMetricsCardInfo>}
                   <BarChartStyled data={graphValues[graph]} title={info[graph].name} unit={info[graph].unit ? info[graph].unit : "Metric Score"} categories={categories}/>
                 </Stack>
               </AccordionDetails>

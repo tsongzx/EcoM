@@ -8,6 +8,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { getMetricScoreByYear, putFrameworkModifyMetrics } from '../helper';
+import NumericLabel from 'react-pretty-numbers';
 
 // This component displays everything associated to the category, metric and indicator weightings, as well as the
 // modals associated if the user chooses to change them. 
@@ -834,7 +835,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '0'}}>
                   <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Environmental</h3>
                   {eScore !== null && (
-                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${eScore}`}</h6>
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>
+                      Score: <NumericLabel>{eScore}</NumericLabel> / 100
+                    </h6>                  
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
@@ -859,8 +862,10 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px'}}>
                   <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Social</h3>
-                  {sScore !== null && (
-                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${sScore}`}</h6>
+                  {sScore !== null && (                  
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>
+                      Score: <NumericLabel>{sScore}</NumericLabel> / 100
+                    </h6>  
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
@@ -886,7 +891,9 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', marginTop: '20px'}}>
                   <h3 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>Governance</h3>
                   {gScore !== null && (
-                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>{`Score: ${gScore}`}</h6>
+                    <h6 style={{ fontSize: '25px', fontFamily: 'Roboto', margin: '0', lineHeight: '1.2' }}>
+                      Score: <NumericLabel>{gScore}</NumericLabel> / 100
+                    </h6>  
                   )}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end'}}>
@@ -908,7 +915,14 @@ const MetricIndicatorsCard = ({selectedIndicators, selectedMetrics, metricNames,
               {`${errorG}` && <div style={{ color: 'red', marginTop: '10px', display: 'flex', justifyContent: 'center' }}>{errorG}</div>}
             </div>
             {frameworkScore !== null && (
-              <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>{`Overall Framework Score: ${isNaN(frameworkScore) ? '' : frameworkScore}`}</h6>
+              <h6 style={{ fontSize: '25px', fontFamily: 'Roboto' }}>
+                {`Overall Framework Score: `}
+                {!isNaN(frameworkScore) && (
+                  <>
+                    <NumericLabel>{frameworkScore}</NumericLabel> / 100
+                  </>
+                )}
+              </h6>            
             )}
           </div>
 

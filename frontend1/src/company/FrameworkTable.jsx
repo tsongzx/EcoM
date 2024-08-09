@@ -135,7 +135,7 @@ const FrameworkTable = ({indicatorsCompany, selectedYear, setSelectedYear,
                     {selectedYear !== 'Predicted' && (
                       <>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>Metric</TableCell>
-                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Score</TableCell>
+                        <TableCell style={{ borderRight: '1px solid #ddd' }}>Score (/100)</TableCell>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Name</TableCell>
                         <TableCell style={{ borderRight: '1px solid #ddd' }}>Indicator Unit</TableCell>
                         <TableCell style={{ borderBottom: '1px solid #ddd' }}>Value</TableCell>
