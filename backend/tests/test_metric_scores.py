@@ -1,6 +1,6 @@
 import unittest
 import metrics
-import models.company_models as company_models
+from src.models import company_models
 class TestMetricCalculations(unittest.TestCase):
     def test_100(self):
         year_indicators = {
