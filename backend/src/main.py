@@ -45,7 +45,7 @@ from .liveData import (
   getCompanyHist,
   getCompanyInfo
 )
-from .metrics import calculate_metric
+from .metrics import calculate_metric as metrics_calculate_metric
 import asyncio
 from collections import defaultdict
 from .articles import access_articles
@@ -1168,7 +1168,7 @@ async def calculate_metric(
 
     weights = {
         indicator.indicator_name: indicator.weighting for indicator in indicators}
-    return calculate_metric(year_indicators, weights)
+    return metrics_calculate_metric(year_indicators, weights)
 
 
 # ***************************************************************
@@ -1622,7 +1622,7 @@ async def calculate_metric_company_view(
     Returns:
         _type_: _description_
     """
-    return calculate_metric(company_indicators, indicators)
+    return metrics_calculate_metric(company_indicators, indicators)
 
 # ***************************************************************
 #                        Headquarter country Apis
