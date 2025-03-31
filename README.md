@@ -1,5 +1,5 @@
-# Capstone Project by 3900h18bcrumpeteers
-## COMP3900 - Computer Science Project 38
+# EcoM Metrics Management Platform
+
 Made by Maria Li, Claire Yu, Tina Song, Gavin Li, David Song
 
 EcoM is a comprehensive platform which aims to assist corporations, investors and the general public on ESG metrics management, reporting and understanding ESG-related information. The platform offers the option to create customised frameworks, provides insight into industry standards, report generation, visualisations and access to real time financial and ESG data. Our solution is designed to address the needs of corporations, investors, government officials and the general public, offering an intuitive user experience with useful functionalities that consider a wide array of data to help customers navigate the ESG investing landscape.
